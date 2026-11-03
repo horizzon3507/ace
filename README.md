@@ -1,6 +1,6 @@
 # Ace
 
-Bot do Fluxer chamado Ace. Comandos usam o prefixo `a.`, lido de `PREFIX` no `.env`.
+Bot do Fluxer chamado Ace. Comandos usam o prefixo `a.`, lido de `PREFIX` no `.env`. Cada servidor pode trocar o dele com `a.setprefix`.
 
 ## Subir
 
@@ -20,7 +20,7 @@ npm run typecheck
 npm run dev
 ```
 
-`npm run dev` sobe a CLI do Ace. Ao salvar, ela recarrega os comandos e, dentro de `src/`, a menção, o prefixo, a marca, o cargo de entrada e o kick/ban, além do `PREFIX` do `.env`. `yuzuha.config.ts`, a própria CLI, os demais arquivos de `src/` (inclui `emoji.ts`) e o token pedem reinício. Um listener novo no `setup` só existe depois desse reinício. `npm start` sobe sem recarga. Os dois leem o `.env` antes da config. `npm run check` não lê o `.env`. Sem `PREFIX` no ambiente, o prefixo fica `a.`.
+`npm run dev` sobe a CLI do Ace. Ao salvar, ela recarrega os comandos e, dentro de `src/`, a menção, o prefixo, a marca, o cargo de entrada e o kick/ban, além do `PREFIX` do `.env`. `yuzuha.config.ts`, a própria CLI, os demais arquivos de `src/` (inclui `emoji.ts`) e o token pedem reinício. Um listener novo no `setup` só existe depois desse reinício. `npm start` sobe sem recarga. Os dois leem o `.env` antes da config. `npm run check` não lê o `.env`. Sem `PREFIX` no ambiente, o prefixo fica `a.` — é o padrão global; `a.setprefix` sobrepõe por servidor.
 
 ## Comandos
 
@@ -34,8 +34,9 @@ npm run dev
 | `a.guildbanner` | Exibe o banner do servidor atual. |
 | `a.kick` | Expulsa um membro do servidor. |
 | `a.ban` | Bane um membro do servidor. |
+| `a.setprefix` | Troca o prefixo do Ace no servidor. `reset` volta ao padrão. |
 
-`a.kick`, `a.ban`, `a.guildavatar` e `a.guildbanner` só rodam dentro de um servidor.
+`a.kick`, `a.ban`, `a.guildavatar`, `a.guildbanner` e `a.setprefix` só rodam dentro de um servidor. `a.setprefix` exige a permissão Gerenciar Servidor.
 
 O token fica só no `.env`. Casos e variáveis vão para o diretório de dados do Yuzuha, sob o nome `ace`.
 
