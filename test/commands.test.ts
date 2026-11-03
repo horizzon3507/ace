@@ -78,7 +78,7 @@ test('ajuda lista os comandos por categoria em grade', async (t) => {
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.title, '<:commandline:1567301268425146368> Confira meus comandos');
   assert.equal(embed?.description, 'Heey! Estes são os meus comandos. Não é uma lista infinita, é **uma lista útil**.');
-  assert.equal(embed?.footer?.text, 'Prefixo a. • Ace');
+  assert.equal(embed?.footer, undefined);
   const fields = embed?.fields ?? [];
   for (const command of fixture.bot.listCommands().filter((item) => !item.hidden)) {
     const field = fields.find((item) => item.name.endsWith(` \`a.${command.name}\``));
