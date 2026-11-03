@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fixAnimatedAssetUrl } from '../src/cdn.js';
+import { fixAnimatedAssetUrl, fullAssetSize } from '../src/cdn.js';
 
 test('assets animados trocam a extensão para gif', () => {
   assert.equal(
@@ -28,4 +28,19 @@ test('assets estáticos e vazios passam intactos', () => {
   );
   assert.equal(fixAnimatedAssetUrl(null), null);
   assert.equal(fixAnimatedAssetUrl(undefined), null);
+});
+
+test('fullAssetSize força a resolução máxima', () => {
+  assert.equal(
+    fullAssetSize('https://cdn.fluxer.app/avatars/1/x.png'),
+    'https://cdn.fluxer.app/avatars/1/x.png?size=4096',
+  );
+  assert.equal(
+    fullAssetSize('https://cdn.fluxer.app/avatars/1/x.png?size=128'),
+    'https://cdn.fluxer.app/avatars/1/x.png?size=4096',
+  );
+  assert.equal(
+    fullAssetSize('https://cdn.fluxer.app/avatars/1/x.gif?animated=true'),
+    'https://cdn.fluxer.app/avatars/1/x.gif?animated=true&size=4096',
+  );
 });

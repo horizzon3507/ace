@@ -1,3 +1,11 @@
+/** Sem `?size` o CDN devolve a miniatura. Força a resolução máxima do asset. */
+export function fullAssetSize(url: string): string {
+  const q = url.indexOf('?');
+  const params = new URLSearchParams(q < 0 ? '' : url.slice(q + 1));
+  params.set('size', '4096');
+  return `${q < 0 ? url : url.slice(0, q)}?${params}`;
+}
+
 /**
  * Corrige URLs de assets animados (hash `a_`) trocando a extensão para `.gif`.
  * O bug é só nos assets de servidor: o SDK monta ícone/banner de guilda sempre
