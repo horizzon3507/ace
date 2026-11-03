@@ -25,7 +25,7 @@ export default defineCommand({
       return;
     }
     if (next.length > 10) {
-      await ctx.reply(`${emoji.unhappy} Prefixo muito longo. Use até 10 caracteres sem espaços.`);
+      await ctx.reply(`${emoji.unhappy} Este prefixo é **muito longo**! Use até **10 caracteres**, sem espaços.`);
       return;
     }
     await ctx.data.guild.set('prefix', next);
