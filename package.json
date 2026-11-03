@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "description": "Bot do Fluxer com Yuzuha — prefixo a., comandos de utilidade e moderação.",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.21.0"
   },
   "scripts": {
     "start": "tsx src/cli.ts start",
@@ -14,7 +15,7 @@
     "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
-    "yuzuha": "^0.1.7"
+    "yuzuha": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",
