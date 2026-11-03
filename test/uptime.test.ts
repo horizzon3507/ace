@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot } from 'yuzuha/testing';
-import uptime, { formatUptime } from '../commands/uptime.js';
+import uptime, { formatBootStamp, formatUptime } from '../commands/uptime.js';
 
 test('formatUptime junta com vírgula e e com plural correto', () => {
   assert.equal(formatUptime(2 * 86400 + 3 * 3600 + 14 * 60), '**2 dias**, **3 horas** e **14 minutos**');
@@ -14,11 +14,16 @@ test('formatUptime junta com vírgula e e com plural correto', () => {
   assert.equal(formatUptime(3661.9), '**1 hora**, **1 minuto** e **1 segundo**');
 });
 
+test('formatBootStamp usa dia/mês e hora:minuto com dois dígitos', () => {
+  assert.equal(formatBootStamp(new Date(2026, 10, 1, 14, 32)), '**01/11 **às **14:32**');
+  assert.equal(formatBootStamp(new Date(2026, 0, 9, 8, 5)), '**09/01 **às **08:05**');
+});
+
 test('uptime responde há quanto tempo está acordado', async (t) => {
   const fixture = createTestBot({ prefix: 'a.', commands: [uptime] });
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.uptime'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /^<:timefill:1567289278214438912> Estou acordado e na escuta há \*\*.+\*\*!$/);
+  assert.match(content, /^<:timefill:1567289278214438912> Eu estou acordado e na escuta há \*\*.+\*\* \(desde \*\*\d{2}\/\d{2} \*\*às \*\*\d{2}:\d{2}\*\*\)!$/);
 });

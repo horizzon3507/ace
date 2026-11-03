@@ -1,6 +1,12 @@
 import { defineCommand } from 'yuzuha';
 import { emoji } from '../src/emoji.js';
 
+const two = (n: number) => String(n).padStart(2, '0');
+
+export function formatBootStamp(date: Date): string {
+  return `**${two(date.getDate())}/${two(date.getMonth() + 1)} **às **${two(date.getHours())}:${two(date.getMinutes())}**`;
+}
+
 export function formatUptime(totalSeconds: number): string {
   const seconds = Math.max(0, Math.floor(totalSeconds));
   const parts = ([
@@ -23,6 +29,8 @@ export default defineCommand({
   aliases: ['up', 'awake', 'tempo', 'acordado', 'online'],
   cooldown: '3s',
   async run(ctx) {
-    await ctx.reply(`${emoji.time} Estou acordado e na escuta há ${formatUptime(process.uptime())}!`);
+    const up = process.uptime();
+    const bootedAt = new Date(Date.now() - up * 1000);
+    await ctx.reply(`${emoji.time} Eu estou acordado e na escuta há ${formatUptime(up)} (desde ${formatBootStamp(bootedAt)})!`);
   },
 });
