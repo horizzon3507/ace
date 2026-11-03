@@ -1,5 +1,6 @@
 import { defineCommand, embed } from 'yuzuha';
 import { emoji } from '../src/emoji.js';
+import { guildPrefix } from '../src/guild-prefix.js';
 import { brand, prefix } from '../src/live.js';
 
 export default defineCommand({
@@ -11,9 +12,10 @@ export default defineCommand({
   ],
   cooldown: '3s',
   async run(ctx) {
+    const p = await guildPrefix(ctx.guildID) ?? prefix();
     const lines = ctx.help().split('\n').filter(Boolean).map(l => {
       const i = l.indexOf(':');
-      return i < 0 ? `\`${prefix()}${l}\`` : `\`${prefix()}${l.slice(0, i)}\` — ${l.slice(i + 1).trim()}`;
+      return i < 0 ? `\`${p}${l}\`` : `\`${p}${l.slice(0, i)}\` — ${l.slice(i + 1).trim()}`;
     });
     await ctx.reply({
       embeds: [embed({
