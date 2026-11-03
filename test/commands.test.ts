@@ -76,7 +76,7 @@ test('ajuda lista os comandos por categoria em grade', async (t) => {
 
   assert.equal(await fixture.send('a.ajuda'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(embed?.title, '<:commandline:1567301268425146368> Confira meus comandos');
+  assert.equal(embed?.title, '<:commandline:1567301268425146368> Confira **meus comandos**');
   assert.equal(embed?.description, 'Heey! Estes são os meus comandos. Não é uma lista infinita, é **uma lista útil**.');
   assert.equal(embed?.footer, undefined);
   const fields = embed?.fields ?? [];
