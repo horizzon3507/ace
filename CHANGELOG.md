@@ -35,7 +35,7 @@ Primeiro corte em desenvolvimento do bot do Fluxer — em construção, ainda n�
 
 - CLI `ace` com banner em pt-BR, cores conforme TTY (`NO_COLOR`/`FORCE_COLOR`) e reload ao vivo de comandos, menção, prefixo, marca, cargo de entrada e moderação; demais mudanças e o token pedem reinício.
 - Prefixo por servidor com `a.setprefix` (exige Gerenciar Servidor), persistido no diretório de dados do Yuzuha com cache em memória; `PREFIX` no `.env` segue o padrão global.
-- Comandos de utilidade `a.ajuda` (embed), `a.ping` (qualificação da conexão) e `a.avatar`, `a.userbanner`, `a.guildicon`, `a.guildbanner` em resolução máxima do CDN.
+- Comandos de utilidade `a.ajuda` (embed), `a.ping` (qualificação da conexão), `a.uptime` (duração em dias/horas/minutos) e `a.avatar`, `a.userbanner`, `a.guildicon`, `a.guildbanner` em resolução máxima do CDN.
 - Moderação `a.kick` e `a.ban` com alvo por menção, ID ou nome (busca com fallback), motivo, hierarquia e casos numerados.
 - Menção com apresentação e link de convite, aviso de comando desconhecido e cargo automático de entrada.
 - Licença AGPL-3.0.
