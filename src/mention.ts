@@ -1,7 +1,9 @@
+import { emoji } from './emoji.js';
+
 const invite = 'https://web.fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120';
 
 export function mentionMessage(commandPrefix: string): string {
-  return `<:emotionhappyfill:1566571242956263425> Heey! Me chamo **Ace**. Sou uma aplicação **multifuncional** para o Fluxer. Saiba mais usando \`${commandPrefix}ajuda\` e [me adicione](${invite}) em seu servidor!`;
+  return `${emoji.happy} Sou o **Ace**, bot multifuncional do Fluxer.\n-# ╰ \`${commandPrefix}ajuda\` lista os comandos · [me adicione](${invite})`;
 }
 
 export function unknownCommandMessage(content: string, commandPrefix: string, names: readonly string[]): string | undefined {
@@ -10,7 +12,7 @@ export function unknownCommandMessage(content: string, commandPrefix: string, na
   if (!name) return;
   const known = new Set(names.map((item) => item.toLowerCase()));
   if (known.has(name)) return;
-  return `<:emotionunhappyfill:1566571242956263424> Infelizmente, eu **não consegui encontrar nenhum comando** com este nome.\n-# ╰ Psst, você pode usar \`${commandPrefix}ajuda\` para ver meus comandos!`;
+  return `${emoji.unhappy} Infelizmente, eu **não consegui encontrar nenhum comando** com este nome.\n-# ╰ Psst, você pode usar \`${commandPrefix}ajuda\` para ver meus comandos!`;
 }
 
 export function isBareMention(content: string, selfId: string, mentioned: boolean): boolean {
