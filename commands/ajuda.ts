@@ -50,8 +50,8 @@ export default defineCommand({
     await ctx.reply({
       embeds: [embed({
         color: brand.primary,
-        title: `${emoji.commandline} Confira **meus comandos**`,
-        description: 'Heey! Estes são os meus comandos. Não é uma lista infinita, é **uma lista útil**.',
+        title: `${emoji.commandline} Confira meus comandos`,
+        description: 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**.',
         fields,
       })],
     });
