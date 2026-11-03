@@ -4,6 +4,7 @@ import type { CommandContext } from 'yuzuha';
 export type AceContext = {
   readonly message: CommandContext['message'];
   readonly tokens: readonly string[];
+  readonly transport: CommandContext['transport'];
   readonly authorID: string;
   readonly input: string;
   readonly resources: CommandContext['resources'];

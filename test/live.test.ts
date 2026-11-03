@@ -91,6 +91,8 @@ test('bindModeration usa o resolve injetado, não o módulo em cache', async () 
   });
   await run({
     tokens: ['alguem'],
+    authorID: 'autor',
+    transport: { botID: 'bot' },
     message: { mentions: [] },
     requireGuild: () => 'guild',
     reply: async (text: string) => {

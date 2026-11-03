@@ -1,4 +1,4 @@
-import { YuzuhaError } from 'yuzuha';
+import { GuardError, YuzuhaError } from 'yuzuha';
 import type { AceContext } from './context.js';
 import { emoji as bundledEmoji } from './emoji.js';
 import { moderationReason as bundledReason, resolveTarget as bundledResolve } from './resolve.js';
@@ -12,9 +12,17 @@ export type ModerationDeps = {
 };
 
 const copy = {
-  kick: { past: 'expulso', fail: 'expulsar', mark: 'kick' },
-  ban: { past: 'banido', fail: 'banir', mark: 'ban' },
+  kick: { past: 'expulso', fail: 'expulsar', mark: 'kick', perm: 'Expulsar membros' },
+  ban: { past: 'banido', fail: 'banir', mark: 'ban', perm: 'Banir membros' },
 } as const;
+
+/** Reescreve os GuardErrors do SDK com a voz do Ace; retorna null pros que não reconhece. */
+function guardReply(raw: string, spec: (typeof copy)[Punishment], emoji: ModerationDeps['emoji']): string | null {
+  if (raw.includes('hierarquia')) return `${emoji.unhappy} Eu não posso ${spec.fail} esse membro — o **cargo** dele tá **acima** do seu ou do meu!`;
+  if (raw.startsWith('Preciso da permissão')) return `${emoji.unhappy} Eu preciso da permissão **${spec.perm}** para isso!`;
+  if (raw.startsWith('Você precisa da permissão')) return `${emoji.unhappy} Você precisa da permissão **${spec.perm}**!`;
+  return null;
+}
 
 /** Erro de "membro fora do servidor" — HTTPError solta HTML na message, então confere por padrão. */
 function memberGone(error: unknown): boolean {
@@ -45,6 +53,14 @@ export function bindModeration(deps: ModerationDeps) {
     }
 
     const { id } = target;
+    if (id === ctx.authorID) {
+      await ctx.reply(`${emoji.unhappy} Ei, você não pode ${spec.fail} **você mesmo**, não!`);
+      return;
+    }
+    if (id === ctx.transport.botID) {
+      await ctx.reply(`${emoji.unhappy} Ei, eu não posso me ${spec.fail}, né!`);
+      return;
+    }
     const reason = moderationReason(ctx);
     // Apelido resolvido antes da ação: falha de label não pode imprimir 'falhou' após banir.
     const name = target.label ?? await memberLabel(ctx, guildID, id).catch(() => id);
@@ -55,6 +71,13 @@ export function bindModeration(deps: ModerationDeps) {
       const caso = record?.id !== undefined ? ` | Caso #${record.id}` : '';
       await ctx.reply(`${emoji[spec.mark]} **${name}** foi ${spec.past} do servidor.\n-# ╰ Motivo: ${reason} | ID: ${id}${caso}`);
     } catch (error) {
+      if (error instanceof GuardError) {
+        const rewritten = guardReply(error.message, spec, emoji);
+        if (rewritten) {
+          await ctx.reply(rewritten);
+          return;
+        }
+      }
       // GuardError/PartialModerationError sobem: a framework responde e o outcome fica honesto.
       if (error instanceof YuzuhaError && !memberGone(error)) throw error;
       await ctx.reply(memberGone(error)
