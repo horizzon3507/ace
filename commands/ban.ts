@@ -4,7 +4,7 @@ import { runModeration } from '../src/live.js';
 export default defineCommand({
   name: 'ban',
   description: 'Bane um membro do servidor.',
-  aliases: ['banir', 'b'],
+  aliases: ['banir', 'b', 'banhammer', 'martelo', 'bn', 'permaban', 'hammer', 'banimento'],
   guildOnly: true,
   permissions: ['BanMembers'],
   botPermissions: ['BanMembers'],

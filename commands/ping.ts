@@ -14,6 +14,7 @@ export default defineCommand({
   aliases: [
     'latency', 'ms', 'pong', 'latencia', 'latência', 'pingpong', 'pings',
     'lat', 'response', 'resposta', 'speed', 'velocidade', 'delay',
+    'p', 'lag', 'conexao', 'conexão', 'latencytest', 'roundtrip',
   ],
   cooldown: '3s',
   async run(ctx) {

@@ -7,6 +7,7 @@ export default defineCommand({
   aliases: [
     'ub', 'userbnr', 'ubnr', 'banner', 'profilebanner', 'pbanner',
     'usercover', 'cover', 'ubg', 'bann', 'userbanners',
+    'usbanner', 'ubanner', 'banneruser', 'ubn', 'userbg', 'profilebg',
   ],
   run: (ctx) => replyUserAsset(ctx, 'banner'),
 });

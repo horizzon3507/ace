@@ -7,6 +7,7 @@ export default defineCommand({
   aliases: [
     'serverbanner', 'sbanner', 'gbanner', 'guildbnr', 'sbnr', 'serverbg',
     'guildbg', 'servercover', 'guildcover', 'serverbannerpic', 'gbg',
+    'sbg', 'svbanner', 'gbr', 'serverbnr', 'bannerdoservidor', 'gb',
   ],
   guildOnly: true,
   run: (ctx) => replyGuildAsset(ctx, 'banner'),

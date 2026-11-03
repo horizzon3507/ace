@@ -26,7 +26,7 @@ export function formatUptime(totalSeconds: number): string {
 export default defineCommand({
   name: 'uptime',
   description: 'Há quanto tempo o Ace está acordado.',
-  aliases: ['up', 'awake', 'tempo', 'acordado', 'online'],
+  aliases: ['up', 'awake', 'tempo', 'acordado', 'online', 'upt', 'alive', 'vivo', 'tempodevida', 'waketime', 'ligado'],
   cooldown: '3s',
   async run(ctx) {
     const up = process.uptime();

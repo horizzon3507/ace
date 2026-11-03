@@ -17,6 +17,7 @@ export default defineCommand({
   aliases: [
     'help', 'commands', 'cmds', 'ajd', 'h', 'menu', 'ajudar',
     'commandslist', 'cmdlist', 'listcommands', 'comandos', 'ajdlist',
+    'assist', 'socorro', 'aj', 'helper', 'commandhelp', 'comandoslista',
   ],
   cooldown: '3s',
   async run(ctx) {

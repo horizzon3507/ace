@@ -4,7 +4,7 @@ import { runModeration } from '../src/live.js';
 export default defineCommand({
   name: 'kick',
   description: 'Expulsa um membro do servidor.',
-  aliases: ['expulsar', 'k'],
+  aliases: ['expulsar', 'k', 'exp', 'kickar', 'kk', 'boot', 'remover', 'eject'],
   guildOnly: true,
   permissions: ['KickMembers'],
   botPermissions: ['KickMembers'],

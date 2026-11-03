@@ -6,7 +6,7 @@ import { prefix } from '../src/live.js';
 export default defineCommand({
   name: 'setprefix',
   description: 'Muda o prefixo do Ace neste servidor.',
-  aliases: ['prefixo', 'setarprefixo', 'mudarprefixo'],
+  aliases: ['prefixo', 'setarprefixo', 'mudarprefixo', 'prefix', 'mudaprefixo', 'trocarprefixo', 'novoprefixo', 'sp', 'prefixset'],
   guildOnly: true,
   permissions: ['ManageGuild'],
   cooldown: '3s',

@@ -8,6 +8,7 @@ export default defineCommand({
     'av', 'pfp', 'profilepic', 'useravatar', 'userpfp', 'foto', 'fotoperfil',
     'avtr', 'dp', 'displaypic', 'userpic', 'memberavatar', 'mav',
     'ui', 'ua', 'upfp', 'usericon', 'userav',
+    'pic', 'avt', 'picture', 'perfil', 'avpic', 'pfpic',
   ],
   run: (ctx) => replyUserAsset(ctx, 'avatar'),
 });

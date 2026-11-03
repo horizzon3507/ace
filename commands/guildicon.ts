@@ -10,6 +10,7 @@ export default defineCommand({
     'serveravatarpic', 'guildavatarpic', 'serverimage', 'guildimage', 'svav',
     'gvav', 'serverpfpic', 'guildpfpic',
     'gi', 'ga', 'gpfp',
+    'svicon', 'gico', 'serverico', 'svic', 'iconedoservidor',
   ],
   guildOnly: true,
   run: (ctx) => replyGuildAsset(ctx, 'icon'),
