@@ -16,7 +16,7 @@ test('alvo vem do primeiro token — menção no motivo não sequestra o ban', a
   // '123456789' é o alvo; <@2> fica no motivo. Alvo fora do servidor → MEMBER_NOT_FOUND.
   assert.equal(await fixture.send('a.ban 123456789 reportado por <@2>'), 'success');
   assert.equal(fixture.transport.actions.length, 0);
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não está no servidor/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não está mais neste servidor/);
 });
 
 test('ban por menção usa a menção do primeiro token', async (t) => {
@@ -62,7 +62,7 @@ test('sem argumento pede o membro', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.kick'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe o membro a ser expulso\./);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Informe o membro\*\* a ser expulso!/);
 });
 
 test('nome desconhecido responde que não encontrou', async (t) => {
@@ -70,7 +70,7 @@ test('nome desconhecido responde que não encontrou', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.ban fulaninho spam'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Não encontrei ninguém como \*\*fulaninho\*\*\./);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu não \*\*encontrei ninguém\*\* como \*\*fulaninho\*\*/);
 });
 
 test('ID curto demais vira missing com aviso', async (t) => {
@@ -86,7 +86,7 @@ test('ban de quem não está no servidor responde sem erro cru', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.ban 777777 razão'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /esse usuário não está no servidor/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não está mais neste servidor/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 

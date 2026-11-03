@@ -32,15 +32,15 @@ export function bindModeration(deps: ModerationDeps) {
     const guildID = ctx.requireGuild();
     const target = await resolveTarget(ctx, guildID, ctx.tokens);
     if (target.status === 'none') {
-      await ctx.reply(`${emoji.unhappy} Informe o membro a ser ${spec.past}.\n-# ╰ Ex: \`a.${action} @usuario motivo\``);
+      await ctx.reply(`${emoji.unhappy} **Informe o membro** a ser ${spec.past}!\n-# ╰ Ex: \`a.${action} @usuario motivo\``);
       return;
     }
     if (target.status === 'missing') {
-      await ctx.reply(`${emoji.unhappy} Não encontrei ninguém como **${target.query}**.\n-# ╰ Use menção ou ID do usuário.`);
+      await ctx.reply(`${emoji.unhappy} Eu não **encontrei ninguém** como **${target.query}**... Use **menção** ou **ID** do usuário.`);
       return;
     }
     if (target.status === 'ambiguous') {
-      await ctx.reply(`${emoji.unhappy} Encontrei vários membros como **${target.query}**.\n-# ╰ Use menção ou ID do usuário.`);
+      await ctx.reply(`${emoji.unhappy} Eu **encontrei vários membros** como **${target.query}**... Use **menção** ou forneça o **ID** do usuário!`);
       return;
     }
 
@@ -58,8 +58,8 @@ export function bindModeration(deps: ModerationDeps) {
       // GuardError/PartialModerationError sobem: a framework responde e o outcome fica honesto.
       if (error instanceof YuzuhaError && !memberGone(error)) throw error;
       await ctx.reply(memberGone(error)
-        ? `${emoji.unhappy} Não foi possível ${spec.fail}: esse usuário não está no servidor.`
-        : `${emoji.unhappy} Não foi possível ${spec.fail} esse membro.`);
+        ? `${emoji.unhappy} Eu não consigo ${spec.fail} um usuário que **não está mais neste servidor**!`
+        : `${emoji.unhappy} Eu **não consegui** ${spec.fail} esse membro!`);
     }
   };
 }
