@@ -105,7 +105,7 @@ test('guildicon exibe o ícone do servidor', async (t) => {
   assert.equal(embed?.color, brand.primary);
   assert.equal(embed?.author?.name, 'Ícone de Comunidade Fluxer');
   assert.equal(embed?.author?.iconURL, 'https://cdn.fluxer.app/icons/server.png');
-  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/icons/server.png');
+  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/icons/server.png?size=4096');
 });
 
 test('guildavatar segue como alias de guildicon', async (t) => {
@@ -152,7 +152,7 @@ test('guildbanner exibe o banner sem ícone no author', async (t) => {
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.author?.name, 'Banner de Comunidade Fluxer');
   assert.equal(embed?.author?.iconURL, undefined);
-  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/banners/server.png');
+  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/banners/server.png?size=4096');
 });
 
 const glacial = {
@@ -242,7 +242,7 @@ test('avatar sem argumento mostra o autor e anima asset a_', async (t) => {
 
   assert.equal(await fixture.send('a.avatar'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/avatars/1/a_ab12.gif?size=1024');
+  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/avatars/1/a_ab12.gif?size=4096');
   assert.equal(embed?.author?.name, 'Avatar de Glacial');
   assert.equal(embed?.thumbnail, undefined);
   assert.deepEqual(fixture.errors, []);
@@ -268,7 +268,7 @@ test('avatar resolve membro por nome no servidor', async (t) => {
 
   assert.equal(await fixture.send('a.avatar glacial'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/avatars/2/a_ab12.gif?size=1024');
+  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/avatars/2/a_ab12.gif?size=4096');
 });
 
 test('avatar avisa quando falta imagem', async (t) => {
