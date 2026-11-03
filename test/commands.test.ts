@@ -38,7 +38,7 @@ test('ping responde a latência', async (t) => {
   assert.equal(await fixture.send('a.ping'), 'success');
   const message = fixture.messages.at(-1)?.payload;
   assert.equal(message?.embeds, undefined);
-  assert.equal(message?.content, '<:globefill:1566571242956263426> Pong! A minha conexão com este servidor está **incrível** (**12**ms).');
+  assert.equal(message?.content, '<:globefill:1566571242956263426> Pong! A minha conexão com este servidor está **incrível** (12ms).');
 });
 
 test('ping sem amostra avisa em vez de inventar latência', async (t) => {
@@ -56,7 +56,7 @@ test('ping degrada a qualificação conforme a latência sobe', async (t) => {
     t.after(() => fixture.destroy());
     fixture.transport.ping = ping;
     assert.equal(await fixture.send('a.ping'), 'success');
-    assert.match(fixture.messages.at(-1)?.payload.content ?? '', new RegExp(`está \\*\\*${status}\\*\\* \\(\\*\\*${ping}\\*\\*ms\\)`));
+    assert.match(fixture.messages.at(-1)?.payload.content ?? '', new RegExp(`está \\*\\*${status}\\*\\* \\(${ping}ms\\)`));
   }
 });
 
