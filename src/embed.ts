@@ -29,13 +29,13 @@ export async function replyGuildAsset(ctx: AceContext, kind: GuildAsset): Promis
   try {
     guild = await ctx.resources.users.guild(guildID);
   } catch {
-    await ctx.reply(`${emoji.unhappy} Não foi possível carregar as informações deste servidor.`);
+    await ctx.reply(`${emoji.unhappy} Eu **não consegui** carregar as informações deste servidor...`);
     return;
   }
   const spec = guildCopy[kind];
   const url = fixAnimatedAssetUrl(kind === 'icon' ? guild.iconURL : guild.bannerURL);
   if (!url) {
-    await ctx.reply(`${emoji.unhappy} O servidor **${guild.name}** não possui ${spec.asset} configurado.`);
+    await ctx.reply(`${emoji.unhappy} O servidor **${guild.name}** **não possui** ${spec.asset} configurado...`);
     return;
   }
   await replyAsset(ctx, `${spec.label} de ${guild.name}`, url, spec.authorIcon ? url : null);
@@ -57,12 +57,12 @@ export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<
     id = target.status === 'found' ? target.id : ctx.authorID;
   } else {
     const text = target.status === 'missing'
-      ? `${emoji.unhappy} Não encontrei ninguém como **${target.query}**.\n-# ╰ Use menção ou ID do usuário.`
+      ? `${emoji.unhappy} Eu **não encontrei** ninguém como **${target.query}**... Use **menção** ou **ID** de usuário...`
       : target.status === 'ambiguous'
-        ? `${emoji.unhappy} Encontrei vários membros como **${target.query}**.\n-# ╰ Use menção ou ID do usuário.`
+        ? `${emoji.unhappy} Eu **encontrei vários** membros como **${target.query}**... Use **menção** ou **ID** de usuário...`
         : ctx.message.guildID
-          ? `${emoji.unhappy} Informe o usuário.\n-# ╰ Ex: \`a.${spec.command} @usuario\``
-          : `${emoji.unhappy} Informe o usuário por menção ou ID.`;
+          ? `${emoji.unhappy} Por favor, **informe um usuário** válido...`
+          : `${emoji.unhappy} Por favor, **informe o usuário** por **menção** ou **ID de usuário**...`;
     await ctx.reply(text);
     return;
   }
@@ -74,13 +74,13 @@ export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<
       ? await ctx.resources.users.member(guildID, id).catch(() => ctx.resources.users.user(id))
       : await ctx.resources.users.user(id);
   } catch {
-    await ctx.reply(`${emoji.unhappy} Não foi possível carregar ${spec.fail} deste usuário.`);
+    await ctx.reply(`${emoji.unhappy} Eu **não consegui** carregar ${spec.fail} deste usuário...`);
     return;
   }
   const label = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
   const url = fixAnimatedAssetUrl(kind === 'avatar' ? user.avatarURL : user.bannerURL);
   if (!url) {
-    await ctx.reply(`${emoji.unhappy} **${label}** não possui ${spec.asset} configurado.`);
+    await ctx.reply(`${emoji.unhappy} **${label}** não possui ${spec.asset} configurado...`);
     return;
   }
   await replyAsset(ctx, `${spec.label} de ${label}`, url);

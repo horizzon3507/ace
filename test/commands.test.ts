@@ -142,7 +142,7 @@ test('guildavatar segue como alias de guildicon', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.guildavatar'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não possui um ícone configurado/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*não possui\*\* um ícone configurado/);
 });
 
 test('guildbanner exibe o banner sem ícone no author', async (t) => {
@@ -305,7 +305,7 @@ test('avatar na DM pede menção ou ID', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.avatar alguém', { guildID: '' }), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe o usuário por menção ou ID\./);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, \*\*informe o usuário\*\* por \*\*menção\*\*/);
 });
 
 test('userbanner avisa quando falta banner', async (t) => {
