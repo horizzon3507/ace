@@ -1,8 +1,7 @@
 import { defineCommand } from 'yuzuha';
-import { brand } from '../src/live.js';
 import { fixAnimatedAssetUrl } from '../src/cdn.js';
-
-const UNHAPPY = '<:emotionunhappyfill:1566571242956263424>';
+import { replyAsset } from '../src/embed.js';
+import { emoji } from '../src/emoji.js';
 
 export default defineCommand({
   name: 'guildbanner',
@@ -14,22 +13,18 @@ export default defineCommand({
   guildOnly: true,
   async run(ctx) {
     const guildID = ctx.requireGuild();
+    let guild;
     try {
-      const guild = await ctx.resources.users.guild(guildID);
-      const url = fixAnimatedAssetUrl(guild.bannerURL);
-      if (!url) {
-        await ctx.reply(`${UNHAPPY} O servidor **${guild.name}** não possui um banner configurado.`);
-        return;
-      }
-      await ctx.reply({
-        embeds: [{
-          title: `Banner de ${guild.name}`,
-          color: brand.primary,
-          image: { url },
-        }],
-      });
+      guild = await ctx.resources.users.guild(guildID);
     } catch {
-      await ctx.reply(`${UNHAPPY} Não foi possível carregar o banner deste servidor.`);
+      await ctx.reply(`${emoji.unhappy} Não foi possível carregar o banner deste servidor.`);
+      return;
     }
+    const url = fixAnimatedAssetUrl(guild.bannerURL);
+    if (!url) {
+      await ctx.reply(`${emoji.unhappy} O servidor **${guild.name}** não possui um banner configurado.`);
+      return;
+    }
+    await replyAsset(ctx, `Banner de ${guild.name}`, url);
   },
 });

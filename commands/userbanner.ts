@@ -1,16 +1,8 @@
-import { defineCommand } from 'yuzuha';
-import { brand } from '../src/live.js';
+import { defineCommand, type UserInfo } from 'yuzuha';
 import { fixAnimatedAssetUrl } from '../src/cdn.js';
-
-const UNHAPPY = '<:emotionunhappyfill:1566571242956263424>';
-
-function targetID(ctx: any): string {
-  const mentions = ctx.message?.mentions ?? [];
-  if (mentions.length) return mentions[0];
-  const token = (ctx.tokens ?? []).find((t: string) => /^\d{5,}$/.test(t));
-  if (token) return token;
-  return ctx.authorID;
-}
+import { replyAsset } from '../src/embed.js';
+import { emoji } from '../src/emoji.js';
+import { resolveAssetTarget } from '../src/resolve.js';
 
 export default defineCommand({
   name: 'userbanner',
@@ -20,24 +12,38 @@ export default defineCommand({
     'usercover', 'cover', 'ubg', 'bann', 'userbanners',
   ],
   async run(ctx) {
-    const id = targetID(ctx);
-    try {
-      const user = await ctx.resources.users.user(id);
-      const url = fixAnimatedAssetUrl(user.bannerURL);
-      const label = user.displayName || user.username;
-      if (!url) {
-        await ctx.reply(`${UNHAPPY} **${label}** não possui um banner configurado.`);
-        return;
-      }
-      await ctx.reply({
-        embeds: [{
-          title: `Banner de ${label}`,
-          color: brand.primary,
-          image: { url },
-        }],
-      });
-    } catch {
-      await ctx.reply(`${UNHAPPY} Não foi possível carregar o banner deste usuário.`);
+    const target = await resolveAssetTarget(ctx);
+    let id: string;
+    if (target.status === 'found' || target.status === 'author') {
+      id = target.status === 'found' ? target.id : ctx.authorID;
+    } else {
+      const text = target.status === 'missing'
+        ? `${emoji.unhappy} Não encontrei ninguém como **${target.query}**.\n-# ╰ Use menção ou ID do usuário.`
+        : target.status === 'ambiguous'
+          ? `${emoji.unhappy} Encontrei vários membros como **${target.query}**.\n-# ╰ Use menção ou ID do usuário.`
+          : ctx.message.guildID
+            ? `${emoji.unhappy} Informe o usuário.\n-# ╰ Ex: \`a.userbanner @usuario\``
+            : `${emoji.unhappy} Informe o usuário por menção ou ID.`;
+      await ctx.reply(text);
+      return;
     }
+
+    const guildID = ctx.message.guildID;
+    let user: UserInfo;
+    try {
+      user = guildID
+        ? await ctx.resources.users.member(guildID, id).catch(() => ctx.resources.users.user(id))
+        : await ctx.resources.users.user(id);
+    } catch {
+      await ctx.reply(`${emoji.unhappy} Não foi possível carregar o banner deste usuário.`);
+      return;
+    }
+    const label = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
+    const url = fixAnimatedAssetUrl(user.bannerURL);
+    if (!url) {
+      await ctx.reply(`${emoji.unhappy} **${label}** não possui um banner configurado.`);
+      return;
+    }
+    await replyAsset(ctx, `Banner de ${label}`, url);
   },
 });

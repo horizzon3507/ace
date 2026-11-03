@@ -1,10 +1,7 @@
 /**
- * Corrige URLs de assets animados do Fluxer/Discord.
- *
- * O SDK (@fluxerjs) monta a URL de ícones/banners de servidor sempre com
- * extensão `.png`, mesmo quando o hash começa com `a_` (asset animado, GIF).
- * Isso quebra a exibição de ícones/banners animados. Esta função troca a
- * extensão para `.gif` nesses casos.
+ * Corrige URLs de assets animados (hash `a_`) trocando a extensão para `.gif`.
+ * O bug é só nos assets de servidor: o SDK monta ícone/banner de guilda sempre
+ * com `.png`. Avatar/banner de usuário já saem com `.gif` correto.
  */
 export function fixAnimatedAssetUrl(url: string | null | undefined): string | null {
   if (!url) return null;
