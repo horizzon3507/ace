@@ -4,7 +4,7 @@ Bot do Fluxer chamado Ace. Comandos usam o prefixo `a.`, lido de `PREFIX` no `.e
 
 ## Subir
 
-Node 22.13 ou mais novo.
+Node 22.21 ou mais novo.
 
 ```sh
 npm install
@@ -20,14 +20,23 @@ npm run typecheck
 npm run dev
 ```
 
-`npm run dev` sobe a CLI do Ace. Ao salvar, ela recarrega os comandos, a menção, o prefixo, a cor, o cargo de entrada e o `PREFIX` do `.env`. `yuzuha.config.ts`, a própria CLI e o token pedem reinício. Um listener novo no `setup` só existe depois desse reinício. O que o listener chama em `src/` recarrega ao salvar. `npm start` sobe sem recarga. Os dois leem o `.env` antes da config. `npm run check` não lê o `.env`. Sem `PREFIX` no ambiente, o prefixo fica `a.`.
+`npm run dev` sobe a CLI do Ace. Ao salvar, ela recarrega os comandos e, dentro de `src/`, a menção, o prefixo, a marca, o cargo de entrada e o kick/ban, além do `PREFIX` do `.env`. `yuzuha.config.ts`, a própria CLI, os demais arquivos de `src/` (inclui `emoji.ts`) e o token pedem reinício. Um listener novo no `setup` só existe depois desse reinício. `npm start` sobe sem recarga. Os dois leem o `.env` antes da config. `npm run check` não lê o `.env`. Sem `PREFIX` no ambiente, o prefixo fica `a.`.
 
 ## Comandos
 
 | Comando | Faz |
 |---|---|
-| `a.ping` | Mostra a latência |
-| `a.guildavatar` | Exibe o avatar (ícone) do servidor atual |
-| `a.ajuda` | Lista os comandos |
+| `a.ajuda` | Lista os comandos do Ace. |
+| `a.ping` | Latência do Ace. |
+| `a.avatar` | Exibe o avatar de um usuário. |
+| `a.userbanner` | Exibe o banner de um usuário. |
+| `a.guildavatar` | Exibe o avatar (ícone) do servidor atual. |
+| `a.guildbanner` | Exibe o banner do servidor atual. |
+| `a.kick` | Expulsa um membro do servidor. |
+| `a.ban` | Bane um membro do servidor. |
+
+`a.kick`, `a.ban`, `a.guildavatar` e `a.guildbanner` só rodam dentro de um servidor.
 
 O token fica só no `.env`. Casos e variáveis vão para o diretório de dados do Yuzuha, sob o nome `ace`.
+
+`assets/` guarda a arte do avatar do Ace — não é usada em runtime.

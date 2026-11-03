@@ -37,6 +37,8 @@ skills-lock.json
 
 # Temp
 /.tmp/
+/coverage/
+*.tsbuildinfo
 
 # Project
 /data/
