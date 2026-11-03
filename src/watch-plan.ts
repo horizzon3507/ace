@@ -1,6 +1,14 @@
 export type ReloadKind = 'commands' | 'runtime' | 'env' | 'restart' | 'ignore';
 
-const runtimeFiles = new Set(['src/mention.ts', 'src/prefix.ts', 'src/brand.ts', 'src/join-role.ts']);
+export const RUNTIME_FILES = [
+  'src/mention.ts',
+  'src/prefix.ts',
+  'src/brand.ts',
+  'src/join-role.ts',
+  'src/punish.ts',
+  'src/resolve.ts',
+] as const;
+// src/emoji.ts fica de fora e exige restart: imports estáticos não aceitam cache-bust.
 
 function normalize(input: string): string {
   const parts: string[] = [];
@@ -16,7 +24,7 @@ function isCode(path: string): boolean {
   return /\.(?:[cm]?js|ts|mts)$/.test(path) && !path.endsWith('.d.ts');
 }
 
-export function classifyChange(input: string): ReloadKind {
+export function classifyChange(input: string, commandsDir = 'commands'): ReloadKind {
   const path = normalize(input);
   if (!path) return 'ignore';
   const parts = path.split('/');
@@ -26,8 +34,9 @@ export function classifyChange(input: string): ReloadKind {
   if (path.endsWith('.map') || path.endsWith('~') || path.endsWith('.swp')) return 'ignore';
   if (path === '.env') return 'env';
   if (/^yuzuha\.config\.(?:ts|mts|js|mjs|cjs)$/.test(path)) return 'restart';
-  if (parts[0] === 'test') return 'ignore';
-  if (parts[0] === 'commands' && isCode(path)) return 'commands';
-  if (parts[0] === 'src' && isCode(path)) return runtimeFiles.has(path) ? 'runtime' : 'restart';
+  if (parts[0] === 'test' || /\.(?:test|spec)\.[cm]?[jt]s$/.test(path)) return 'ignore';
+  const commands = normalize(commandsDir);
+  if (commands && (path === commands || path.startsWith(`${commands}/`)) && isCode(path)) return 'commands';
+  if (parts[0] === 'src' && isCode(path)) return (RUNTIME_FILES as readonly string[]).includes(path) ? 'runtime' : 'restart';
   return 'ignore';
 }
