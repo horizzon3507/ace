@@ -41,3 +41,5 @@ npm run dev
 O token fica só no `.env`. Casos e variáveis vão para o diretório de dados do Yuzuha, sob o nome `ace`.
 
 `assets/` guarda a arte do avatar do Ace — não é usada em runtime.
+
+Mudanças de versão vão para o [CHANGELOG.md](CHANGELOG.md), no estilo Hory.
