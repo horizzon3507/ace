@@ -1,4 +1,5 @@
 import { defineCommand } from 'yuzuha';
+import { emoji } from '../src/emoji.js';
 
 function connectionStatus(ping: number): string {
   if (ping < 50) return 'incrível';
@@ -14,9 +15,13 @@ export default defineCommand({
     'latency', 'ms', 'pong', 'latencia', 'latência', 'pingpong', 'pings',
     'lat', 'response', 'resposta', 'speed', 'velocidade', 'delay',
   ],
+  cooldown: '3s',
   async run(ctx) {
     const ping = ctx.transport.ping;
-    const status = connectionStatus(ping);
-    await ctx.reply(`<:globefill:1566571242956263426> Pong! A minha conexão com este servidor está **${status}** (**${ping}**ms).`);
+    if (!Number.isFinite(ping) || ping < 0) {
+      await ctx.reply(`${emoji.globe} Ainda sem amostra de latência — tente de novo em instantes.`);
+      return;
+    }
+    await ctx.reply(`${emoji.globe} Latência do gateway: **${ping}**ms — conexão ${connectionStatus(ping)}.`);
   },
 });
