@@ -6,4 +6,5 @@ export const emoji = {
   kick: '<:logoutboxfill:1566645144776605696>',
   ban: '<:userforbidfill:1566644852504932352>',
   time: '<:timefill:1567289278214438912>',
+  commandline: '<:commandline:1567301268425146368>',
 } as const;
