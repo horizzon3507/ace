@@ -42,4 +42,4 @@ O token fica só no `.env`. Casos e variáveis vão para o diretório de dados d
 
 `assets/` guarda a arte do avatar do Ace — não é usada em runtime.
 
-Mudanças de versão vão para o [CHANGELOG.md](CHANGELOG.md), no estilo Hory.
+Mudanças de versão vão para o [CHANGELOG.md](CHANGELOG.md), no estilo Hory. Para contribuir, veja o [CONTRIBUTING.md](CONTRIBUTING.md).
