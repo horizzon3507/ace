@@ -3,13 +3,12 @@ import { emoji } from '../src/emoji.js';
 import { guildPrefix } from '../src/guild-prefix.js';
 import { brand, prefix } from '../src/live.js';
 
-type CommandCategory = { name: string; emoji: keyof typeof emoji; commands: readonly string[] };
+type CommandCategory = { emoji: keyof typeof emoji; commands: readonly string[] };
 
 const categories: CommandCategory[] = [
-  { name: 'Geral', emoji: 'information', commands: ['ajuda', 'ping', 'uptime'] },
-  { name: 'Utilidades', emoji: 'globe', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner'] },
-  { name: 'Moderação', emoji: 'ban', commands: ['kick', 'ban'] },
-  { name: 'Servidor', emoji: 'happy', commands: ['setprefix'] },
+  { emoji: 'information', commands: ['ajuda', 'ping', 'uptime', 'setprefix'] },
+  { emoji: 'globe', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner'] },
+  { emoji: 'ban', commands: ['kick', 'ban'] },
 ];
 
 export default defineCommand({
@@ -34,22 +33,18 @@ export default defineCommand({
 
     const fields: { name: string; value: string; inline?: boolean }[] = [];
     const listed = new Set<string>();
-    const pushCategory = (name: string, icon: string, commands: readonly string[]) => {
-      const entries = commands
-        .map((command) => [command, descriptions.get(command)] as const)
-        .filter((entry): entry is readonly [string, string] => entry[1] !== undefined);
-      if (!entries.length) return;
-      fields.push({ name: `${icon} ${name}`, value: '​' });
-      for (const [command, description] of entries) {
-        fields.push({ name: `\`${p}${command}\``, value: description || '​', inline: true });
-        listed.add(command);
-      }
+    const push = (command: string, icon: string) => {
+      const description = descriptions.get(command);
+      if (description === undefined) return;
+      fields.push({ name: `${icon} \`${p}${command}\``, value: description || '​', inline: true });
+      listed.add(command);
     };
     for (const category of categories) {
-      pushCategory(category.name, emoji[category.emoji], category.commands);
+      for (const command of category.commands) push(command, emoji[category.emoji]);
     }
-    const rest = [...descriptions.keys()].filter((command) => !listed.has(command));
-    if (rest.length) pushCategory('Outros', emoji.happy, rest);
+    for (const command of descriptions.keys()) {
+      if (!listed.has(command)) push(command, emoji.happy);
+    }
 
     await ctx.reply({
       embeds: [embed({

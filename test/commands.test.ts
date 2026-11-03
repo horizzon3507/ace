@@ -81,18 +81,18 @@ test('ajuda lista os comandos por categoria em grade', async (t) => {
   assert.equal(embed?.footer?.text, 'Prefixo a. • Ace');
   const fields = embed?.fields ?? [];
   for (const command of fixture.bot.listCommands().filter((item) => !item.hidden)) {
-    const field = fields.find((item) => item.name === `\`a.${command.name}\``);
+    const field = fields.find((item) => item.name.endsWith(` \`a.${command.name}\``));
     assert.ok(field, `ajuda não listou ${command.name}`);
     assert.equal(field.inline, true);
     assert.ok(field.value, `ajuda listou ${command.name} sem descrição`);
   }
-  const headers = fields.filter((item) => item.inline !== true).map((item) => item.name);
-  assert.deepEqual(headers, [
-    '<:information2fill:1566640356991184896> Geral',
-    '<:globefill:1566571242956263426> Utilidades',
-    '<:userforbidfill:1566644852504932352> Moderação',
-    '<:emotionhappyfill:1566571242956263425> Servidor',
+  const icons = Object.fromEntries(fields.map((item) => [item.name.split(' `')[0], item.name]));
+  assert.deepEqual(Object.keys(icons).sort(), [
+    '<:globefill:1566571242956263426>',
+    '<:information2fill:1566640356991184896>',
+    '<:userforbidfill:1566644852504932352>',
   ]);
+  assert.match(fields.find((item) => item.name.endsWith('`a.setprefix`'))?.name ?? '', /^<:information2fill/);
   assert.doesNotMatch(fields.map((item) => item.name).join(' '), /hello/);
   assert.deepEqual(fixture.errors, []);
 });
