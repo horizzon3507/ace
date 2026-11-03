@@ -1,7 +1,5 @@
 import { defineCommand } from 'yuzuha';
-import { fixAnimatedAssetUrl } from '../src/cdn.js';
-import { replyAsset } from '../src/embed.js';
-import { emoji } from '../src/emoji.js';
+import { replyGuildAsset } from '../src/embed.js';
 
 export default defineCommand({
   name: 'guildicon',
@@ -14,20 +12,5 @@ export default defineCommand({
     'gi', 'ga', 'gpfp',
   ],
   guildOnly: true,
-  async run(ctx) {
-    const guildID = ctx.requireGuild();
-    let guild;
-    try {
-      guild = await ctx.resources.users.guild(guildID);
-    } catch {
-      await ctx.reply(`${emoji.unhappy} Não foi possível carregar as informações deste servidor.`);
-      return;
-    }
-    const iconUrl = fixAnimatedAssetUrl(guild.iconURL);
-    if (!iconUrl) {
-      await ctx.reply(`${emoji.unhappy} O servidor **${guild.name}** não possui um ícone configurado.`);
-      return;
-    }
-    await replyAsset(ctx, `Ícone de ${guild.name}`, iconUrl);
-  },
+  run: (ctx) => replyGuildAsset(ctx, 'icon'),
 });

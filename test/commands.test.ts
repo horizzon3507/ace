@@ -130,6 +130,31 @@ test('guildavatar segue como alias de guildicon', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não possui um ícone configurado/);
 });
 
+test('guildbanner exibe o banner sem ícone no author', async (t) => {
+  const fixture = bot({
+    users: {
+      async guild(guildID: string) {
+        return {
+          id: guildID,
+          name: 'Comunidade Fluxer',
+          ownerID: '1',
+          iconURL: 'https://cdn.fluxer.app/icons/server.png',
+          bannerURL: 'https://cdn.fluxer.app/banners/server.png',
+          memberCount: 5,
+          createdTimestamp: 0,
+        };
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.guildbanner'), 'success');
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(embed?.author?.name, 'Banner de Comunidade Fluxer');
+  assert.equal(embed?.author?.iconURL, undefined);
+  assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/banners/server.png');
+});
+
 const glacial = {
   id: '2',
   username: 'glacial',
