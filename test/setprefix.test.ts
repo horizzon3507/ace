@@ -24,12 +24,12 @@ test('grava a variável da guild e confirma', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /agora é `x\.`/);
 });
 
-test('sem argumento mostra o prefixo atual', async (t) => {
+test('sem argumento pede o prefixo novo', async (t) => {
   const fixture = bot();
   t.after(() => { setGuildPrefixCache('100', undefined); return fixture.destroy(); });
 
   assert.equal(await fixture.send('a.setprefix'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /é `a\.`/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*me fornecer\*\* um prefixo novo/);
 });
 
 test('reset remove a variável e volta ao padrão', async (t) => {

@@ -1,6 +1,6 @@
 import { defineCommand } from 'yuzuha';
 import { emoji } from '../src/emoji.js';
-import { guildPrefix, setGuildPrefixCache } from '../src/guild-prefix.js';
+import { setGuildPrefixCache } from '../src/guild-prefix.js';
 import { prefix } from '../src/live.js';
 
 export default defineCommand({
@@ -15,8 +15,7 @@ export default defineCommand({
     const guildID = ctx.requireGuild();
     const next = ctx.tokens[0];
     if (!next) {
-      const current = await guildPrefix(guildID) ?? prefix();
-      await ctx.reply(`${emoji.information} O prefixo neste servidor é \`${current}\`.\n-# ╰ Use \`${current}setprefix <novo>\` para trocar ou \`${current}setprefix reset\` para voltar ao padrão.`);
+      await ctx.reply(`${emoji.information} Você precisa **me fornecer** um prefixo novo para eu definir neste ambiente!`);
       return;
     }
     if (/^(reset|padr[aã]o|default)$/i.test(next)) {
