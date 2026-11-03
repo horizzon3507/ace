@@ -4,10 +4,10 @@ import { replyAsset } from '../src/embed.js';
 import { emoji } from '../src/emoji.js';
 
 export default defineCommand({
-  name: 'guildavatar',
+  name: 'guildicon',
   description: 'Exibe o ícone do servidor atual.',
   aliases: [
-    'serveravatar', 'servericon', 'guildicon', 'gav', 'guildpfp', 'serverpfp',
+    'guildavatar', 'serveravatar', 'servericon', 'gav', 'guildpfp', 'serverpfp',
     'serverimg', 'guildimg', 'sap', 'gicon', 'sicon', 'serverpic', 'guildpic',
     'serveravatarpic', 'guildavatarpic', 'serverimage', 'guildimage', 'svav',
     'gvav', 'serverpfpic', 'guildpfpic',

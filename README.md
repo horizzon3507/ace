@@ -30,13 +30,13 @@ npm run dev
 | `a.ping` | Latência do Ace. |
 | `a.avatar` | Exibe o avatar de um usuário. |
 | `a.userbanner` | Exibe o banner de um usuário. |
-| `a.guildavatar` | Exibe o avatar (ícone) do servidor atual. |
+| `a.guildicon` | Exibe o ícone do servidor atual. |
 | `a.guildbanner` | Exibe o banner do servidor atual. |
 | `a.kick` | Expulsa um membro do servidor. |
 | `a.ban` | Bane um membro do servidor. |
 | `a.setprefix` | Troca o prefixo do Ace no servidor. `reset` volta ao padrão. |
 
-`a.kick`, `a.ban`, `a.guildavatar`, `a.guildbanner` e `a.setprefix` só rodam dentro de um servidor. `a.setprefix` exige a permissão Gerenciar Servidor.
+`a.kick`, `a.ban`, `a.guildicon`, `a.guildbanner` e `a.setprefix` só rodam dentro de um servidor. `a.setprefix` exige a permissão Gerenciar Servidor.
 
 O token fica só no `.env`. Casos e variáveis vão para o diretório de dados do Yuzuha, sob o nome `ace`.
 

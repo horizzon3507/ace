@@ -5,14 +5,14 @@ import { brand } from '../src/brand.js';
 import { prefix } from '../src/prefix.js';
 import ping from '../commands/ping.js';
 import ajuda from '../commands/ajuda.js';
-import guildavatar from '../commands/guildavatar.js';
+import guildicon from '../commands/guildicon.js';
 import avatar from '../commands/avatar.js';
 import userbanner from '../commands/userbanner.js';
 import guildbanner from '../commands/guildbanner.js';
 import kick from '../commands/kick.js';
 import ban from '../commands/ban.js';
 
-const commands = [ping, ajuda, guildavatar, avatar, userbanner, guildbanner, kick, ban];
+const commands = [ping, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban];
 
 function bot(resources?: MockResourceOverrides) {
   return createTestBot({ prefix: 'a.', commands, resources });
@@ -82,7 +82,7 @@ test('ajuda lista os comandos', async (t) => {
   assert.deepEqual(fixture.errors, []);
 });
 
-test('guildavatar exibe o ícone do servidor', async (t) => {
+test('guildicon exibe o ícone do servidor', async (t) => {
   const fixture = bot({
     users: {
       async guild(guildID: string) {
@@ -100,7 +100,7 @@ test('guildavatar exibe o ícone do servidor', async (t) => {
   });
   t.after(() => fixture.destroy());
 
-  assert.equal(await fixture.send('a.guildavatar'), 'success');
+  assert.equal(await fixture.send('a.guildicon'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.color, brand.primary);
   assert.equal(embed?.author?.name, 'Ícone de Comunidade Fluxer');
@@ -108,7 +108,7 @@ test('guildavatar exibe o ícone do servidor', async (t) => {
   assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/icons/server.png');
 });
 
-test('guildavatar avisa quando o servidor não possui ícone', async (t) => {
+test('guildavatar segue como alias de guildicon', async (t) => {
   const fixture = bot({
     users: {
       async guild(guildID: string) {
