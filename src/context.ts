@@ -1,0 +1,16 @@
+import type { CommandContext } from 'yuzuha';
+
+/** Superfície que os comandos nativos realmente expõem. Evita o tipo da classe, que o handler não satisfaz. */
+export type AceContext = {
+  readonly message: CommandContext['message'];
+  readonly tokens: readonly string[];
+  readonly authorID: string;
+  readonly input: string;
+  readonly resources: CommandContext['resources'];
+  readonly mod: CommandContext['mod'];
+  readonly help: CommandContext['help'];
+  requireGuild: CommandContext['requireGuild'];
+  reply: CommandContext['reply'];
+  requirePermission: CommandContext['requirePermission'];
+  moderate: CommandContext['moderate'];
+};
