@@ -22,21 +22,6 @@ export default defineConfig({
     },
   },
   setup(bot) {
-    const applyPresence = () => {
-      console.log('[ace] applying streaming presence');
-      bot.client.user?.setPresence({
-        status: 'online',
-        activities: [
-          {
-            name: 'Fluxer',
-            type: 1,
-            url: 'https://twitch.tv/fluxer',
-          },
-        ],
-      });
-    };
-    bot.client.on(SDK.Events.Ready, applyPresence);
-    bot.client.on(SDK.Events.ShardResumed, applyPresence);
     bot.on(SDK.Events.MessageCreate, async (message) => {
       const me = bot.client.user;
       if (!me || message.author.bot) return;
