@@ -12,13 +12,14 @@ import { classifyChange, RUNTIME_FILES, type ReloadKind } from './watch-plan.js'
 export async function refreshRuntime(root: string): Promise<void> {
   const stamp = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
   const load = (file: string) => import(`${pathToFileURL(resolve(root, file)).href}?ace=${stamp}`);
-  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
+  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
     typeof import('./mention.js'),
     typeof import('./prefix.js'),
     typeof import('./brand.js'),
     typeof import('./join-role.js'),
     typeof import('./punish.js'),
     typeof import('./resolve.js'),
+    typeof import('./emoji.js'),
   ];
   const missing = (file: string, name: string) => new Error(`${file} não exportou '${name}'.`);
   if (typeof mention.mentionMessage !== 'function') throw missing('src/mention.ts', 'mentionMessage');
@@ -31,7 +32,12 @@ export async function refreshRuntime(root: string): Promise<void> {
   if (typeof resolveMod.moderationReason !== 'function') throw missing('src/resolve.ts', 'moderationReason');
   if (typeof resolveMod.targetUserID !== 'function') throw missing('src/resolve.ts', 'targetUserID');
   if (typeof punishMod.bindModeration !== 'function') throw missing('src/punish.ts', 'bindModeration');
-  // emoji vem do import estático: classifyChange o marca 'restart', então recarregar aqui seria meia-troca.
+  if (!emojiMod.emoji || typeof emojiMod.emoji !== 'object') throw missing('src/emoji.ts', 'emoji');
+  for (const [key, value] of Object.entries(emojiMod.emoji)) {
+    if (typeof value !== 'string' || value.length === 0) {
+      throw new Error(`src/emoji.ts: 'emoji.${key}' não é texto.`);
+    }
+  }
   const runModeration = punishMod.bindModeration({ emoji, resolveTarget: resolveMod.resolveTarget, moderationReason: resolveMod.moderationReason });
   if (typeof runModeration !== 'function') {
     throw new Error('src/punish.ts: bindModeration() não devolveu função.');
@@ -46,6 +52,9 @@ export async function refreshRuntime(root: string): Promise<void> {
     targetUserID: resolveMod.targetUserID,
     brand: brandMod.brand,
   });
+  // Quem importa emoji segura a referência do módulo original: muta in-place só
+  // depois do install, para uma falha acima não deixar os emojis meio-trocados.
+  Object.assign(emoji, emojiMod.emoji);
 }
 
 export function relativeChange(root: string, filename: string): string | undefined {

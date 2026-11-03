@@ -24,8 +24,8 @@ test('classifica o que a cli recarrega', () => {
   assert.equal(classifyChange('.env.swp'), 'ignore');
 });
 
-test('emoji pede restart e sujeira de editor é ignorada', () => {
-  assert.equal(classifyChange('src/emoji.ts'), 'restart');
+test('emoji recarrega e sujeira de editor é ignorada', () => {
+  assert.equal(classifyChange('src/emoji.ts'), 'runtime');
   assert.equal(classifyChange('src/foo.test.ts'), 'ignore');
   assert.equal(classifyChange('commands/x.test.ts'), 'ignore');
   assert.equal(classifyChange('src/deep/bar.spec.ts'), 'ignore');

@@ -20,7 +20,7 @@ npm run typecheck
 npm run dev
 ```
 
-`npm run dev` sobe a CLI do Ace. Ao salvar, ela recarrega os comandos e, dentro de `src/`, a menção, o prefixo, a marca, o cargo de entrada e o kick/ban, além do `PREFIX` do `.env`. `yuzuha.config.ts`, a própria CLI, os demais arquivos de `src/` (inclui `emoji.ts`) e o token pedem reinício. Um listener novo no `setup` só existe depois desse reinício. `npm start` sobe sem recarga. Os dois leem o `.env` antes da config. `npm run check` não lê o `.env`. Sem `PREFIX` no ambiente, o prefixo fica `a.` — é o padrão global; `a.setprefix` sobrepõe por servidor.
+`npm run dev` sobe a CLI do Ace. Ao salvar, ela recarrega os comandos e, dentro de `src/`, a menção, o prefixo, a marca, os emojis, o cargo de entrada e o kick/ban, além do `PREFIX` do `.env`. `yuzuha.config.ts`, a própria CLI, os demais arquivos de `src/` e o token pedem reinício. Um listener novo no `setup` só existe depois desse reinício. `npm start` sobe sem recarga. Os dois leem o `.env` antes da config. `npm run check` não lê o `.env`. Sem `PREFIX` no ambiente, o prefixo fica `a.` — é o padrão global; `a.setprefix` sobrepõe por servidor.
 
 ## Comandos
 

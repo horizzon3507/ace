@@ -7,8 +7,8 @@ export const RUNTIME_FILES = [
   'src/join-role.ts',
   'src/punish.ts',
   'src/resolve.ts',
+  'src/emoji.ts',
 ] as const;
-// src/emoji.ts fica de fora e exige restart: imports estáticos não aceitam cache-bust.
 
 function normalize(input: string): string {
   const parts: string[] = [];
