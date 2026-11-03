@@ -28,6 +28,7 @@ npm run dev
 |---|---|
 | `a.ajuda` | Lista os comandos do Ace. |
 | `a.ping` | Latência do Ace. |
+| `a.uptime` | Há quanto tempo o Ace está acordado. |
 | `a.avatar` | Exibe o avatar de um usuário. |
 | `a.userbanner` | Exibe o banner de um usuário. |
 | `a.guildicon` | Exibe o ícone do servidor atual. |
