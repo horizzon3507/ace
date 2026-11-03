@@ -22,6 +22,6 @@ export default defineCommand({
       await ctx.reply(`${emoji.globe} Ainda sem amostra de latência — tente de novo em instantes.`);
       return;
     }
-    await ctx.reply(`${emoji.globe} Latência do gateway: **${ping}**ms — conexão ${connectionStatus(ping)}.`);
+    await ctx.reply(`${emoji.globe} Pong! A minha conexão com este servidor está **${connectionStatus(ping)}** (**${ping}**ms).`);
   },
 });
