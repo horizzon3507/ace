@@ -1,4 +1,5 @@
 export function prefix(): string {
   const value = process.env.PREFIX?.trim();
-  return value ? value : 'a.';
+  // Espaço no prefixo derruba o roteamento do yuzuha em toda mensagem.
+  return value && !/\s/.test(value) ? value : 'a.';
 }
