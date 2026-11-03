@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Bot do Fluxer com Yuzuha — prefixo a., comandos de utilidade e moderação.",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=22.21.0"
   },
