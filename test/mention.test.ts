@@ -6,7 +6,7 @@ const self = '1565400101596172288';
 
 test('menção pura monta o texto sem embed', () => {
   const text = mentionMessage('a.');
-  assert.equal(text, '<:emotionhappyfill:1566571242956263425> Sou o **Ace**, bot multifuncional do Fluxer.\n-# ╰ `a.ajuda` lista os comandos · [me adicione](https://web.fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120)');
+  assert.equal(text, '<:emotionhappyfill:1566571242956263425> Heey! Me chamo **Ace**. Sou uma aplicação **multifuncional** para o Fluxer. Saiba mais usando `a.ajuda` e [me adicione](https://web.fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120) em seu servidor!');
 });
 
 test('comando inexistente avisa e aponta a ajuda', () => {
