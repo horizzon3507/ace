@@ -52,7 +52,7 @@ test('hierarquia acima do bot bloqueia', async (t) => {
   fixture.transport.setMember('100', { id: '5', owner: false, permissions: 0n, rank: 500 });
 
   assert.equal(await fixture.send('a.kick <@5>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /está \*\*acima\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /está \*\*acima do seu ou do meu\*\*/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
