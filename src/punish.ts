@@ -18,7 +18,7 @@ const copy = {
 
 /** Reescreve os GuardErrors do SDK com a voz do Ace; retorna null pros que não reconhece. */
 function guardReply(raw: string, spec: (typeof copy)[Punishment], emoji: ModerationDeps['emoji']): string | null {
-  if (raw.includes('hierarquia')) return `${emoji.unhappy} Eu não posso ${spec.fail} esse membro — o **cargo** dele tá **acima** do seu ou do meu!`;
+  if (raw.includes('hierarquia')) return `${emoji.unhappy} Eu **não posso ${spec.fail}** esse membro! O cargo dele está **acima** do seu ou do meu...`;
   if (raw.startsWith('Preciso da permissão')) return `${emoji.unhappy} Eu preciso da permissão **${spec.perm}** para isso!`;
   if (raw.startsWith('Você precisa da permissão')) return `${emoji.unhappy} Você precisa da permissão **${spec.perm}**!`;
   return null;
@@ -54,11 +54,11 @@ export function bindModeration(deps: ModerationDeps) {
 
     const { id } = target;
     if (id === ctx.authorID) {
-      await ctx.reply(`${emoji.unhappy} Ei, você não pode ${spec.fail} **você mesmo**, não!`);
+      await ctx.reply(`${emoji.unhappy} Você não pode me usar pra **${spec.fail} a si mesmo**!`);
       return;
     }
     if (id === ctx.transport.botID) {
-      await ctx.reply(`${emoji.unhappy} Ei, eu não posso me ${spec.fail}, né!`);
+      await ctx.reply(`${emoji.unhappy} Eu não posso **me ${spec.fail}** do servidor!`);
       return;
     }
     const reason = moderationReason(ctx);

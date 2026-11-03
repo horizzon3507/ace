@@ -33,7 +33,7 @@ test('não pode moderar a si mesmo', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.kick <@1>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /você não pode expulsar \*\*você mesmo\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /me usar pra \*\*expulsar a si mesmo\*\*/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -42,7 +42,7 @@ test('não pode moderar o próprio bot', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.kick <@999>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /eu não posso me expulsar/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não posso \*\*me expulsar\*\* do servidor/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -52,7 +52,7 @@ test('hierarquia acima do bot bloqueia', async (t) => {
   fixture.transport.setMember('100', { id: '5', owner: false, permissions: 0n, rank: 500 });
 
   assert.equal(await fixture.send('a.kick <@5>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /tá \*\*acima\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /está \*\*acima\*\*/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
