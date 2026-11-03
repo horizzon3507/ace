@@ -4,6 +4,8 @@ import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
 import { brand } from '../src/brand.js';
 import { prefix } from '../src/prefix.js';
 import ping from '../commands/ping.js';
+import uptime from '../commands/uptime.js';
+import setprefix from '../commands/setprefix.js';
 import ajuda from '../commands/ajuda.js';
 import guildicon from '../commands/guildicon.js';
 import avatar from '../commands/avatar.js';
@@ -12,7 +14,7 @@ import guildbanner from '../commands/guildbanner.js';
 import kick from '../commands/kick.js';
 import ban from '../commands/ban.js';
 
-const commands = [ping, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban];
+const commands = [ping, uptime, setprefix, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban];
 
 function bot(resources?: MockResourceOverrides) {
   return createTestBot({ prefix: 'a.', commands, resources });
@@ -68,17 +70,30 @@ test('mensagem sem o prefixo é ignorada', async (t) => {
   assert.equal(fixture.messages.length, 0);
 });
 
-test('ajuda lista os comandos', async (t) => {
+test('ajuda lista os comandos por categoria em grade', async (t) => {
   const fixture = bot();
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.ajuda'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
-  const content = embed?.description ?? '';
+  assert.equal(embed?.title, '<:information2fill:1566640356991184896> Veja meus comandos!');
+  assert.equal(embed?.description, 'Heey! Estes são os meus comandos. Não é uma lista infinita, é **uma lista útil**.');
+  assert.equal(embed?.footer?.text, 'Prefixo a. • Ace');
+  const fields = embed?.fields ?? [];
   for (const command of fixture.bot.listCommands().filter((item) => !item.hidden)) {
-    assert.match(content, new RegExp(`a\\.${command.name}\\b`), `ajuda não listou ${command.name}`);
+    const field = fields.find((item) => item.name === `\`a.${command.name}\``);
+    assert.ok(field, `ajuda não listou ${command.name}`);
+    assert.equal(field.inline, true);
+    assert.ok(field.value, `ajuda listou ${command.name} sem descrição`);
   }
-  assert.doesNotMatch(content, /hello/);
+  const headers = fields.filter((item) => item.inline !== true).map((item) => item.name);
+  assert.deepEqual(headers, [
+    '<:information2fill:1566640356991184896> Geral',
+    '<:globefill:1566571242956263426> Utilidades',
+    '<:userforbidfill:1566644852504932352> Moderação',
+    '<:emotionhappyfill:1566571242956263425> Servidor',
+  ]);
+  assert.doesNotMatch(fields.map((item) => item.name).join(' '), /hello/);
   assert.deepEqual(fixture.errors, []);
 });
 
