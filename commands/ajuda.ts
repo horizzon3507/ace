@@ -8,7 +8,7 @@ type CommandCategory = { emoji: keyof typeof emoji; commands: readonly string[] 
 const categories: CommandCategory[] = [
   { emoji: 'information', commands: ['ajuda', 'ping', 'uptime', 'setprefix'] },
   { emoji: 'globe', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner'] },
-  { emoji: 'ban', commands: ['kick', 'ban'] },
+  { emoji: 'ban', commands: ['kick', 'ban', 'lock', 'unlock'] },
 ];
 
 export default defineCommand({
