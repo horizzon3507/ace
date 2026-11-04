@@ -1,4 +1,5 @@
 import { brand as initialBrand } from './brand.js';
+import { runChannelLock as initialLock, type LockAction } from './channel-lock.js';
 import type { AceContext } from './context.js';
 import { grantJoinRole as initialGrant, type JoinMember } from './join-role.js';
 import { isBareMention as initialBare, mentionMessage as initialMention, unknownCommandMessage as initialUnknown } from './mention.js';
@@ -12,6 +13,7 @@ type BareFn = (content: string, selfId: string, mentioned: boolean) => boolean;
 type UnknownFn = (content: string, commandPrefix: string, names: readonly string[]) => string | undefined;
 type GrantFn = (member: JoinMember) => Promise<boolean>;
 type ModerationFn = (ctx: AceContext, action: Punishment) => Promise<void>;
+type ChannelLockFn = (ctx: AceContext, action: LockAction) => Promise<void>;
 type TargetFn = (ctx: AceContext) => string;
 
 export type RuntimeBrand = { primary: number; eyes: number; background: number };
@@ -23,6 +25,7 @@ export type RuntimeInstall = {
   unknownCommandMessage: UnknownFn;
   grantJoinRole: GrantFn;
   runModeration: ModerationFn;
+  runChannelLock: ChannelLockFn;
   targetUserID: TargetFn;
   brand: RuntimeBrand;
 };
@@ -34,6 +37,7 @@ const slots: RuntimeInstall = {
   unknownCommandMessage: initialUnknown,
   grantJoinRole: initialGrant,
   runModeration: initialModeration,
+  runChannelLock: initialLock,
   targetUserID: initialTarget,
   brand: {
     primary: initialBrand.primary,
@@ -68,6 +72,10 @@ export function runModeration(ctx: AceContext, action: Punishment): Promise<void
   return slots.runModeration(ctx, action);
 }
 
+export function runChannelLock(ctx: AceContext, action: LockAction): Promise<void> {
+  return slots.runChannelLock(ctx, action);
+}
+
 export function targetUserID(ctx: AceContext): string {
   return slots.targetUserID(ctx);
 }
@@ -99,6 +107,9 @@ export function installRuntime(next: RuntimeInstall): void {
   if (typeof next.runModeration !== 'function') {
     throw new Error('runModeration() não é função.');
   }
+  if (typeof next.runChannelLock !== 'function') {
+    throw new Error('runChannelLock() não é função.');
+  }
   if (typeof next.targetUserID !== 'function') {
     throw new Error('targetUserID() não é função.');
   }
@@ -111,6 +122,7 @@ export function installRuntime(next: RuntimeInstall): void {
   slots.unknownCommandMessage = next.unknownCommandMessage;
   slots.grantJoinRole = next.grantJoinRole;
   slots.runModeration = next.runModeration;
+  slots.runChannelLock = next.runChannelLock;
   slots.targetUserID = next.targetUserID;
   // Quem importa brand segura a referência: muta in-place, nunca troca o objeto.
   Object.assign(brand, next.brand);

@@ -8,6 +8,7 @@ export const RUNTIME_FILES = [
   'src/punish.ts',
   'src/resolve.ts',
   'src/emoji.ts',
+  'src/channel-lock.ts',
 ] as const;
 
 function normalize(input: string): string {

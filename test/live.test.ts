@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { brand as sourceBrand } from '../src/brand.js';
+import { runChannelLock as sourceLock } from '../src/channel-lock.js';
 import { brand, grantJoinRole, installRuntime, isBareMention, mentionMessage, prefix, targetUserID, unknownCommandMessage } from '../src/live.js';
 import { grantJoinRole as sourceGrant } from '../src/join-role.js';
 import { unknownCommandMessage as sourceUnknown } from '../src/mention.js';
@@ -9,6 +10,7 @@ import { targetUserID as sourceTarget } from '../src/resolve.js';
 
 const moderation = {
   runModeration: sourceModeration,
+  runChannelLock: sourceLock,
   targetUserID: sourceTarget,
 };
 
@@ -27,6 +29,7 @@ test('install troca menção, prefixo, cor e cargo no mesmo objeto', async () =>
     unknownCommandMessage: (_content, commandPrefix, names) => names.length ? undefined : `faltou ${commandPrefix}`,
     grantJoinRole: async () => false,
     runModeration: async () => undefined,
+    runChannelLock: async () => undefined,
     targetUserID: () => 'slot',
     brand: { primary: 0x112233, eyes: 0xf1f1f1, background: 0x171717 },
   });

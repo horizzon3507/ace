@@ -12,7 +12,7 @@ import { classifyChange, RUNTIME_FILES, type ReloadKind } from './watch-plan.js'
 export async function refreshRuntime(root: string): Promise<void> {
   const stamp = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
   const load = (file: string) => import(`${pathToFileURL(resolve(root, file)).href}?ace=${stamp}`);
-  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
+  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod, lockMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
     typeof import('./mention.js'),
     typeof import('./prefix.js'),
     typeof import('./brand.js'),
@@ -20,6 +20,7 @@ export async function refreshRuntime(root: string): Promise<void> {
     typeof import('./punish.js'),
     typeof import('./resolve.js'),
     typeof import('./emoji.js'),
+    typeof import('./channel-lock.js'),
   ];
   const missing = (file: string, name: string) => new Error(`${file} não exportou '${name}'.`);
   if (typeof mention.mentionMessage !== 'function') throw missing('src/mention.ts', 'mentionMessage');
@@ -42,6 +43,11 @@ export async function refreshRuntime(root: string): Promise<void> {
   if (typeof runModeration !== 'function') {
     throw new Error('src/punish.ts: bindModeration() não devolveu função.');
   }
+  if (typeof lockMod.bindChannelLock !== 'function') throw missing('src/channel-lock.ts', 'bindChannelLock');
+  const runChannelLock = lockMod.bindChannelLock({ emoji });
+  if (typeof runChannelLock !== 'function') {
+    throw new Error('src/channel-lock.ts: bindChannelLock() não devolveu função.');
+  }
   installRuntime({
     prefix: prefixMod.prefix,
     mentionMessage: mention.mentionMessage,
@@ -49,6 +55,7 @@ export async function refreshRuntime(root: string): Promise<void> {
     unknownCommandMessage: mention.unknownCommandMessage,
     grantJoinRole: joinMod.grantJoinRole,
     runModeration,
+    runChannelLock,
     targetUserID: resolveMod.targetUserID,
     brand: brandMod.brand,
   });
