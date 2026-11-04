@@ -37,6 +37,7 @@ Primeiro corte em desenvolvimento do bot do Fluxer — em construção, ainda n�
 - Prefixo por servidor com `a.setprefix` (exige Gerenciar Servidor), persistido no diretório de dados do Yuzuha com cache em memória; `PREFIX` no `.env` segue o padrão global.
 - Comandos de utilidade `a.ajuda` (embed), `a.ping` (qualificação da conexão), `a.uptime` (duração em dias/horas/minutos) e `a.avatar`, `a.userbanner`, `a.guildicon`, `a.guildbanner` em resolução máxima do CDN.
 - Moderação `a.kick` e `a.ban` com alvo por menção, ID ou nome (busca com fallback), motivo, hierarquia e casos numerados.
+- `a.lock` e `a.unlock` trancam/destrancam canais de texto via overwrite de `SendMessages` no `@everyone`, com canal opcional por menção ou ID, motivo no audit log e recusa de canais de voz e categorias.
 - Menção com apresentação e link de convite, aviso de comando desconhecido e cargo automático de entrada.
 - Licença AGPL-3.0.
 - Various other small tweaks

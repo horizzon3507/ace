@@ -46,11 +46,13 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 | `a.guildbanner` | | Banner do servidor atual. |
 | `a.kick` | `<usuário> [motivo]` | Expulsa um membro do servidor. |
 | `a.ban` | `<usuário> [motivo]` | Bane um membro do servidor. |
+| `a.lock` | `[canal] [motivo]` | Tranca o canal para novas mensagens. |
+| `a.unlock` | `[canal] [motivo]` | Destranca o canal novamente. |
 | `a.setprefix` | `<prefixo>` ou `reset` | Troca o prefixo do Ace no servidor. |
 
 `usuário` aceita menção, ID ou nome (nome resolve por busca no servidor). Sem argumento, `a.avatar` e `a.userbanner` mostram o seu.
 
-`a.guildicon`, `a.guildbanner`, `a.kick`, `a.ban` e `a.setprefix` só rodam dentro de um servidor. `a.kick` e `a.ban` pedem a permissão equivalente; `a.setprefix` pede Gerenciar Servidor.
+`a.guildicon`, `a.guildbanner`, `a.kick`, `a.ban`, `a.lock`, `a.unlock` e `a.setprefix` só rodam dentro de um servidor. `a.kick` e `a.ban` pedem a permissão equivalente; `a.lock` e `a.unlock` pedem Gerenciar Cargos; `a.setprefix` pede Gerenciar Servidor.
 
 ## Dados
 
