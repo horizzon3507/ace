@@ -98,7 +98,8 @@ test('unlock sem alvo destranca o canal atual', async (t) => {
 
   assert.equal(await fixture.send('a.unlock'), 'success');
   assert.equal(calls.at(-1)?.channelID, '200');
-  assert.deepEqual(calls.at(-1)?.input.allow, ['SendMessages']);
+  assert.deepEqual(calls.at(-1)?.input.allow, []);
+  assert.deepEqual(calls.at(-1)?.input.deny, []);
   const content = fixture.messages.at(-1)?.payload.content ?? '';
   assert.match(content, /Canal \*\*destrancado\*\*!/);
   assert.match(content, /liberadas novamente/);

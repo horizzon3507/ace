@@ -43,7 +43,8 @@ export function bindChannelLock(deps: ChannelLockDeps) {
       await ctx.reply(`${emoji.unhappy} Eu não consigo ${spec.wrongType} **esse tipo de canal**... Só funciona em canais de texto!`);
       return;
     }
-    const grant = action === 'lock' ? { deny: ['SendMessages'] } : { allow: ['SendMessages'] };
+    // Unlock zera a máscara (@everyone volta ao neutro); lock nega o envio.
+    const grant = action === 'lock' ? { deny: ['SendMessages'] } : { allow: [], deny: [] };
     await ctx.resources.channels.overwrite(channel.id, guildID, {
       ...grant,
       type: 'role',
