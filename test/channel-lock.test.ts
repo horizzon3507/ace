@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot } from 'yuzuha/testing';
+import { SDK } from 'yuzuha';
 import type { ChannelInfo, ChannelOverwriteInput, RoleInfo } from 'yuzuha';
 import lock from '../commands/lock.js';
 import unlock from '../commands/unlock.js';
+import { everyoneMasks } from '../src/channel-lock.js';
 
 // MockTransport: autor '1' (dono/Admin), bot '999' (Admin), canal padrão '200', guild '100'.
 const calls: { channelID: string; targetID: string; input: ChannelOverwriteInput }[] = [];
@@ -112,4 +114,49 @@ test('unlock com menção destranca outro canal', async (t) => {
   assert.equal(await fixture.send('a.unlock <#9>'), 'success');
   assert.equal(calls.at(-1)?.channelID, '9');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Canal <#9> \*\*destrancado\*\*!/);
+});
+
+// Regressão: o PUT de overwrite substitui a máscara inteira — lock/unlock só pode
+// mexer no bit de SendMessages, senão apaga o deny de ViewChannel que faz um
+// canal privado continuar privado (e qualquer outro bit alheio).
+const { AddReactions, SendMessages, ViewChannel } = SDK.PermissionFlags;
+
+test('lock preserva o deny de ViewChannel de canal privado', () => {
+  const next = everyoneMasks({ allow: 0n, deny: ViewChannel }, 'lock');
+  assert.equal(next.deny, ViewChannel | SendMessages);
+  assert.equal(next.allow, 0n);
+  assert.equal(next.neutral, false);
+});
+
+test('unlock tira só o SendMessages e mantém o canal privado', () => {
+  const next = everyoneMasks({ allow: 0n, deny: ViewChannel | SendMessages }, 'unlock');
+  assert.equal(next.deny, ViewChannel);
+  assert.equal(next.allow, 0n);
+  assert.equal(next.neutral, false);
+});
+
+test('lock remove SendMessages do allow e preserva bits alheios', () => {
+  const next = everyoneMasks({ allow: SendMessages | AddReactions, deny: ViewChannel }, 'lock');
+  assert.equal(next.allow, AddReactions);
+  assert.equal(next.deny, ViewChannel | SendMessages);
+});
+
+test('unlock limpa SendMessages dos dois lados e vira neutro', () => {
+  const next = everyoneMasks({ allow: SendMessages, deny: SendMessages }, 'unlock');
+  assert.equal(next.allow, 0n);
+  assert.equal(next.deny, 0n);
+  assert.equal(next.neutral, true);
+  assert.equal(next.had, true); // overwrite existia → delete limpa ele da lista
+});
+
+test('unlock sem overwrite prévio não chama a API', () => {
+  const next = everyoneMasks(undefined, 'unlock');
+  assert.equal(next.neutral, true);
+  assert.equal(next.had, false);
+});
+
+test('lock sem overwrite prévio cria só o deny de SendMessages', () => {
+  const next = everyoneMasks(undefined, 'lock');
+  assert.equal(next.deny, SendMessages);
+  assert.equal(next.allow, 0n);
 });

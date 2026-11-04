@@ -1,3 +1,4 @@
+import { SDK } from 'yuzuha';
 import type { AceContext } from './context.js';
 import { emoji as bundledEmoji } from './emoji.js';
 
@@ -14,6 +15,20 @@ const copy = {
 
 /** GuildText (0) e GuildAnnouncement (5) — os únicos onde SendMessages faz sentido. */
 const TEXT_TYPES = new Set([0, 5]);
+
+const SEND = SDK.PermissionFlags.SendMessages;
+
+/** Mexe só no bit de SendMessages: o resto da máscara do @everyone (ex.: deny de ViewChannel em canal privado) sobrevive intacto. */
+export function everyoneMasks(
+  current: { allow: bigint; deny: bigint } | undefined,
+  action: LockAction,
+) {
+  const allow = (current?.allow ?? 0n) & ~SEND;
+  const deny = action === 'lock'
+    ? (current?.deny ?? 0n) | SEND
+    : (current?.deny ?? 0n) & ~SEND;
+  return { allow, deny, neutral: allow === 0n && deny === 0n, had: current !== undefined };
+}
 
 /** Fecha sobre os emojis desta carga. O import estático fica no cache do Node. */
 export function bindChannelLock(deps: ChannelLockDeps) {
@@ -43,13 +58,34 @@ export function bindChannelLock(deps: ChannelLockDeps) {
       await ctx.reply(`${emoji.unhappy} Eu não consigo ${spec.wrongType} **esse tipo de canal**... Só funciona em canais de texto!`);
       return;
     }
-    // Unlock zera a máscara (@everyone volta ao neutro); lock nega o envio.
-    const grant = action === 'lock' ? { deny: ['SendMessages'] } : { allow: [], deny: [] };
-    await ctx.resources.channels.overwrite(channel.id, guildID, {
-      ...grant,
-      type: 'role',
-      reason: `${ctx.authorName}: ${reason}`,
-    });
+    // O PUT de overwrite substitui a máscara inteira — ler o estado atual via client
+    // nativo para não apagar outros bits (deny de ViewChannel de canal privado, etc.).
+    let overwrites: SDK.GuildChannel['permissionOverwrites'] | undefined;
+    try {
+      const raw = await ctx.client.channels.resolve(channel.id);
+      overwrites = raw instanceof SDK.GuildChannel ? raw.permissionOverwrites : undefined;
+    } catch {
+      overwrites = undefined; // sem client nativo (testes) → caminho simples
+    }
+    if (overwrites) {
+      const current = overwrites.cache.get(guildID);
+      const next = everyoneMasks(
+        current ? { allow: current.allow.bitfield, deny: current.deny.bitfield } : undefined,
+        action,
+      );
+      if (next.neutral) {
+        if (next.had) await overwrites.delete(guildID);
+      } else {
+        await overwrites.edit(guildID, { type: SDK.OverwriteType.Role, allow: next.allow, deny: next.deny });
+      }
+    } else {
+      const grant = action === 'lock' ? { deny: ['SendMessages'] } : { allow: [], deny: [] };
+      await ctx.resources.channels.overwrite(channel.id, guildID, {
+        ...grant,
+        type: 'role',
+        reason: `${ctx.authorName}: ${reason}`,
+      });
+    }
     const body = action === 'lock'
       ? `Ninguém mais consegue enviar mensagens ${ref ? 'lá' : 'aqui'} por enquanto`
       : 'As mensagens estão liberadas novamente';
