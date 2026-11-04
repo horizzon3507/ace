@@ -6,6 +6,8 @@ export type AceContext = {
   readonly tokens: readonly string[];
   readonly transport: CommandContext['transport'];
   readonly authorID: string;
+  readonly authorName: CommandContext['authorName'];
+  readonly channelID: CommandContext['channelID'];
   readonly input: string;
   readonly resources: CommandContext['resources'];
   readonly mod: CommandContext['mod'];
