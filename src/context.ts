@@ -10,6 +10,7 @@ export type AceContext = {
   readonly channelID: CommandContext['channelID'];
   readonly input: string;
   readonly resources: CommandContext['resources'];
+  readonly client: CommandContext['client'];
   readonly mod: CommandContext['mod'];
   readonly help: CommandContext['help'];
   requireGuild: CommandContext['requireGuild'];
