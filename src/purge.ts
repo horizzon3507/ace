@@ -25,11 +25,11 @@ export function bindPurge(deps: PurgeDeps) {
         return;
       }
       if (target.status === 'missing') {
-        await ctx.reply(`${emoji.unhappy} Eu não encontrei ninguém como ${target.query}... Use menção ou ID do usuário.`);
+        await ctx.reply(`${emoji.unhappy} Eu não encontrei ninguém como ${target.query}... Use menção ou ID de usuário.`);
         return;
       }
       if (target.status === 'ambiguous') {
-        await ctx.reply(`${emoji.unhappy} Eu encontrei vários membros como ${target.query}... Use menção ou forneça o ID do usuário!`);
+        await ctx.reply(`${emoji.unhappy} Eu encontrei vários membros como ${target.query}... Use menção ou forneça o ID de usuário!`);
         return;
       }
       const parsed = ctx.tokens[1] === undefined ? 10 : amount(ctx.tokens[1]);
