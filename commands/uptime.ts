@@ -1,11 +1,11 @@
 import { defineCommand } from 'yuzuha';
 import { emoji } from '../src/emoji.js';
+import { formatStamp } from '../src/format.js';
 
-const two = (n: number) => String(n).padStart(2, '0');
+export { formatStamp };
 
-export function formatBootStamp(date: Date): string {
-  return `**${two(date.getDate())}/${two(date.getMonth() + 1)} **às **${two(date.getHours())}:${two(date.getMinutes())}**`;
-}
+/** Mantido para quem ainda importa daqui; a casa do carimbo agora é src/format.ts. */
+export const formatBootStamp = formatStamp;
 
 export function formatUptime(totalSeconds: number): string {
   const seconds = Math.max(0, Math.floor(totalSeconds));
@@ -31,6 +31,6 @@ export default defineCommand({
   async run(ctx) {
     const up = process.uptime();
     const bootedAt = new Date(Date.now() - up * 1000);
-    await ctx.reply(`${emoji.time} Eu estou acordado e na escuta há ${formatUptime(up)} (desde ${formatBootStamp(bootedAt)})!`);
+    await ctx.reply(`${emoji.time} Eu estou acordado e na escuta há ${formatUptime(up)} (desde ${formatStamp(bootedAt)})!`);
   },
 });
