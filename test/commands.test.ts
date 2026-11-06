@@ -13,8 +13,14 @@ import userbanner from '../commands/userbanner.js';
 import guildbanner from '../commands/guildbanner.js';
 import kick from '../commands/kick.js';
 import ban from '../commands/ban.js';
+import userinfo from '../commands/userinfo.js';
+import guildinfo from '../commands/guildinfo.js';
+import clear from '../commands/clear.js';
+import purge from '../commands/purge.js';
+import timeout from '../commands/timeout.js';
+import unban from '../commands/unban.js';
 
-const commands = [ping, uptime, setprefix, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban];
+const commands = [ping, uptime, setprefix, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban, userinfo, guildinfo, clear, purge, timeout, unban];
 
 function bot(resources?: MockResourceOverrides) {
   return createTestBot({ prefix: 'a.', commands, resources });
