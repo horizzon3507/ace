@@ -32,6 +32,7 @@ export async function refreshRuntime(root: string): Promise<void> {
   if (typeof resolveMod.resolveTarget !== 'function') throw missing('src/resolve.ts', 'resolveTarget');
   if (typeof resolveMod.moderationReason !== 'function') throw missing('src/resolve.ts', 'moderationReason');
   if (typeof resolveMod.targetUserID !== 'function') throw missing('src/resolve.ts', 'targetUserID');
+  if (typeof resolveMod.resolveBanTarget !== 'function') throw missing('src/resolve.ts', 'resolveBanTarget');
   if (typeof punishMod.bindModeration !== 'function') throw missing('src/punish.ts', 'bindModeration');
   if (!emojiMod.emoji || typeof emojiMod.emoji !== 'object') throw missing('src/emoji.ts', 'emoji');
   for (const [key, value] of Object.entries(emojiMod.emoji)) {
@@ -39,7 +40,7 @@ export async function refreshRuntime(root: string): Promise<void> {
       throw new Error(`src/emoji.ts: 'emoji.${key}' não é texto.`);
     }
   }
-  const runModeration = punishMod.bindModeration({ emoji, resolveTarget: resolveMod.resolveTarget, moderationReason: resolveMod.moderationReason });
+  const runModeration = punishMod.bindModeration({ emoji, resolveTarget: resolveMod.resolveTarget, resolveBanTarget: resolveMod.resolveBanTarget, moderationReason: resolveMod.moderationReason });
   if (typeof runModeration !== 'function') {
     throw new Error('src/punish.ts: bindModeration() não devolveu função.');
   }
