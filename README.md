@@ -44,15 +44,21 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 | `a.userbanner` | `[usuário]` | Banner seu ou de outro usuário. |
 | `a.guildicon` | | Ícone do servidor atual. |
 | `a.guildbanner` | | Banner do servidor atual. |
+| `a.userinfo` | `[usuário]` | Informações suas ou de outro usuário. |
+| `a.guildinfo` | | Informações do servidor atual. |
 | `a.kick` | `<usuário> [motivo]` | Expulsa um membro do servidor. |
 | `a.ban` | `<usuário> [motivo]` | Bane um membro do servidor. |
+| `a.unban` | `<usuário> [motivo]` | Remove o banimento de um usuário. |
+| `a.timeout` | `<usuário> <duração> [motivo]` | Silencia um membro temporariamente (até 28 dias). |
 | `a.lock` | `[canal] [motivo]` | Tranca o canal para novas mensagens. |
 | `a.unlock` | `[canal] [motivo]` | Destranca o canal novamente. |
+| `a.clear` | `<n>` | Apaga as últimas mensagens do canal. |
+| `a.purge` | `<usuário> [n]` | Apaga mensagens recentes de um membro no canal. |
 | `a.setprefix` | `<prefixo>` ou `reset` | Troca o prefixo do Ace no servidor. |
 
-`usuário` aceita menção, ID ou nome (nome resolve por busca no servidor). Sem argumento, `a.avatar` e `a.userbanner` mostram o seu.
+`usuário` aceita menção, ID ou nome (nome resolve por busca no servidor; no `a.unban`, na lista de bans). Sem argumento, `a.avatar`, `a.userbanner` e `a.userinfo` mostram o seu.
 
-`a.guildicon`, `a.guildbanner`, `a.kick`, `a.ban`, `a.lock`, `a.unlock` e `a.setprefix` só rodam dentro de um servidor. `a.kick` e `a.ban` pedem a permissão equivalente; `a.lock` e `a.unlock` pedem Gerenciar Cargos; `a.setprefix` pede Gerenciar Servidor.
+`a.guildicon`, `a.guildbanner`, `a.userinfo`, `a.guildinfo`, `a.kick`, `a.ban`, `a.unban`, `a.timeout`, `a.lock`, `a.unlock`, `a.clear`, `a.purge` e `a.setprefix` só rodam dentro de um servidor. `a.kick`, `a.ban` e `a.unban` pedem a permissão equivalente; `a.timeout` pede Moderar Membros; `a.lock` e `a.unlock` pedem Gerenciar Cargos; `a.clear` e `a.purge` pedem Gerenciar Mensagens; `a.setprefix` pede Gerenciar Servidor.
 
 ## Dados
 
@@ -62,6 +68,6 @@ O token fica só no `.env`; `data/` e `.env` nunca entram no Git. Casos de moder
 
 ## Mais
 
-- [CHANGELOG.md](CHANGELOG.md): versões no estilo Hory, `v0.1.0-alpha` em desenvolvimento.
+- [CHANGELOG.md](CHANGELOG.md): versões no estilo Hory, `v0.1.1-alpha` em desenvolvimento.
 - [CONTRIBUTING.md](CONTRIBUTING.md): convenções de commit, testes e novos comandos.
 - [LICENSE](LICENSE): AGPL-3.0.
