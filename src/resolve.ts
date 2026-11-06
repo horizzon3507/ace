@@ -63,6 +63,34 @@ export async function resolveTarget(ctx: AceContext, guildID: string, tokens: re
   }
 }
 
+/** Alvo de unban: menção/ID direto ou busca por nome na lista de bans do servidor. */
+export async function resolveBanTarget(ctx: AceContext, guildID: string, tokens: readonly string[]): Promise<TargetResult> {
+  const token = tokens[0];
+  if (!token) return { status: 'none' };
+  const mention = MENTION.exec(token);
+  if (mention) return { status: 'found', id: mention[1] };
+  // Banido não é membro: qualquer sequência de dígitos é ID candidato — quem
+  // chamou confere a existência na lista de bans em vez de exigir um snowflake.
+  if (/^\d+$/.test(token)) return { status: 'found', id: token };
+
+  const query = token.replace(/^@+/, '').replace(/#\d+$/, '').trim().toLowerCase();
+  if (!query) return { status: 'none' };
+  if (/^\d+$/.test(query)) return { status: 'found', id: query };
+
+  try {
+    const bans = await ctx.resources.users.bans(guildID, 1000);
+    const exact = bans.find((ban) => ban.username.toLowerCase() === query);
+    if (exact) return { status: 'found', id: exact.userID, label: exact.username || undefined };
+    if (query.length < 2) return { status: 'missing', query };
+    const partial = bans.filter((ban) => ban.username.toLowerCase().startsWith(query));
+    const hit = partial.length === 1 ? partial[0] : undefined;
+    if (hit) return { status: 'found', id: hit.userID, label: hit.username || undefined };
+    return partial.length > 1 ? { status: 'ambiguous', query } : { status: 'missing', query };
+  } catch {
+    return { status: 'missing', query };
+  }
+}
+
 export type AssetTarget =
   | { status: 'found'; id: string }
   | { status: 'author' }
@@ -88,9 +116,9 @@ export async function resolveAssetTarget(ctx: AceContext): Promise<AssetTarget> 
 }
 
 /** tokens[0] é o alvo; todo <@…> restante é menção solta no motivo (ex: ping de reply). */
-export function moderationReason(ctx: AceContext): string {
+export function moderationReason(ctx: AceContext, skip = 1): string {
   const reason = ctx.tokens
-    .slice(1)
+    .slice(skip)
     .filter((token) => !token.startsWith('<@'))
     .join(' ')
     .trim();
