@@ -6,9 +6,9 @@ import { brand, prefix } from '../src/live.js';
 type CommandCategory = { emoji: keyof typeof emoji; commands: readonly string[] };
 
 const categories: CommandCategory[] = [
-  { emoji: 'information', commands: ['ajuda', 'ping', 'uptime', 'setprefix'] },
+  { emoji: 'information', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
   { emoji: 'globe', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner'] },
-  { emoji: 'ban', commands: ['kick', 'ban', 'lock', 'unlock'] },
+  { emoji: 'ban', commands: ['kick', 'ban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
 ];
 
 export default defineCommand({
