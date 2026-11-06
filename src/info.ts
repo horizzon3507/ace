@@ -14,12 +14,12 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
     id = target.status === 'found' ? target.id : ctx.authorID;
   } else {
     const text = target.status === 'missing'
-      ? `${emoji.unhappy} Eu **não encontrei** ninguém como **${target.query}**... Use **menção** ou **ID** de usuário...`
+      ? `${emoji.unhappy} Eu não encontrei ninguém como ${target.query}... Use menção ou ID de usuário...`
       : target.status === 'ambiguous'
-        ? `${emoji.unhappy} Eu **encontrei vários** membros como **${target.query}**... Use **menção** ou **ID** de usuário...`
+        ? `${emoji.unhappy} Eu encontrei vários membros como ${target.query}... Use menção ou ID de usuário...`
         : ctx.message.guildID
-          ? `${emoji.unhappy} Por favor, **informe um usuário** válido...`
-          : `${emoji.unhappy} Por favor, **informe o usuário** por **menção** ou **ID de usuário**...`;
+          ? `${emoji.unhappy} Por favor, informe um usuário válido...`
+          : `${emoji.unhappy} Por favor, informe o usuário por menção ou ID de usuário...`;
     await ctx.reply(text);
     return;
   }
@@ -35,7 +35,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
       user = await ctx.resources.users.user(id);
     }
   } catch {
-    await ctx.reply(`${emoji.unhappy} Eu **não consegui** carregar as informações deste usuário...`);
+    await ctx.reply(`${emoji.unhappy} Eu não consegui carregar as informações deste usuário...`);
     return;
   }
 
@@ -77,7 +77,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   try {
     guild = await ctx.resources.users.guild(guildID);
   } catch {
-    await ctx.reply(`${emoji.unhappy} Eu **não consegui** carregar as informações deste servidor...`);
+    await ctx.reply(`${emoji.unhappy} Eu não consegui carregar as informações deste servidor...`);
     return;
   }
 

@@ -55,7 +55,7 @@ test('nome fora da lista responde que não encontrou', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.unban ninguem'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu não \*\*encontrei ninguém\*\* como \*\*ninguem\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu não encontrei ninguém como ninguem/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -64,6 +64,6 @@ test('sem argumento pede o membro', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.unban'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Informe o membro\*\* a ser desbanido!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe o membro a ser desbanido!/);
   assert.equal(fixture.transport.actions.length, 0);
 });

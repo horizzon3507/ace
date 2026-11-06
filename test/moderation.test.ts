@@ -33,7 +33,7 @@ test('não pode moderar a si mesmo', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.kick <@1>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /me usar pra \*\*expulsar a si mesmo\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /me usar pra expulsar a si mesmo/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -42,7 +42,7 @@ test('não pode moderar o próprio bot', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.kick <@999>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não posso \*\*me expulsar\*\* do servidor/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não posso me expulsar do servidor/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -52,7 +52,7 @@ test('hierarquia acima do bot bloqueia', async (t) => {
   fixture.transport.setMember('100', { id: '5', owner: false, permissions: 0n, rank: 500 });
 
   assert.equal(await fixture.send('a.kick <@5>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /está \*\*acima do seu ou do meu\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /está acima do seu ou do meu/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -71,7 +71,7 @@ test('sem argumento pede o membro', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.kick'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Informe o membro\*\* a ser expulso!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe o membro a ser expulso!/);
 });
 
 test('nome desconhecido responde que não encontrou', async (t) => {
@@ -79,7 +79,7 @@ test('nome desconhecido responde que não encontrou', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.ban fulaninho spam'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu não \*\*encontrei ninguém\*\* como \*\*fulaninho\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu não encontrei ninguém como fulaninho/);
 });
 
 test('ID curto demais vira missing com aviso', async (t) => {

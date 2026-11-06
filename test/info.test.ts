@@ -130,7 +130,7 @@ test('userinfo avisa quando membro e usuário falham', async (t) => {
 
   assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /não consegui\*\* carregar as informações deste usuário/);
+  assert.match(content, /não consegui carregar as informações deste usuário/);
 });
 
 test('userinfo mostra silenciamento só quando ele é futuro', async (t) => {
@@ -194,5 +194,5 @@ test('guildinfo avisa quando a guild falha', async (t) => {
 
   assert.equal(await fixture.send('a.guildinfo'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /não consegui\*\* carregar as informações deste servidor/);
+  assert.match(content, /não consegui carregar as informações deste servidor/);
 });

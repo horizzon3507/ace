@@ -37,7 +37,7 @@ test('clear exige uma quantidade de 1 a 99', async (t) => {
   for (const input of ['a.clear', 'a.clear abc', 'a.clear 0', 'a.clear 100']) {
     assert.equal(await fixture.send(input), 'success');
     const content = fixture.messages.at(-1)?.payload.content ?? '';
-    assert.match(content, /\*\*Informe quantas mensagens\*\* apagar \(de \*\*1 a 99\*\*\)!/, input);
+    assert.match(content, /Informe quantas mensagens apagar \(de 1 a 99\)!/, input);
     assert.match(content, /Ex: `a\.clear 20`/, input);
     fixture.clock.advance(4_000); // cooldown de 3s entre comandos
   }
@@ -69,7 +69,7 @@ test('clear sem nada apagável admite que não encontrou', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.clear 2'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*não encontrei mensagens\*\* para apagar/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não encontrei mensagens para apagar/);
   assert.equal(fixture.messages.length, 1);
 });
 
@@ -79,7 +79,7 @@ test('purge sem membro mostra o uso', async (t) => {
 
   assert.equal(await fixture.send('a.purge'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /\*\*Informe o membro\*\* cujas mensagens apagar!/);
+  assert.match(content, /Informe o membro cujas mensagens apagar!/);
   assert.match(content, /Ex: `a\.purge @usuario 10`/);
 });
 
@@ -88,7 +88,7 @@ test('purge de nome desconhecido responde que não encontrou', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.purge ninguem'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não \*\*encontrei ninguém\*\* como \*\*ninguem\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não encontrei ninguém como ninguem/);
 });
 
 test('purge com quantidade inválida repete o uso de contagem', async (t) => {
@@ -97,7 +97,7 @@ test('purge com quantidade inválida repete o uso de contagem', async (t) => {
 
   for (const input of ['a.purge <@2> 0', 'a.purge <@2> abc', 'a.purge <@2> 100']) {
     assert.equal(await fixture.send(input), 'success');
-    assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Informe quantas mensagens\*\* apagar/, input);
+    assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe quantas mensagens apagar/, input);
     fixture.clock.advance(4_000); // cooldown de 3s entre comandos
   }
 });

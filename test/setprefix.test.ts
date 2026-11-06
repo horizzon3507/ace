@@ -29,7 +29,7 @@ test('sem argumento pede o prefixo novo', async (t) => {
   t.after(() => { setGuildPrefixCache('100', undefined); return fixture.destroy(); });
 
   assert.equal(await fixture.send('a.setprefix'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*me fornecer\*\* um prefixo novo/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /me fornecer um prefixo novo/);
 });
 
 test('reset remove a variável e volta ao padrão', async (t) => {

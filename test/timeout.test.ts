@@ -27,7 +27,7 @@ test('sem argumento pede o membro', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Informe o membro\*\* a ser silenciado!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe o membro a ser silenciado!/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -36,7 +36,7 @@ test('sem duração pede a duração do silenciamento', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout <@2>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Informe a duração\*\* do silenciamento!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe a duração do silenciamento!/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -45,7 +45,7 @@ test('duração inválida pede a duração do silenciamento', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout <@2> banana'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Informe a duração\*\* do silenciamento!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe a duração do silenciamento!/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -54,7 +54,7 @@ test('não pode silenciar a si mesmo', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout <@1> 10m'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /me usar pra \*\*silenciar a si mesmo\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /me usar pra silenciar a si mesmo/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -63,7 +63,7 @@ test('não pode silenciar o próprio bot', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout <@999> 10m'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não posso \*\*me silenciar\*\* do servidor/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não posso me silenciar do servidor/);
   assert.equal(fixture.transport.actions.length, 0);
 });
 

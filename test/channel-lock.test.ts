@@ -81,7 +81,7 @@ test('canal inexistente responde que não encontrou', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.lock <#42>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não encontrei\*\* nenhum canal como \*\*<#42>\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não encontrei nenhum canal como <#42>/);
   assert.equal(calls.length, 0);
 });
 
@@ -90,7 +90,7 @@ test('canal de voz é recusado pelo tipo', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.lock <#7>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /esse tipo de canal\*\*/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /esse tipo de canal/);
   assert.equal(calls.length, 0);
 });
 
