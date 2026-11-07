@@ -51,7 +51,7 @@ export default defineCommand({
       embeds: [embed({
         color: brand.primary,
         title: `${emoji.commandline} Confira meus comandos`,
-        description: 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**.',
+        description: 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...',
         fields,
       })],
     });
