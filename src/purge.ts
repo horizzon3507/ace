@@ -22,6 +22,7 @@ export function bindPurge(deps: PurgeDeps) {
 
   return async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
     const guildID = ctx.requireGuild();
+    const selfID = ctx.message.id;
     let n: number;
     let label: string | undefined;
     let ids: string[] | undefined;
@@ -52,10 +53,7 @@ export function bindPurge(deps: PurgeDeps) {
       n = parsed;
       label = target.label ?? target.id;
       const recent = await ctx.resources.messages.list(ctx.channelID, 100);
-      ids = recent.filter((message) => message.authorID === target.id).slice(0, n).map((message) => message.id);
-      // A listagem da API já traz a mensagem do comando; o prepend cobre o caso de ela faltar.
-      const selfID = ctx.message.id;
-      if (selfID && !ids.includes(selfID)) ids.unshift(selfID);
+      ids = recent.filter((message) => message.authorID === target.id && message.id !== selfID).slice(0, n).map((message) => message.id);
     } else {
       const parsed = amount(ctx.tokens[0]);
       if (parsed === undefined) {
@@ -71,16 +69,23 @@ export function bindPurge(deps: PurgeDeps) {
     if (mode === 'channel' && (await bulkDelete(ctx, n + 1))) {
       count = n;
     } else {
-      ids ??= (await ctx.resources.messages.list(ctx.channelID, n + 1)).map((message) => message.id);
+      ids ??= (await ctx.resources.messages.list(ctx.channelID, n + 1))
+        .map((message) => message.id)
+        .filter((id) => id !== selfID)
+        .slice(0, n);
       count = await removeEach(ctx, ids);
+      // A mensagem do comando sai junto, mas fora da conta — o total é só do alvo.
+      if (selfID) await ctx.transport.delete(ctx.channelID, selfID).catch(() => {});
     }
 
+    // A deleção cobre a mensagem do comando: responder com reply referenciaria
+    // um id morto (404). A resposta vai como send puro, sem referência.
     if (count === 0) {
-      await ctx.reply(`${emoji.unhappy} Eu não encontrei mensagens para apagar...`);
+      await ctx.send(`${emoji.unhappy} Eu não encontrei mensagens para apagar...`);
       return;
     }
     const scope = mode === 'user' ? `de @${label}` : 'deste canal';
-    const sent = await ctx.reply(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`);
+    const sent = await ctx.send(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`);
     after(REPLY_TTL_MS, () => {
       void ctx.transport.delete(ctx.channelID, sent).catch(() => { /* já foi apagada por outra via */ });
     });

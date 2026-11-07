@@ -50,8 +50,10 @@ test('clear apaga as mensagens listadas e conta só as que existiam', async (t) 
   seed(fixture, '41', '42'); // '43' saiu da listagem antes do delete — NOT_FOUND não derruba a contagem.
 
   assert.equal(await fixture.send('a.clear 2'), 'success');
-  const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /Eu apaguei \*\*2 mensagens\*\* deste canal\./);
+  const sent = fixture.messages.at(-1);
+  assert.match(sent?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* deste canal\./);
+  // A mensagem do comando foi apagada: a confirmação não pode referenciá-la.
+  assert.equal(sent?.replyTo, undefined);
   assert.equal(fixture.messages.length, 1); // só sobrou a resposta
   assert.deepEqual(fixture.errors, []);
 });
@@ -109,8 +111,9 @@ test('purge apaga só as mensagens do membro alvo', async (t) => {
   seed(fixture, '50', '51', '52');
 
   assert.equal(await fixture.send('a.purge <@2> 2'), 'success');
-  const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /Eu apaguei \*\*2 mensagens\*\* de @2\./);
+  const sent = fixture.messages.at(-1);
+  assert.match(sent?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* de @2\./);
+  assert.equal(sent?.replyTo, undefined);
   assert.ok(!fixture.messages.some((message) => message.id === '50'));
   assert.ok(fixture.messages.some((message) => message.id === '51')); // de outra autora — fica
   assert.ok(!fixture.messages.some((message) => message.id === '52'));
@@ -156,12 +159,12 @@ test('a resposta de sucesso se apaga sozinha depois de 10s', async () => {
     client: { channels: { resolve: async () => { throw new Error('sem client'); } } },
     resources: { messages: { list: async () => [{ id: 'm1' }, { id: 'm2' }, { id: 'm3' }] } },
     transport: { delete: async (_c: string, id: string) => { deleted.push(id); } },
-    reply: async () => 'sent-1',
+    send: async () => 'sent-1',
   } as unknown as Parameters<typeof run>[0], 'channel');
-  assert.equal(deleted.length, 3); // m1, m2, m3 — a resposta ainda não
+  assert.deepEqual(deleted, ['m1', 'm2', 'cmd']); // 2 do canal + a do comando, fora da conta
   assert.equal(scheduled.length, 1);
   assert.equal(scheduled[0]?.[0], 10_000);
   scheduled[0]?.[1]();
   await Promise.resolve();
-  assert.deepEqual(deleted, ['m1', 'm2', 'm3', 'sent-1']);
+  assert.deepEqual(deleted, ['m1', 'm2', 'cmd', 'sent-1']);
 });

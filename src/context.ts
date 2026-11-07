@@ -15,6 +15,7 @@ export type AceContext = {
   readonly help: CommandContext['help'];
   requireGuild: CommandContext['requireGuild'];
   reply: CommandContext['reply'];
+  send: CommandContext['send'];
   requirePermission: CommandContext['requirePermission'];
   moderate: CommandContext['moderate'];
 };
