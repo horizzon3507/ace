@@ -85,8 +85,27 @@ test('canal inexistente responde que não encontrou', async (t) => {
   assert.equal(calls.length, 0);
 });
 
-test('canal de voz é recusado pelo tipo', async (t) => {
+test('canal de voz tranca com deny de Connect', async (t) => {
   const fixture = bot({ '7': 2 });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.lock <#7>'), 'success');
+  assert.equal(calls.at(-1)?.channelID, '7');
+  assert.deepEqual(calls.at(-1)?.input.deny, ['Connect']);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /consegue entrar lá/);
+});
+
+test('canal de anúncio tranca com deny de SendMessages', async (t) => {
+  const fixture = bot({ '8': 5 });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.lock <#8>'), 'success');
+  assert.equal(calls.at(-1)?.channelID, '8');
+  assert.deepEqual(calls.at(-1)?.input.deny, ['SendMessages']);
+});
+
+test('categoria é recusada pelo tipo', async (t) => {
+  const fixture = bot({ '7': 4 });
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.lock <#7>'), 'success');
