@@ -12,7 +12,7 @@ export function unknownCommandMessage(content: string, commandPrefix: string, na
   if (!name) return;
   const known = new Set(names.map((item) => item.toLowerCase()));
   if (known.has(name)) return;
-  return `${emoji.unhappy} Infelizmente, eu não consegui encontrar nenhum comando com este nome.\n-# ╰ Psst, você pode usar \`${commandPrefix}ajuda\` para ver meus comandos!`;
+  return `${emoji.unhappy} Infelizmente, eu **não consegui encontrar nenhum comando** com este nome.\n-# ╰ Psst, você pode usar \`${commandPrefix}ajuda\` para ver meus comandos!`;
 }
 
 export function isBareMention(content: string, selfId: string, mentioned: boolean): boolean {

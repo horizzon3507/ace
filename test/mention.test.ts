@@ -11,7 +11,7 @@ test('menção pura monta o texto sem embed', () => {
 
 test('comando inexistente avisa e aponta a ajuda', () => {
   const text = unknownCommandMessage('a.nope', 'a.', ['ping', 'hello', 'ajuda']);
-  assert.equal(text, '<:emotionunhappyfill:1566571242956263424> Infelizmente, eu não consegui encontrar nenhum comando com este nome.\n-# ╰ Psst, você pode usar `a.ajuda` para ver meus comandos!');
+  assert.equal(text, '<:emotionunhappyfill:1566571242956263424> Infelizmente, eu **não consegui encontrar nenhum comando** com este nome.\n-# ╰ Psst, você pode usar `a.ajuda` para ver meus comandos!');
   assert.equal(unknownCommandMessage('a.ajuda', 'a.', ['ajuda']), undefined);
   assert.equal(unknownCommandMessage('a.Ping', 'a.', ['ping']), undefined);
   assert.equal(unknownCommandMessage('a.', 'a.', ['ping']), undefined);

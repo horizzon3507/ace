@@ -71,7 +71,7 @@ test('sem argumento pede o membro', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.kick'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Informe o membro a ser expulso!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o membro a ser expulso!/);
 });
 
 test('nome desconhecido responde que não encontrou', async (t) => {

@@ -311,7 +311,7 @@ test('avatar na DM pede menção ou ID', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.avatar alguém', { guildID: '' }), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, informe o usuário por menção/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o usuário por menção/);
 });
 
 test('userbanner avisa quando falta banner', async (t) => {

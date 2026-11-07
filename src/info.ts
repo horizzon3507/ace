@@ -18,8 +18,8 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
       : target.status === 'ambiguous'
         ? `${emoji.unhappy} Eu encontrei vários membros como ${target.query}... Use menção ou ID de usuário...`
         : ctx.message.guildID
-          ? `${emoji.unhappy} Por favor, informe um usuário válido...`
-          : `${emoji.unhappy} Por favor, informe o usuário por menção ou ID de usuário...`;
+          ? `${emoji.unhappy} Por favor, me informe um usuário válido...`
+          : `${emoji.unhappy} Por favor, me informe o usuário por menção ou ID de usuário...`;
     await ctx.reply(text);
     return;
   }

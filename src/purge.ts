@@ -21,7 +21,7 @@ export function bindPurge(deps: PurgeDeps) {
     if (mode === 'user') {
       const target = await resolveTarget(ctx, guildID, ctx.tokens);
       if (target.status === 'none') {
-        await ctx.reply(`${emoji.unhappy} Informe o membro cujas mensagens apagar!\n-# ╰ Ex: \`a.purge @usuario 10\``);
+        await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro cujas mensagens apagar!\n-# ╰ Ex: \`a.purge @usuario 10\``);
         return;
       }
       if (target.status === 'missing') {
@@ -34,7 +34,7 @@ export function bindPurge(deps: PurgeDeps) {
       }
       const parsed = ctx.tokens[1] === undefined ? 10 : amount(ctx.tokens[1]);
       if (parsed === undefined) {
-        await ctx.reply(`${emoji.unhappy} Informe quantas mensagens apagar (de 1 a 99)!\n-# ╰ Ex: \`a.purge @usuario 10\``);
+        await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)!\n-# ╰ Ex: \`a.purge @usuario 10\``);
         return;
       }
       n = parsed;
@@ -47,7 +47,7 @@ export function bindPurge(deps: PurgeDeps) {
     } else {
       const parsed = amount(ctx.tokens[0]);
       if (parsed === undefined) {
-        await ctx.reply(`${emoji.unhappy} Informe quantas mensagens apagar (de 1 a 99)!\n-# ╰ Ex: \`a.clear 20\``);
+        await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)!\n-# ╰ Ex: \`a.clear 20\``);
         return;
       }
       n = parsed;

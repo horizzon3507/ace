@@ -55,7 +55,7 @@ export function bindChannelLock(deps: ChannelLockDeps) {
       return;
     }
     if (!TEXT_TYPES.has(channel.type)) {
-      await ctx.reply(`${emoji.unhappy} Eu não consigo ${spec.wrongType} esse tipo de canal... Só funciona em canais de texto!`);
+      await ctx.reply(`${emoji.unhappy} Eu não consigo ${spec.wrongType} este tipo de canal... Só funciona em canais de texto!`);
       return;
     }
     // O PUT de overwrite substitui a máscara inteira — ler o estado atual via client

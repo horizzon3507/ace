@@ -41,7 +41,7 @@ function humanDuration(ms: number): string {
 /** Reescreve os GuardErrors do SDK com a voz do Ace; retorna null pros que não reconhece. */
 function guardReply(raw: string, spec: (typeof copy)[Punishment], emoji: ModerationDeps['emoji']): string | null {
   if (raw.includes('silenciar um administrador')) return `${emoji.unhappy} Eu não posso silenciar um administrador!`;
-  if (raw.includes('hierarquia')) return `${emoji.unhappy} Eu não posso ${spec.fail} esse membro! O cargo dele está acima do seu ou do meu...`;
+  if (raw.includes('hierarquia')) return `${emoji.unhappy} Eu não posso ${spec.fail} este membro! O cargo dele está acima do seu ou do meu...`;
   if (raw.startsWith('Preciso da permissão')) return `${emoji.unhappy} Eu preciso da permissão ${spec.perm} para isso!`;
   if (raw.startsWith('Você precisa da permissão')) return `${emoji.unhappy} Você precisa da permissão ${spec.perm}!`;
   return null;
@@ -69,7 +69,7 @@ export function bindModeration(deps: ModerationDeps) {
     const guildID = ctx.requireGuild();
     const target = await (action === 'unban' ? resolveBanTarget : resolveTarget)(ctx, guildID, ctx.tokens);
     if (target.status === 'none') {
-      await ctx.reply(`${emoji.unhappy} Informe o membro a ser ${spec.past}!\n-# ╰ Ex: \`a.${action} @usuario motivo\``);
+      await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro a ser ${spec.past}!\n-# ╰ Ex: \`a.${action} @usuario motivo\``);
       return;
     }
     if (target.status === 'missing') {
@@ -88,7 +88,7 @@ export function bindModeration(deps: ModerationDeps) {
       try {
         const bans = await ctx.resources.users.bans(guildID, 1000);
         if (!bans.some((ban) => ban.userID === id)) {
-          await ctx.reply(`${emoji.unhappy} Esse usuário não está banido nesse servidor!`);
+          await ctx.reply(`${emoji.unhappy} Este usuário não está banido neste servidor!`);
           return;
         }
       } catch {
@@ -112,7 +112,7 @@ export function bindModeration(deps: ModerationDeps) {
         return;
       }
       if (!Number.isSafeInteger(ms) || ms <= 0) {
-        await ctx.reply(`${emoji.unhappy} Informe a duração do silenciamento!\n-# ╰ Ex: \`a.timeout @usuario 10m motivo\``);
+        await ctx.reply(`${emoji.unhappy} Por favor, me informe a duração do silenciamento!\n-# ╰ Ex: \`a.timeout @usuario 10m motivo\``);
         return;
       }
       timeoutMs = ms;
@@ -144,14 +144,14 @@ export function bindModeration(deps: ModerationDeps) {
         }
       }
       if (action === 'unban' && notBanned(error)) {
-        await ctx.reply(`${emoji.unhappy} Esse usuário não está banido nesse servidor!`);
+        await ctx.reply(`${emoji.unhappy} Este usuário não está banido neste servidor!`);
         return;
       }
       // GuardError/PartialModerationError sobem: a framework responde e o outcome fica honesto.
       if (error instanceof YuzuhaError && !memberGone(error)) throw error;
       await ctx.reply(memberGone(error)
         ? `${emoji.unhappy} Eu não consigo ${spec.fail} um usuário que não está mais neste servidor!`
-        : `${emoji.unhappy} Eu não consegui ${spec.fail} esse membro!`);
+        : `${emoji.unhappy} Eu não consegui ${spec.fail} este membro!`);
     }
   };
 }
