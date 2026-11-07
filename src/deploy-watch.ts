@@ -1,19 +1,22 @@
 import { execSync } from 'node:child_process';
 
-const REPO = 'horizzon3507/ace';
-const BRANCH = 'main';
-const INTERVAL_MS = 60 * 1000;
+const INTERVAL_MS = (Number(process.env.DEPLOY_POLL_SECONDS) || 60) * 1000;
 
-function localSha(): string | undefined {
+function git(args: string): string | undefined {
   try {
-    return execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || undefined;
+    return execSync(`git ${args}`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || undefined;
   } catch {
     return undefined;
   }
 }
 
-async function remoteSha(etag?: string): Promise<{ sha?: string; etag?: string }> {
-  const res = await fetch(`https://api.github.com/repos/${REPO}/commits/${BRANCH}`, {
+function remoteSlug(): string | undefined {
+  const url = git('remote get-url origin');
+  return url?.match(/github\.com[/:]([\w.-]+\/[\w.-]+?)(?:\.git)?$/)?.[1];
+}
+
+async function remoteSha(slug: string, branch: string, etag?: string): Promise<{ sha?: string; etag?: string }> {
+  const res = await fetch(`https://api.github.com/repos/${slug}/commits/${branch}`, {
     headers: {
       'User-Agent': 'ace-deploy-watch',
       Accept: 'application/vnd.github+json',
@@ -27,12 +30,15 @@ async function remoteSha(etag?: string): Promise<{ sha?: string; etag?: string }
 }
 
 export function watchDeploys(onDeploy: () => void): void {
+  const slug = remoteSlug();
+  const branch = git('rev-parse --abbrev-ref HEAD');
+  if (!slug || !branch || branch === 'HEAD') return;
   let etag: string | undefined;
   let baseline: string | undefined;
   const tick = async () => {
     try {
-      baseline ??= localSha();
-      const result = await remoteSha(etag);
+      baseline ??= git('rev-parse HEAD');
+      const result = await remoteSha(slug, branch, etag);
       etag = result.etag;
       if (result.sha && baseline && result.sha !== baseline) onDeploy();
     } catch {
