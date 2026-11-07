@@ -11,13 +11,8 @@ jobs:
     steps:
       - name: Restart bot server
         run: |
-          curl -sf -X POST "${{ secrets.PANEL_URL }}/api/client/servers/${{ secrets.SERVER_ID }}/power" \
+          curl -sf -X POST "${{ secrets.PANEL_URL }}/api/core/control/servers/${{ secrets.SERVER_ID }}/power" \
             -H "Authorization: Bearer ${{ secrets.PANEL_API_KEY }}" \
             -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{"signal":"restart"}' \
-          || curl -sf -X POST "${{ secrets.PANEL_URL }}/api/client/servers/${{ secrets.SERVER_ID }}/power" \
-            -H "Authorization: Bearer ${{ secrets.PANEL_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{"signal":"start"}'
+            -H "Idempotency-Key: ${{ github.run_id }}-${{ github.run_attempt }}" \
+            -d "{\"tenantId\":\"${{ secrets.TENANT_ID }}\",\"signal\":\"restart\"}"
