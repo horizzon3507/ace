@@ -67,8 +67,8 @@ export function bindPurge(deps: PurgeDeps) {
       await ctx.reply(`${emoji.unhappy} Eu não encontrei mensagens para apagar...`);
       return;
     }
-    const scope = mode === 'user' ? ` Só as de **${label}**` : '';
-    await ctx.reply(`${emoji.purge} **${count} ${count === 1 ? 'mensagem apagada' : 'mensagens apagadas'}**!${scope}...`);
+    const scope = mode === 'user' ? `de @${label}` : 'deste canal';
+    await ctx.reply(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`);
   };
 }
 
