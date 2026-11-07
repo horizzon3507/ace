@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 
 const REPO = 'horizzon3507/ace';
 const BRANCH = 'main';
-const INTERVAL_MS = 5 * 60 * 1000;
+const INTERVAL_MS = 60 * 1000;
 
 function localSha(): string | undefined {
   try {
