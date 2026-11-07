@@ -25,7 +25,7 @@ Um commit por mudança lógica, no estilo breakable-commits:
 
 ## Branches
 
-Desenvolve no `canary`, tudo local. Ao terminar e validar (`npm run typecheck` + `npm test`), pusha as duas:
+Desenvolve no `canary`, tudo local — commits e validação (`npm run typecheck` + `npm test`) ficam na máquina. Nada é pushado até o dono do repo pedir; aí vão as duas:
 
 ```sh
 git push origin canary canary:main
