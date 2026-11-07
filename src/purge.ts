@@ -7,18 +7,46 @@ export type PurgeMode = 'channel' | 'user';
 export type PurgeDeps = {
   emoji: { unhappy: string; purge: string };
   after?: (ms: number, fn: () => void) => void;
+  wait?: (ms: number) => Promise<void>;
 };
 
 const REPLY_TTL_MS = 10_000;
+const RETRY_DELAY_MS = 750;
 
 /** setTimeout real com unref — não segura o processo se o bot cair antes dos 10s. */
 function later(ms: number, fn: () => void): void {
   setTimeout(fn, ms).unref();
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Só erro de transporte (fetch failed, socket reset) merece retentativa — o REST do
+ * SDK não retenta POST/DELETE. 404 e erros de API passam direto, sem espera.
+ */
+function transient(error: unknown): boolean {
+  if (error instanceof TypeError) return true;
+  if (!(error instanceof Error)) return false;
+  const cause = (error as { cause?: unknown }).cause;
+  const text = cause instanceof Error ? `${error.message} ${cause.message}` : error.message;
+  return /fetch failed|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|UND_ERR/i.test(text);
+}
+
 /** Fecha sobre os emojis desta carga. O import estático fica no cache do Node. */
 export function bindPurge(deps: PurgeDeps) {
-  const { emoji, after = later } = deps;
+  const { emoji, after = later, wait = sleep } = deps;
+
+  const call = async <T>(fn: () => Promise<T>): Promise<T> => {
+    try {
+      return await fn();
+    } catch (error) {
+      if (!transient(error)) throw error;
+      await wait(RETRY_DELAY_MS);
+      return fn();
+    }
+  };
 
   return async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
     const guildID = ctx.requireGuild();
@@ -73,21 +101,21 @@ export function bindPurge(deps: PurgeDeps) {
         .map((message) => message.id)
         .filter((id) => id !== selfID)
         .slice(0, n);
-      count = await removeEach(ctx, ids);
+      count = await removeEach(ids, (id) => call(() => ctx.transport.delete(ctx.channelID, id)));
       // A mensagem do comando sai junto, mas fora da conta — o total é só do alvo.
-      if (selfID) await ctx.transport.delete(ctx.channelID, selfID).catch(() => {});
+      if (selfID) await call(() => ctx.transport.delete(ctx.channelID, selfID)).catch(() => {});
     }
 
     // A deleção cobre a mensagem do comando: responder com reply referenciaria
     // um id morto (404). A resposta vai como send puro, sem referência.
     if (count === 0) {
-      await ctx.send(`${emoji.unhappy} Eu não encontrei mensagens para apagar...`);
+      await call(() => ctx.send(`${emoji.unhappy} Eu não encontrei mensagens para apagar...`));
       return;
     }
     const scope = mode === 'user' ? `de @${label}` : 'deste canal';
-    const sent = await ctx.send(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`);
+    const sent = await call(() => ctx.send(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`));
     after(REPLY_TTL_MS, () => {
-      void ctx.transport.delete(ctx.channelID, sent).catch(() => { /* já foi apagada por outra via */ });
+      void call(() => ctx.transport.delete(ctx.channelID, sent)).catch(() => { /* já foi apagada por outra via */ });
     });
   };
 }
@@ -113,11 +141,11 @@ async function bulkDelete(ctx: AceContext, limit: number): Promise<boolean> {
 }
 
 /** Apaga id a id contando só os sucessos — NOT_FOUND de mensagem já removida não derruba o restante. */
-async function removeEach(ctx: AceContext, ids: readonly string[]): Promise<number> {
+async function removeEach(ids: readonly string[], del: (id: string) => Promise<void>): Promise<number> {
   let count = 0;
   for (const id of ids) {
     try {
-      await ctx.transport.delete(ctx.channelID, id);
+      await del(id);
       count += 1;
     } catch { /* a mensagem já saiu do canal — segue para a próxima */ }
   }

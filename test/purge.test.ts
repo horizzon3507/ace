@@ -168,3 +168,29 @@ test('a resposta de sucesso se apaga sozinha depois de 10s', async () => {
   await Promise.resolve();
   assert.deepEqual(deleted, ['m1', 'm2', 'cmd', 'sent-1']);
 });
+
+test('fetch failed na confirmação retenta uma vez antes de desistir', async () => {
+  const waits: number[] = [];
+  let sends = 0;
+  const run = bindPurge({
+    emoji: { unhappy: 'u', purge: 'p' },
+    after: () => {},
+    wait: async (ms) => { waits.push(ms); },
+  });
+  await run({
+    requireGuild: () => '100',
+    tokens: ['2'],
+    channelID: '200',
+    message: { id: 'cmd' },
+    client: { channels: { resolve: async () => { throw new Error('sem client'); } } },
+    resources: { messages: { list: async () => [{ id: 'm1' }] } },
+    transport: { delete: async () => {} },
+    send: async () => {
+      sends += 1;
+      if (sends === 1) throw new TypeError('fetch failed'); // socket morreu — REST não retenta POST
+      return 'sent-1';
+    },
+  } as unknown as Parameters<typeof run>[0], 'channel');
+  assert.equal(sends, 2); // primeira caiu, retentativa passou
+  assert.deepEqual(waits, [750]);
+});
