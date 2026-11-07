@@ -6,11 +6,19 @@ export type PurgeMode = 'channel' | 'user';
 
 export type PurgeDeps = {
   emoji: { unhappy: string; purge: string };
+  after?: (ms: number, fn: () => void) => void;
 };
+
+const REPLY_TTL_MS = 10_000;
+
+/** setTimeout real com unref — não segura o processo se o bot cair antes dos 10s. */
+function later(ms: number, fn: () => void): void {
+  setTimeout(fn, ms).unref();
+}
 
 /** Fecha sobre os emojis desta carga. O import estático fica no cache do Node. */
 export function bindPurge(deps: PurgeDeps) {
-  const { emoji } = deps;
+  const { emoji, after = later } = deps;
 
   return async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
     const guildID = ctx.requireGuild();
@@ -68,7 +76,10 @@ export function bindPurge(deps: PurgeDeps) {
       return;
     }
     const scope = mode === 'user' ? `de @${label}` : 'deste canal';
-    await ctx.reply(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`);
+    const sent = await ctx.reply(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`);
+    after(REPLY_TTL_MS, () => {
+      void ctx.transport.delete(ctx.channelID, sent).catch(() => { /* já foi apagada por outra via */ });
+    });
   };
 }
 

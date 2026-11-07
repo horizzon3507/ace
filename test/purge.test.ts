@@ -4,6 +4,7 @@ import { createTestBot } from 'yuzuha/testing';
 import type { MessageInfo } from 'yuzuha';
 import clear from '../commands/clear.js';
 import purge from '../commands/purge.js';
+import { bindPurge } from '../src/purge.js';
 
 // MockTransport: autor '1' (dono/Admin), bot '999' (Admin), canal padrão '200', guild '100'.
 // Sem client nativo o runner sempre cai no fallback: list() mockada + delete por id.
@@ -125,4 +126,29 @@ test('purge sem quantidade apaga até 10 do membro', async (t) => {
   const content = fixture.messages.at(-1)?.payload.content ?? '';
   assert.match(content, /Eu apaguei \*\*10 mensagens\*\* de @2\./);
   assert.equal(fixture.messages.length, 3); // 2 que sobraram + a resposta
+});
+
+test('a resposta de sucesso se apaga sozinha depois de 10s', async () => {
+  const deleted: string[] = [];
+  const scheduled: Array<[number, () => void]> = [];
+  const run = bindPurge({
+    emoji: { unhappy: 'u', purge: 'p' },
+    after: (ms, fn) => { scheduled.push([ms, fn]); },
+  });
+  await run({
+    requireGuild: () => '100',
+    tokens: ['2'],
+    channelID: '200',
+    message: { id: 'cmd' },
+    client: { channels: { resolve: async () => { throw new Error('sem client'); } } },
+    resources: { messages: { list: async () => [{ id: 'm1' }, { id: 'm2' }, { id: 'm3' }] } },
+    transport: { delete: async (_c: string, id: string) => { deleted.push(id); } },
+    reply: async () => 'sent-1',
+  } as unknown as Parameters<typeof run>[0], 'channel');
+  assert.equal(deleted.length, 3); // m1, m2, m3 — a resposta ainda não
+  assert.equal(scheduled.length, 1);
+  assert.equal(scheduled[0]?.[0], 10_000);
+  scheduled[0]?.[1]();
+  await Promise.resolve();
+  assert.deepEqual(deleted, ['m1', 'm2', 'm3', 'sent-1']);
 });
