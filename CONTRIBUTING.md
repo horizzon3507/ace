@@ -23,6 +23,16 @@ Um commit por mudança lógica, no estilo breakable-commits:
 - Nada de `wip`, commit vazio ou dois assuntos no mesmo commit.
 - `.env`, `data/` e qualquer segredo nunca entram.
 
+## Branches
+
+Desenvolve no `main` e, ao terminar, pusha as duas:
+
+```sh
+git push origin main main:canary
+```
+
+As duas branches seguem o mesmo histórico — o clone de produção observa `main` e o de homologação observa `canary`, e o deploy-watch de cada instância se atualiza quando a sua branch muda no GitHub.
+
 ## Novo comando
 
 1. `commands/nome.ts` com `defineCommand` — `name`, `description`, `aliases`, `cooldown`, e `guildOnly`/`permissions`/`botPermissions` quando couber.
