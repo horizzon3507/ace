@@ -46,7 +46,7 @@ test('ping responde a latência', async (t) => {
   assert.equal(await fixture.send('a.ping'), 'success');
   const message = fixture.messages.at(-1)?.payload;
   assert.equal(message?.embeds, undefined);
-  assert.equal(message?.content, '<:globefill:1566571242956263426> Pong! A minha conexão com este servidor está **incrível** (12ms).');
+  assert.equal(message?.content, '<:globefill:1566571242956263426> Pong! A minha conexão com este servidor está **incrível** (12ms)...');
 });
 
 test('ping sem amostra avisa em vez de inventar latência', async (t) => {

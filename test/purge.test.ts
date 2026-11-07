@@ -37,7 +37,7 @@ test('clear exige uma quantidade de 1 a 99', async (t) => {
   for (const input of ['a.clear', 'a.clear abc', 'a.clear 0', 'a.clear 100']) {
     assert.equal(await fixture.send(input), 'success');
     const content = fixture.messages.at(-1)?.payload.content ?? '';
-    assert.match(content, /Por favor, me informe quantas mensagens apagar \(de 1 a 99\)!/, input);
+    assert.match(content, /Por favor, me informe quantas mensagens apagar \(de 1 a 99\)\.\.\./, input);
     assert.match(content, /Ex: `a\.clear 20`/, input);
     fixture.clock.advance(4_000); // cooldown de 3s entre comandos
   }
@@ -79,7 +79,7 @@ test('purge sem membro mostra o uso', async (t) => {
 
   assert.equal(await fixture.send('a.purge'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /Por favor, me informe o membro cujas mensagens apagar!/);
+  assert.match(content, /Por favor, me informe o membro cujas mensagens apagar\.\.\./);
   assert.match(content, /Ex: `a\.purge @usuario 10`/);
 });
 

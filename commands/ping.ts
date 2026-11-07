@@ -23,6 +23,6 @@ export default defineCommand({
       await ctx.reply(`${emoji.globe} Ainda sem amostra de latência — tente de novo em instantes.`);
       return;
     }
-    await ctx.reply(`${emoji.globe} Pong! A minha conexão com este servidor está **${connectionStatus(ping)}** (${ping}ms).`);
+    await ctx.reply(`${emoji.globe} Pong! A minha conexão com este servidor está **${connectionStatus(ping)}** (${ping}ms)...`);
   },
 });

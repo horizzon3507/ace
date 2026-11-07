@@ -51,11 +51,11 @@ export function bindChannelLock(deps: ChannelLockDeps) {
     try {
       channel = await ctx.resources.channels.get(channelID);
     } catch {
-      await ctx.reply(`${emoji.unhappy} Eu não encontrei nenhum canal como ${first ?? channelID}... Use menção ou ID do canal!`);
+      await ctx.reply(`${emoji.unhappy} Eu não encontrei nenhum canal como ${first ?? channelID}! Use menção ou ID do canal...`);
       return;
     }
     if (!TEXT_TYPES.has(channel.type)) {
-      await ctx.reply(`${emoji.unhappy} Eu não consigo ${spec.wrongType} este tipo de canal... Só funciona em canais de texto!`);
+      await ctx.reply(`${emoji.unhappy} Eu não consigo ${spec.wrongType} este tipo de canal! Só funciona em canais de texto...`);
       return;
     }
     // O PUT de overwrite substitui a máscara inteira — ler o estado atual via client

@@ -31,6 +31,6 @@ export default defineCommand({
   async run(ctx) {
     const up = process.uptime();
     const bootedAt = new Date(Date.now() - up * 1000);
-    await ctx.reply(`${emoji.time} Eu estou acordado e na escuta há ${formatUptime(up)} (desde ${formatStamp(bootedAt)})!`);
+    await ctx.reply(`${emoji.time} Eu estou acordado e na escuta há ${formatUptime(up)} (desde ${formatStamp(bootedAt)})...`);
   },
 });

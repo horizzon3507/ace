@@ -27,7 +27,7 @@ test('sem argumento pede o membro', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o membro a ser silenciado!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o membro a ser silenciado\.\.\./);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -36,7 +36,7 @@ test('sem duração pede a duração do silenciamento', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout <@2>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe a duração do silenciamento!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe a duração do silenciamento\.\.\./);
   assert.equal(fixture.transport.actions.length, 0);
 });
 
@@ -45,7 +45,7 @@ test('duração inválida pede a duração do silenciamento', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.timeout <@2> banana'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe a duração do silenciamento!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe a duração do silenciamento\.\.\./);
   assert.equal(fixture.transport.actions.length, 0);
 });
 

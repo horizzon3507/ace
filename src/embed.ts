@@ -57,9 +57,9 @@ export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<
     id = target.status === 'found' ? target.id : ctx.authorID;
   } else {
     const text = target.status === 'missing'
-      ? `${emoji.unhappy} Eu não encontrei ninguém como ${target.query}... Use menção ou ID de usuário...`
+      ? `${emoji.unhappy} Eu não encontrei ninguém como ${target.query}! Use menção ou ID de usuário...`
       : target.status === 'ambiguous'
-        ? `${emoji.unhappy} Eu encontrei vários membros como ${target.query}... Use menção ou ID de usuário...`
+        ? `${emoji.unhappy} Eu encontrei vários membros como ${target.query}! Use menção ou ID de usuário...`
         : ctx.message.guildID
           ? `${emoji.unhappy} Por favor, me informe um usuário válido...`
           : `${emoji.unhappy} Por favor, me informe o usuário por menção ou ID de usuário...`;

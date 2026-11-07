@@ -64,6 +64,6 @@ test('sem argumento pede o membro', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.unban'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o membro a ser desbanido!/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o membro a ser desbanido\.\.\./);
   assert.equal(fixture.transport.actions.length, 0);
 });

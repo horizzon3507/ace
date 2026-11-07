@@ -103,5 +103,5 @@ test('bindModeration usa o resolve injetado, não o módulo em cache', async () 
       seen.push(text);
     },
   } as unknown as Parameters<typeof run>[0], 'kick');
-  assert.deepEqual(seen, ['resolve', 'u Por favor, me informe o membro a ser expulso!\n-# ╰ Ex: `a.kick @usuario motivo`']);
+  assert.deepEqual(seen, ['resolve', 'u Por favor, me informe o membro a ser expulso...\n-# ╰ Ex: `a.kick @usuario motivo`']);
 });
