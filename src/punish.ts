@@ -121,20 +121,16 @@ export function bindModeration(deps: ModerationDeps) {
     // Apelido resolvido antes da ação: falha de label não pode imprimir 'falhou' após banir.
     const name = target.label ?? await memberLabel(ctx, guildID, id).catch(() => id);
     try {
-      const record = action === 'ban'
-        ? await ctx.mod.ban(id, { reason })
-        : action === 'timeout'
-          ? await ctx.mod.timeout(id, { reason, duration: ctx.tokens[1]! })
-          : action === 'unban'
-            ? await ctx.mod.unban(id, { reason })
-            : await ctx.mod.kick(id, { reason });
-      const caso = record?.id !== undefined ? ` | Caso #${record.id}` : '';
+      if (action === 'ban') await ctx.mod.ban(id, { reason });
+      else if (action === 'timeout') await ctx.mod.timeout(id, { reason, duration: ctx.tokens[1]! });
+      else if (action === 'unban') await ctx.mod.unban(id, { reason });
+      else await ctx.mod.kick(id, { reason });
       const headline = action === 'timeout'
         ? `**${name}** foi **${spec.past}** por **${humanDuration(timeoutMs)}**`
         : action === 'unban'
           ? `**${name}** foi **${spec.past}** do servidor`
           : `**${name}** foi ${spec.past} do servidor`;
-      await ctx.reply(`${emoji[spec.mark]} ${headline}.\n-# ╰ Motivo: ${reason} | ID: ${id}${caso}`);
+      await ctx.reply(`${emoji[spec.mark]} ${headline}.\n-# ╰ Motivo: ${reason} | ID: ${id}`);
     } catch (error) {
       if (error instanceof GuardError) {
         const rewritten = guardReply(error.message, spec, emoji);

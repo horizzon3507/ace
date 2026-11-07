@@ -115,6 +115,6 @@ test('kick sem motivo usa o default e registra caso', async (t) => {
 
   assert.equal(await fixture.send('a.kick <@2>'), 'success');
   assert.equal(fixture.transport.actions.at(-1)?.reason, 'Sem motivo informado.');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Caso #1/);
+  assert.doesNotMatch(fixture.messages.at(-1)?.payload.content ?? '', /Caso/);
   assert.deepEqual(fixture.errors, []);
 });

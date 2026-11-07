@@ -29,7 +29,7 @@ test('unban por ID remove o ban e registra caso', async (t) => {
   assert.equal(action?.targetID, '7');
   assert.equal(action?.reason, 'razão');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /desbanido/);
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Caso #1/);
+  assert.doesNotMatch(fixture.messages.at(-1)?.payload.content ?? '', /Caso/);
 });
 
 test('unban por nome resolve o ID pela lista de bans', async (t) => {

@@ -19,7 +19,7 @@ test('timeout por menção silencia e registra caso', async (t) => {
   assert.equal(action?.reason, 'spam');
   assert.equal(action?.duration, 600_000);
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /silenciado/);
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Caso #1/);
+  assert.doesNotMatch(fixture.messages.at(-1)?.payload.content ?? '', /Caso/);
 });
 
 test('sem argumento pede o membro', async (t) => {

@@ -62,9 +62,14 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 
 ## Dados
 
-O token fica só no `.env`; `data/` e `.env` nunca entram no Git. Casos de moderação e variáveis (como o prefixo de cada servidor) vão para o diretório de dados do Yuzuha sob o nome `ace`.
+O token fica só no `.env`; `data/` e `.env` nunca entram no Git. Variáveis (como o prefixo de cada servidor) vão para o diretório de dados do Yuzuha sob o nome `ace`.
 
 `assets/` guarda a arte do Ace, fora de runtime: o avatar na raiz e o banner em `assets/readme/`.
+
+## Roadmap
+
+- Em estudo: `warn`, `snipe`, lembretes e log de moderação.
+- Não planejado por enquanto: casos de moderação numerados.
 
 ## Mais
 
