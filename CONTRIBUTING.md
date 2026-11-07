@@ -25,10 +25,10 @@ Um commit por mudança lógica, no estilo breakable-commits:
 
 ## Branches
 
-Desenvolve no `main` e, ao terminar, pusha as duas:
+Desenvolve no `canary`, tudo local. Ao terminar e validar (`npm run typecheck` + `npm test`), pusha as duas:
 
 ```sh
-git push origin main main:canary
+git push origin canary canary:main
 ```
 
 As duas branches seguem o mesmo histórico — o clone de produção observa `main` e o de homologação observa `canary`, e o deploy-watch de cada instância se atualiza quando a sua branch muda no GitHub.
