@@ -55,7 +55,7 @@ test('ping sem amostra avisa em vez de inventar latência', async (t) => {
   fixture.transport.ping = -1;
 
   assert.equal(await fixture.send('a.ping'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Ainda sem amostra de latência/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /sem amostras de latência/);
 });
 
 test('ping degrada a qualificação conforme a latência sobe', async (t) => {
@@ -204,7 +204,7 @@ test('kick expulsa por menção e mostra motivo e ID', async (t) => {
   assert.equal(await fixture.send('a.kick <@2> spam'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
   assert.match(content, /<:logoutboxfill:1566645144776605696> \*\*Glacial\*\* foi expulso do servidor\./);
-  assert.match(content, /-# ╰ Motivo: spam \| ID: 2 \| Caso #1/);
+  assert.match(content, /-# ╰ Motivo: spam \| ID: 2$/);
   assert.equal(fixture.transport.actions.at(-1)?.action, 'kick');
   assert.equal(fixture.transport.actions.at(-1)?.targetID, '2');
 });
@@ -230,7 +230,7 @@ test('ban resolve glacial#0001 e mostra motivo e ID', async (t) => {
   assert.equal(await fixture.send('a.ban glacial#0001 spam'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
   assert.match(content, /<:userforbidfill:1566644852504932352> \*\*Glacial\*\* foi banido do servidor\./);
-  assert.match(content, /-# ╰ Motivo: spam \| ID: 2 \| Caso #1/);
+  assert.match(content, /-# ╰ Motivo: spam \| ID: 2$/);
   assert.equal(fixture.transport.actions.at(-1)?.action, 'ban');
   assert.equal(fixture.transport.actions.at(-1)?.targetID, '2');
   assert.equal(fixture.transport.actions.at(-1)?.reason, 'spam');

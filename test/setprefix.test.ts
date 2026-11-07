@@ -21,7 +21,7 @@ test('grava a variável da guild e confirma', async (t) => {
   assert.equal(await fixture.send('a.setprefix x.'), 'success');
   assert.equal(await fixture.store.read((state) => state.variables[VAR('100')]), 'x.');
   assert.equal(await guildPrefix('100'), 'x.');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /agora é `x\.`/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /agora é \*\*`x\.`\*\*!/);
 });
 
 test('sem argumento pede o prefixo novo', async (t) => {
@@ -41,7 +41,7 @@ test('reset remove a variável e volta ao padrão', async (t) => {
   assert.equal(await fixture.send('a.setprefix reset'), 'success');
   assert.equal(await fixture.store.read((state) => state.variables[VAR('100')]), undefined);
   assert.equal(await guildPrefix('100'), undefined);
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /voltou para `a\.`/);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /voltou para \*\*`a\.`\*\*!/);
 });
 
 test('prefixo longo demais é recusado sem gravar', async (t) => {

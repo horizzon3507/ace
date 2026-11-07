@@ -21,7 +21,7 @@ export default defineCommand({
     if (/^(reset|padr[aã]o|default)$/i.test(next)) {
       await ctx.data.guild.delete('prefix');
       setGuildPrefixCache(guildID, undefined);
-      await ctx.reply(`${emoji.happy} Prefixo do servidor voltou para \`${prefix()}\`.`);
+      await ctx.reply(`${emoji.happy} O prefixo do servidor voltou para **\`${prefix()}\`**!`);
       return;
     }
     if (next.length > 10) {
@@ -30,6 +30,6 @@ export default defineCommand({
     }
     await ctx.data.guild.set('prefix', next);
     setGuildPrefixCache(guildID, next);
-    await ctx.reply(`${emoji.happy} Prefixo do servidor agora é \`${next}\`.`);
+    await ctx.reply(`${emoji.happy} O prefixo do servidor agora é **\`${next}\`**!`);
   },
 });

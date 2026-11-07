@@ -20,7 +20,7 @@ export default defineCommand({
   async run(ctx) {
     const ping = ctx.transport.ping;
     if (!Number.isFinite(ping) || ping < 0) {
-      await ctx.reply(`${emoji.globe} Ainda sem amostra de latência — tente de novo em instantes.`);
+      await ctx.reply(`${emoji.globe} Eu ainda estou sem amostras de latência, tente de novo em alguns instantes...`);
       return;
     }
     await ctx.reply(`${emoji.globe} Pong! A minha conexão com este servidor está **${connectionStatus(ping)}** (${ping}ms)...`);
