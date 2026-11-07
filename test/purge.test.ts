@@ -117,6 +117,19 @@ test('purge apaga só as mensagens do membro alvo', async (t) => {
   assert.deepEqual(fixture.errors, []);
 });
 
+test('purge aceita a menção depois da quantidade', async (t) => {
+  const fixture = bot([info('50', '2'), info('51', '7'), info('52', '2')]);
+  t.after(() => fixture.destroy());
+  seed(fixture, '50', '51', '52');
+
+  assert.equal(await fixture.send('a.purge 2 <@2>'), 'success');
+  const content = fixture.messages.at(-1)?.payload.content ?? '';
+  assert.match(content, /Eu apaguei \*\*2 mensagens\*\* de @2\./);
+  assert.ok(!fixture.messages.some((message) => message.id === '50'));
+  assert.ok(fixture.messages.some((message) => message.id === '51')); // de outra autora — fica
+  assert.ok(!fixture.messages.some((message) => message.id === '52'));
+});
+
 test('purge sem quantidade apaga até 10 do membro', async (t) => {
   const fixture = bot([...Array(12)].map((_, i) => info(String(60 + i), '2')));
   t.after(() => fixture.destroy());

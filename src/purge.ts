@@ -27,7 +27,9 @@ export function bindPurge(deps: PurgeDeps) {
     let ids: string[] | undefined;
 
     if (mode === 'user') {
-      const target = await resolveTarget(ctx, guildID, ctx.tokens);
+      // A menção vale em qualquer posição (`a.purge 2 @user` ≡ `a.purge @user 2`).
+      const mention = ctx.tokens.find((token) => /^<@!?\d+>$/.test(token));
+      const target = await resolveTarget(ctx, guildID, mention ? [mention] : ctx.tokens);
       if (target.status === 'none') {
         await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro cujas mensagens apagar...\n-# ╰ Ex: \`a.purge @usuario 10\``);
         return;
@@ -40,7 +42,9 @@ export function bindPurge(deps: PurgeDeps) {
         await ctx.reply(`${emoji.unhappy} Eu encontrei vários membros como ${target.query}! Use menção ou forneça o ID de usuário...`);
         return;
       }
-      const parsed = ctx.tokens[1] === undefined ? 10 : amount(ctx.tokens[1]);
+      const targetToken = mention ?? ctx.tokens[0];
+      const countRaw = ctx.tokens.find((token) => token !== targetToken);
+      const parsed = countRaw === undefined ? 10 : amount(countRaw);
       if (parsed === undefined) {
         await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)...\n-# ╰ Ex: \`a.purge @usuario 10\``);
         return;
