@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { SDK, Yuzuha, YuzuhaError, type YuzuhaConfig } from 'yuzuha';
 import { colorEnabled, emit, explain, gatewayDetail, usage } from './cli-util.js';
 import { applyChanges, watchProject } from './dev-reload.js';
+import { watchDeploys } from './deploy-watch.js';
 import { fillMissingEnv } from './env-file.js';
 import { prefix } from './live.js';
 import { formatBanner, formatConnecting, type Panel } from './term.js';
@@ -211,6 +212,12 @@ async function main(): Promise<void> {
     }
     show();
     if (mode === 'dev') watcher = watchProject(root, commandsPath, (files) => applyChanges(root, bot, commandsPath, shellEnv, files));
+    if (mode === 'start' && process.env.AUTO_UPDATE === '1') {
+      watchDeploys(() => {
+        emit('deploy', 'commit novo no main. Reiniciando pra puxar.');
+        void shutdown().finally(() => process.exit(1));
+      });
+    }
   } catch (error) {
     if (stop) {
       await stop;
