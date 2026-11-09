@@ -317,7 +317,7 @@ test('avatar na DM pede menção ou ID', async (t) => {
 const noProfile = {
   user: animatedMember('1'),
   member: null,
-  globalProfile: { pronouns: null, bio: null, banner: null, accentColor: null, bannerColor: null, theme: null, mutualGuildIDs: [], connectedAccounts: [] },
+  globalProfile: { pronouns: null, bio: null, banner: null, bannerURL: null, accentColor: null, bannerColor: null, theme: null, mutualGuildIDs: [], connectedAccounts: [] },
   serverProfile: null,
 };
 

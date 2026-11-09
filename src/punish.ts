@@ -1,4 +1,4 @@
-import { GuardError, YuzuhaError } from 'yuzuha';
+import { GuardError, isGuardReason, YuzuhaError } from 'yuzuha';
 import type { AceContext } from './context.js';
 import { emoji as bundledEmoji } from './emoji.js';
 import { moderationReason as bundledReason, resolveBanTarget as bundledBanResolve, resolveTarget as bundledResolve } from './resolve.js';
@@ -38,17 +38,25 @@ function humanDuration(ms: number): string {
   return `${shown} ${shown === 1 ? one : many}`;
 }
 
-/** Reescreve os GuardErrors do SDK com a voz do Ace; retorna null pros que não reconhece. */
-function guardReply(raw: string, spec: (typeof copy)[Punishment], emoji: ModerationDeps['emoji']): string | null {
-  if (raw.includes('silenciar um administrador')) return `${emoji.unhappy} Eu não posso silenciar um administrador...`;
-  if (raw.includes('hierarquia')) return `${emoji.unhappy} Eu não posso ${spec.fail} este membro! O cargo dele está acima do seu ou do meu...`;
-  if (raw.startsWith('Preciso da permissão')) return `${emoji.unhappy} Eu preciso da permissão ${spec.perm} para isso...`;
-  if (raw.startsWith('Você precisa da permissão')) return `${emoji.unhappy} Você precisa da permissão ${spec.perm}...`;
-  return null;
+/** Reescreve os GuardErrors por reason tipado (0.3.1) — nada de sniffing na mensagem. */
+function guardReply(error: GuardError, spec: (typeof copy)[Punishment], emoji: ModerationDeps['emoji']): string | null {
+  switch (error.reason) {
+    case 'ADMIN_IMMUNE':
+      return `${emoji.unhappy} Eu não posso silenciar um administrador...`;
+    case 'HIERARCHY':
+      return `${emoji.unhappy} Eu não posso ${spec.fail} este membro! O cargo dele está acima do seu ou do meu...`;
+    case 'PERMISSION_MISSING_BOT':
+      return `${emoji.unhappy} Eu preciso da permissão ${spec.perm} para isso...`;
+    case 'PERMISSION_MISSING_AUTHOR':
+      return `${emoji.unhappy} Você precisa da permissão ${spec.perm}...`;
+    default:
+      return null;
+  }
 }
 
-/** Erro de "membro fora do servidor" — HTTPError solta HTML na message, então confere por padrão. */
+/** Erro de "membro fora do servidor" — GuardError tipado, código legado ou padrão no HTML. */
 function memberGone(error: unknown): boolean {
+  if (isGuardReason(error, 'MEMBER_NOT_FOUND')) return true;
   if (error instanceof YuzuhaError) return error.code === 'MEMBER_NOT_FOUND';
   const text = error instanceof Error ? error.message : String(error);
   return /\b404\b|unknown (member|user)|member.?not.?found|n[aã]o encontrado/i.test(text);
@@ -56,6 +64,7 @@ function memberGone(error: unknown): boolean {
 
 /** Erro de "alvo sem ban ativo" no unban — mesmo esquema de padrão do memberGone. */
 function notBanned(error: unknown): boolean {
+  if (isGuardReason(error, 'NOT_BANNED')) return true;
   const text = error instanceof Error ? error.message : String(error);
   return /\b404\b|not.?banned|n[aã]o banido/i.test(text);
 }
@@ -133,7 +142,7 @@ export function bindModeration(deps: ModerationDeps) {
       await ctx.reply(`${emoji[spec.mark]} ${headline}.\n-# ╰ Motivo: ${reason} | ID: ${id}`);
     } catch (error) {
       if (error instanceof GuardError) {
-        const rewritten = guardReply(error.message, spec, emoji);
+        const rewritten = guardReply(error, spec, emoji);
         if (rewritten) {
           await ctx.reply(rewritten);
           return;
