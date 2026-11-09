@@ -91,18 +91,22 @@ export function bindPurge(deps: PurgeDeps) {
       n = parsed;
     }
 
-    // Só o modo canal tem atalho nativo: bulkDelete(n + 1) busca e apaga as
-    // últimas n + 1 numa chamada, já cobrindo a mensagem do comando.
+    // No modo canal os alvos são as n mais recentes; no modo usuário, ids já
+    // veio filtrado por autor. O lote manda tudo num POST só — comando incluso,
+    // fora da conta — e cai pro por-id se a rota de bulk recusar.
+    const targets = ids ?? (await ctx.resources.messages.list(ctx.channelID, n + 1))
+      .map((message) => message.id)
+      .filter((id) => id !== selfID)
+      .slice(0, n);
+    const batch = selfID ? [selfID, ...targets] : [...targets];
+    const deleted = batch.length
+      ? await call(() => ctx.resources.messages.bulkDelete(ctx.channelID, batch)).catch(() => null)
+      : null;
     let count: number;
-    if (mode === 'channel' && (await bulkDelete(ctx, n + 1))) {
-      count = n;
+    if (deleted) {
+      count = deleted.filter((id) => id !== selfID).length;
     } else {
-      ids ??= (await ctx.resources.messages.list(ctx.channelID, n + 1))
-        .map((message) => message.id)
-        .filter((id) => id !== selfID)
-        .slice(0, n);
-      count = await removeEach(ids, (id) => call(() => ctx.transport.delete(ctx.channelID, id)));
-      // A mensagem do comando sai junto, mas fora da conta — o total é só do alvo.
+      count = await removeEach(targets, (id) => call(() => ctx.transport.delete(ctx.channelID, id)));
       if (selfID) await call(() => ctx.transport.delete(ctx.channelID, selfID)).catch(() => {});
     }
 
@@ -127,17 +131,6 @@ function amount(raw: string | undefined): number | undefined {
   if (raw === undefined || !/^\d+$/.test(raw)) return undefined;
   const n = Number.parseInt(raw, 10);
   return n >= 1 && n <= 99 ? n : undefined;
-}
-
-/** Apaga as últimas `limit` mensagens pelo client nativo; false sem client (testes) ou se a rota falhar. */
-async function bulkDelete(ctx: AceContext, limit: number): Promise<boolean> {
-  try {
-    const channel = await ctx.client.channels.resolve(ctx.channelID);
-    await channel.bulkDelete(limit);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 /** Menção e ID não trazem nome — resolve o membro para exibir @nome em vez do snowflake cru. */

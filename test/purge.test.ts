@@ -12,7 +12,7 @@ function info(id: string, authorID = '1'): MessageInfo {
   return { id, channelID: '10', authorID, authorName: 'x', content: 'oi', createdTimestamp: 0, pinned: false, attachments: [], embeds: [] };
 }
 
-function bot(list: MessageInfo[]) {
+function bot(list: MessageInfo[], bulkDelete?: (ids: string[]) => Promise<string[]>) {
   return createTestBot({
     prefix: 'a.',
     commands: [clear, purge],
@@ -21,7 +21,16 @@ function bot(list: MessageInfo[]) {
         async list(_channelID: string, limit?: number) {
           return list.slice(0, limit ?? list.length);
         },
+        ...(bulkDelete ? { async bulkDelete(_c: string, ids: string[]) { return bulkDelete(ids); } } : {}),
       },
+      // O wrapper autorizado valida canal + ManageMessages antes de chegar no recurso.
+      ...(bulkDelete ? {
+        channels: {
+          async get(id: string) {
+            return { id, name: 'geral', type: 0, guildID: '100', parentID: null, position: 0, topic: null, slowmode: 0, nsfw: false };
+          },
+        },
+      } : {}),
     },
   });
 }
@@ -65,6 +74,33 @@ test('clear com 1 apagada usa o singular', async (t) => {
 
   assert.equal(await fixture.send('a.clear 1'), 'success');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu apaguei \*\*1 mensagem\*\* deste canal!/);
+});
+
+test('clear apaga num lote só quando o bulkDelete nativo responde', async (t) => {
+  const batches: string[][] = [];
+  const fixture = bot([info('41'), info('42'), info('43')], async (ids) => {
+    batches.push(ids);
+    return ids;
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.clear 2'), 'success');
+  // A do comando ('1') entra no lote, mas fora da conta: 2 do canal.
+  assert.deepEqual(batches, [['1', '41', '42']]);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* deste canal!/);
+});
+
+test('purge em lote manda só as do alvo mais a do comando', async (t) => {
+  const batches: string[][] = [];
+  const fixture = bot([info('50', '2'), info('51', '7'), info('52', '2')], async (ids) => {
+    batches.push(ids);
+    return ids;
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.purge <@2> 2'), 'success');
+  assert.deepEqual(batches, [['1', '50', '52']]);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* de @2!/);
 });
 
 test('clear sem nada apagável admite que não encontrou', async (t) => {
@@ -157,7 +193,10 @@ test('a resposta de sucesso se apaga sozinha depois de 7s', async () => {
     channelID: '200',
     message: { id: 'cmd' },
     client: { channels: { resolve: async () => { throw new Error('sem client'); } } },
-    resources: { messages: { list: async () => [{ id: 'm1' }, { id: 'm2' }, { id: 'm3' }] } },
+    resources: { messages: {
+      list: async () => [{ id: 'm1' }, { id: 'm2' }, { id: 'm3' }],
+      bulkDelete: async () => { throw new Error('nativo fora'); },
+    } },
     transport: { delete: async (_c: string, id: string) => { deleted.push(id); } },
     send: async () => 'sent-1',
   } as unknown as Parameters<typeof run>[0], 'channel');
@@ -183,7 +222,10 @@ test('fetch failed na confirmação retenta uma vez antes de desistir', async ()
     channelID: '200',
     message: { id: 'cmd' },
     client: { channels: { resolve: async () => { throw new Error('sem client'); } } },
-    resources: { messages: { list: async () => [{ id: 'm1' }] } },
+    resources: { messages: {
+      list: async () => [{ id: 'm1' }],
+      bulkDelete: async () => { throw new Error('nativo fora'); },
+    } },
     transport: { delete: async () => {} },
     send: async () => {
       sends += 1;
