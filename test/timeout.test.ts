@@ -2,10 +2,38 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot } from 'yuzuha/testing';
 import timeout from '../commands/timeout.js';
+import { emoji } from '../src/emoji.js';
 
 // MockTransport: autor '1' é dono/Admin rank 100, bot '999' rank 90, alvo '2' rank 1.
+// O members.resolve nativo bate no users.member — '1', '2' e '999' existem.
+function memberish(id: string) {
+  return {
+    id, username: `user${id}`, displayName: `User${id}`, bot: false,
+    avatarURL: null, bannerURL: null, createdTimestamp: 0,
+    nickname: null, joinedTimestamp: 0, roles: [], permissions: '0', timedOutUntil: null,
+  };
+}
+
 function bot() {
-  return createTestBot({ prefix: 'a.', commands: [timeout] });
+  return createTestBot({
+    prefix: 'a.',
+    commands: [timeout],
+    emoji,
+    resources: {
+      users: {
+        async member(_guildID: string, id: string) {
+          if (['1', '2', '999'].includes(id)) return memberish(id);
+          throw Object.assign(new Error('Unknown Member'), { status: 404 });
+        },
+        async searchMembers() {
+          return { members: [], total: 0, hasMore: false, indexing: false };
+        },
+        async members() {
+          return [];
+        },
+      },
+    },
+  });
 }
 
 test('timeout por menção silencia e registra caso', async (t) => {

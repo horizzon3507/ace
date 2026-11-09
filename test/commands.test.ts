@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
 import { brand } from '../src/brand.js';
+import { emoji } from '../src/emoji.js';
 import { prefix } from '../src/prefix.js';
 import ping from '../commands/ping.js';
 import uptime from '../commands/uptime.js';
@@ -23,7 +24,7 @@ import unban from '../commands/unban.js';
 const commands = [ping, uptime, setprefix, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban, userinfo, guildinfo, clear, purge, timeout, unban];
 
 function bot(resources?: MockResourceOverrides) {
-  return createTestBot({ prefix: 'a.', commands, resources });
+  return createTestBot({ prefix: 'a.', commands, emoji, resources });
 }
 
 test('PREFIX define o prefixo e cai em a. quando falta', (t) => {
@@ -314,18 +315,15 @@ test('avatar na DM pede menção ou ID', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o usuário por menção/);
 });
 
-const noProfile = {
-  user: animatedMember('1'),
-  member: null,
-  globalProfile: { pronouns: null, bio: null, banner: null, bannerURL: null, accentColor: null, bannerColor: null, theme: null, mutualGuildIDs: [], connectedAccounts: [] },
-  serverProfile: null,
-};
-
 test('userbanner exibe o banner do perfil', async (t) => {
   const fixture = bot({
     users: {
-      async profile() {
-        return { ...noProfile, globalProfile: { ...noProfile.globalProfile, banner: 'a_b456' } };
+      async member(_guildID: string, userID: string) {
+        return animatedMember(userID);
+      },
+      // O recurso resolve o perfil por dentro e já devolve a URL animada final.
+      async bannerURL() {
+        return 'https://fluxerusercontent.com/banners/1/a_b456.gif?size=4096';
       },
     },
   });
@@ -340,8 +338,14 @@ test('userbanner exibe o banner do perfil', async (t) => {
 test('userbanner avisa quando falta banner', async (t) => {
   const fixture = bot({
     users: {
-      async profile() {
-        return noProfile;
+      async member(_guildID: string, userID: string) {
+        return animatedMember(userID);
+      },
+      async bannerURL() {
+        return null;
+      },
+      async user(id: string) {
+        return { ...animatedMember(id), bannerURL: null };
       },
     },
   });

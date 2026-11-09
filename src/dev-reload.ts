@@ -40,15 +40,12 @@ export async function refreshRuntime(root: string): Promise<void> {
       throw new Error(`src/emoji.ts: 'emoji.${key}' não é texto.`);
     }
   }
-  const runModeration = punishMod.bindModeration({ emoji, resolveTarget: resolveMod.resolveTarget, resolveBanTarget: resolveMod.resolveBanTarget, moderationReason: resolveMod.moderationReason });
+  const runModeration = punishMod.bindModeration({ resolveTarget: resolveMod.resolveTarget, resolveBanTarget: resolveMod.resolveBanTarget, moderationReason: resolveMod.moderationReason });
   if (typeof runModeration !== 'function') {
     throw new Error('src/punish.ts: bindModeration() não devolveu função.');
   }
-  if (typeof lockMod.bindChannelLock !== 'function') throw missing('src/channel-lock.ts', 'bindChannelLock');
-  const runChannelLock = lockMod.bindChannelLock({ emoji });
-  if (typeof runChannelLock !== 'function') {
-    throw new Error('src/channel-lock.ts: bindChannelLock() não devolveu função.');
-  }
+  if (typeof lockMod.runChannelLock !== 'function') throw missing('src/channel-lock.ts', 'runChannelLock');
+  const runChannelLock = lockMod.runChannelLock;
   installRuntime({
     prefix: prefixMod.prefix,
     mentionMessage: mention.mentionMessage,

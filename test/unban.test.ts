@@ -2,17 +2,23 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot } from 'yuzuha/testing';
 import unban from '../commands/unban.js';
+import { emoji } from '../src/emoji.js';
 
-// MockTransport: autor '1' é dono/Admin rank 100, bot '999' rank 90. A lista de
-// bans vem do mock — '7' está banido, qualquer outro ID não.
+// MockTransport: autor '1' é dono/Admin rank 100, bot '999' rank 90. O resolveBan
+// nativo resolve dentro dos bans — '7' está banido, qualquer outra consulta não.
 function bot() {
   return createTestBot({
     prefix: 'a.',
     commands: [unban],
+    emoji,
     resources: {
       users: {
-        async bans() {
-          return [{ userID: '7', username: 'fulano', reason: 'spam' }];
+        async resolveBan(_guildID: string, query: string) {
+          const text = query.trim();
+          if (text === '7' || text === '<@7>' || text.toLowerCase() === 'fulano') {
+            return { status: 'found' as const, id: '7', label: 'fulano', reason: 'spam', via: 'id' as const };
+          }
+          return { status: 'missing' as const, query: text };
         },
       },
     },

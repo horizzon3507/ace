@@ -1,5 +1,4 @@
 import { defineCommand } from 'yuzuha';
-import { emoji } from '../src/emoji.js';
 
 function connectionStatus(ping: number): string {
   if (ping < 50) return 'incrível';
@@ -20,9 +19,9 @@ export default defineCommand({
   async run(ctx) {
     const ping = ctx.transport.ping;
     if (!Number.isFinite(ping) || ping < 0) {
-      await ctx.reply(`${emoji.globe} Eu ainda estou sem amostras de latência, tente de novo em alguns instantes...`);
+      await ctx.reply(`${ctx.emoji.globe} Eu ainda estou sem amostras de latência, tente de novo em alguns instantes...`);
       return;
     }
-    await ctx.reply(`${emoji.globe} Pong! A minha conexão com este servidor está **${connectionStatus(ping)}** (${ping}ms)...`);
+    await ctx.reply(`${ctx.emoji.globe} Pong! A minha conexão com este servidor está **${connectionStatus(ping)}** (${ping}ms)...`);
   },
 });

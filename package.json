@@ -16,7 +16,7 @@
     "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
-    "yuzuha": "^0.3.1"
+    "yuzuha": "^0.3.2"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",

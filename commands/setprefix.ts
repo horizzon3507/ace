@@ -1,5 +1,4 @@
 import { defineCommand } from 'yuzuha';
-import { emoji } from '../src/emoji.js';
 import { setGuildPrefixCache } from '../src/guild-prefix.js';
 import { prefix } from '../src/live.js';
 
@@ -15,21 +14,21 @@ export default defineCommand({
     const guildID = ctx.requireGuild();
     const next = ctx.tokens[0];
     if (!next) {
-      await ctx.reply(`${emoji.information} Você precisa me fornecer um prefixo novo para eu definir neste ambiente...`);
+      await ctx.reply(`${ctx.emoji.information} Você precisa me fornecer um prefixo novo para eu definir neste ambiente...`);
       return;
     }
     if (/^(reset|padr[aã]o|default)$/i.test(next)) {
       await ctx.data.guild.delete('prefix');
       setGuildPrefixCache(guildID, undefined);
-      await ctx.reply(`${emoji.happy} O prefixo do servidor voltou para **\`${prefix()}\`**!`);
+      await ctx.reply(`${ctx.emoji.happy} O prefixo do servidor voltou para **\`${prefix()}\`**!`);
       return;
     }
     if (next.length > 10) {
-      await ctx.reply(`${emoji.unhappy} Este prefixo é muito longo! Use até 10 caracteres, sem espaços...`);
+      await ctx.reply(`${ctx.emoji.unhappy} Este prefixo é muito longo! Use até 10 caracteres, sem espaços...`);
       return;
     }
     await ctx.data.guild.set('prefix', next);
     setGuildPrefixCache(guildID, next);
-    await ctx.reply(`${emoji.happy} O prefixo do servidor agora é **\`${next}\`**!`);
+    await ctx.reply(`${ctx.emoji.happy} O prefixo do servidor agora é **\`${next}\`**!`);
   },
 });

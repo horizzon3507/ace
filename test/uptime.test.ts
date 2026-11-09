@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot } from 'yuzuha/testing';
 import uptime, { formatBootStamp, formatUptime } from '../commands/uptime.js';
+import { emoji } from '../src/emoji.js';
 
 test('formatUptime junta com vírgula e e com plural correto', () => {
   assert.equal(formatUptime(2 * 86400 + 3 * 3600 + 14 * 60), '**2 dias**, **3 horas** e **14 minutos**');
@@ -20,7 +21,7 @@ test('formatBootStamp usa dia/mês e hora:minuto com dois dígitos', () => {
 });
 
 test('uptime responde há quanto tempo está acordado', async (t) => {
-  const fixture = createTestBot({ prefix: 'a.', commands: [uptime] });
+  const fixture = createTestBot({ prefix: 'a.', commands: [uptime], emoji });
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.uptime'), 'success');

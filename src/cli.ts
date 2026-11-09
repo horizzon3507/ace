@@ -6,6 +6,7 @@ import { SDK, Yuzuha, YuzuhaError, type YuzuhaConfig } from 'yuzuha';
 import { colorEnabled, emit, explain, gatewayDetail, usage } from './cli-util.js';
 import { applyChanges, watchProject } from './dev-reload.js';
 import { watchDeploys } from './deploy-watch.js';
+import { emoji } from './emoji.js';
 import { fillMissingEnv } from './env-file.js';
 import { prefix } from './live.js';
 import { formatBanner, formatConnecting, type Panel } from './term.js';
@@ -130,6 +131,7 @@ async function main(): Promise<void> {
   let reportedDetail = '';
   const bot = new Yuzuha({
     ...config,
+    emoji,
     clientOptions: { ...config.clientOptions, logger },
     onError(error, ctx) {
       if (closing) return config.onError?.(error, ctx);

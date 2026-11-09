@@ -1,21 +1,8 @@
-import type { CommandContext } from 'yuzuha';
+import type { CommandContext, CommandContextLike } from 'yuzuha';
 
-/** Superfície que os comandos nativos realmente expõem. Evita o tipo da classe, que o handler não satisfaz. */
-export type AceContext = {
-  readonly message: CommandContext['message'];
-  readonly tokens: readonly string[];
-  readonly transport: CommandContext['transport'];
-  readonly authorID: string;
-  readonly authorName: CommandContext['authorName'];
-  readonly channelID: CommandContext['channelID'];
-  readonly input: string;
-  readonly resources: CommandContext['resources'];
-  readonly client: CommandContext['client'];
-  readonly mod: CommandContext['mod'];
-  readonly help: CommandContext['help'];
-  requireGuild: CommandContext['requireGuild'];
-  reply: CommandContext['reply'];
-  send: CommandContext['send'];
-  requirePermission: CommandContext['requirePermission'];
-  moderate: CommandContext['moderate'];
-};
+/**
+ * Superfície que os helpers do Ace usam — CommandContextLike cobre purge, expire,
+ * members, cdn e emoji. 'args' sai porque TypedArguments não satisfaz ArgumentBag
+ * (e nada nosso usa ctx.args); requireGuild fica de fora do Pick e entra aqui.
+ */
+export type AceContext = Omit<CommandContextLike, 'args'> & Pick<CommandContext, 'requireGuild'>;

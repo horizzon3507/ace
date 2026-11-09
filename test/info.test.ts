@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { Embed } from 'yuzuha';
 import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
+import { emoji } from '../src/emoji.js';
 import { brand } from '../src/brand.js';
 import userinfo from '../commands/userinfo.js';
 import guildinfo from '../commands/guildinfo.js';
@@ -9,7 +10,7 @@ import guildinfo from '../commands/guildinfo.js';
 const commands = [userinfo, guildinfo];
 
 function bot(resources?: MockResourceOverrides) {
-  return createTestBot({ prefix: 'a.', commands, resources });
+  return createTestBot({ prefix: 'a.', commands, emoji, resources });
 }
 
 const glacial = {
@@ -82,12 +83,16 @@ test('userinfo por menção mostra o mesmo embed', async (t) => {
 test('userinfo mostra o banner do perfil como imagem', async (t) => {
   const fixture = bot({
     users: {
+      async member() {
+        return glacial;
+      },
       async profile() {
         return {
           user: glacial,
           member: glacial,
           globalProfile: {
-            pronouns: null, bio: null, banner: 'a_b456', bannerURL: null,
+            // 0.3.x: o perfil já traz bannerURL resolvido (a_ → .gif incluso).
+            pronouns: null, bio: null, banner: null, bannerURL: 'https://fluxerusercontent.com/banners/2/a_b456.gif',
             accentColor: null, bannerColor: null, theme: null, mutualGuildIDs: [], connectedAccounts: [],
           },
           serverProfile: null,
@@ -107,7 +112,8 @@ test('userinfo cai para o usuário global quando o membro falha', async (t) => {
   const fixture = bot({
     users: {
       async member() {
-        throw new Error('fora do servidor');
+        // 404 → resolve nativo missing → ID segue found → member falha de novo e cai pro user.
+        throw Object.assign(new Error('fora do servidor'), { status: 404 });
       },
       async user() {
         return {
@@ -139,7 +145,7 @@ test('userinfo avisa quando membro e usuário falham', async (t) => {
   const fixture = bot({
     users: {
       async member() {
-        throw new Error('fora do servidor');
+        throw Object.assign(new Error('fora do servidor'), { status: 404 });
       },
       async user() {
         throw new Error('não existe');

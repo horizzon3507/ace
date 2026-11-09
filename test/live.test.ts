@@ -85,7 +85,6 @@ test('install rejeita cor e prefixo inválidos e mantém o anterior', () => {
 test('bindModeration usa o resolve injetado, não o módulo em cache', async () => {
   const seen: string[] = [];
   const run = bindModeration({
-    emoji: { unhappy: 'u', kick: 'k', ban: 'b', time: 't', unban: 'ub' },
     resolveTarget: async () => {
       seen.push('resolve');
       return { status: 'none' };
@@ -98,6 +97,7 @@ test('bindModeration usa o resolve injetado, não o módulo em cache', async () 
     authorID: 'autor',
     transport: { botID: 'bot' },
     message: { mentions: [] },
+    emoji: { unhappy: 'u', kick: 'k', ban: 'b', time: 't', unban: 'ub' },
     requireGuild: () => 'guild',
     reply: async (text: string) => {
       seen.push(text);

@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import { createTestBot } from 'yuzuha/testing';
 import setprefix from '../commands/setprefix.js';
 import { bindGuildPrefixes, guildPrefix, setGuildPrefixCache } from '../src/guild-prefix.js';
+import { emoji } from '../src/emoji.js';
 
 const VAR = (guildID: string) => JSON.stringify(['guild', guildID, 'prefix']);
 
 // MockTransport registra o autor admin só na guild '100'. O cache do módulo é
 // compartilhado entre testes, então cada teste limpa a entrada ao terminar.
 function bot() {
-  const fixture = createTestBot({ prefix: 'a.', commands: [setprefix] });
+  const fixture = createTestBot({ prefix: 'a.', commands: [setprefix], emoji });
   bindGuildPrefixes(fixture.store);
   return fixture;
 }

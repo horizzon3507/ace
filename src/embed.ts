@@ -1,7 +1,5 @@
 import { embed, type UserInfo } from 'yuzuha';
-import { fixAnimatedAssetUrl, fullAssetSize, profileBannerURL } from './cdn.js';
 import type { AceContext } from './context.js';
-import { emoji } from './emoji.js';
 import { brand } from './live.js';
 import { resolveAssetTarget } from './resolve.js';
 
@@ -10,7 +8,7 @@ export async function replyAsset(ctx: AceContext, name: string, url: string, aut
     embeds: [embed({
       color: brand.primary,
       author: authorIcon ? { name, iconURL: authorIcon } : { name },
-      image: { url: fullAssetSize(url) },
+      image: { url: ctx.cdn.asset(url, { size: 4096 }) ?? url },
     })],
   });
 }
@@ -24,6 +22,7 @@ const guildCopy = {
 
 /** Busca a guild uma vez e responde o asset em embed; sem asset, avisa. */
 export async function replyGuildAsset(ctx: AceContext, kind: GuildAsset): Promise<void> {
+  const { emoji } = ctx;
   const guildID = ctx.requireGuild();
   let guild;
   try {
@@ -33,7 +32,7 @@ export async function replyGuildAsset(ctx: AceContext, kind: GuildAsset): Promis
     return;
   }
   const spec = guildCopy[kind];
-  const url = fixAnimatedAssetUrl(kind === 'icon' ? guild.iconURL : guild.bannerURL);
+  const url = kind === 'icon' ? guild.iconURL : guild.bannerURL;
   if (!url) {
     await ctx.reply(`${emoji.unhappy} O servidor ${guild.name} não possui ${spec.asset} configurado...`);
     return;
@@ -50,12 +49,10 @@ const userCopy = {
 
 /** Resolve o alvo, busca membro→usuário e responde o asset em embed. */
 export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<void> {
+  const { emoji } = ctx;
   const spec = userCopy[kind];
   const target = await resolveAssetTarget(ctx);
-  let id: string;
-  if (target.status === 'found' || target.status === 'author') {
-    id = target.status === 'found' ? target.id : ctx.authorID;
-  } else {
+  if (target.status !== 'found') {
     const text = target.status === 'missing'
       ? `${emoji.unhappy} Eu não encontrei ninguém como ${target.query}! Use menção ou ID de usuário...`
       : target.status === 'ambiguous'
@@ -66,28 +63,31 @@ export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<
     await ctx.reply(text);
     return;
   }
+  const { id } = target;
 
   const guildID = ctx.message.guildID;
   let user: UserInfo;
-  let bannerHash: string | null = null;
+  let url: string | null;
   try {
     if (kind === 'banner') {
-      const profile = await ctx.resources.users.profile(id, guildID ?? undefined);
-      user = profile.member ?? profile.user;
-      bannerHash = (guildID ? profile.serverProfile?.banner : null) ?? profile.globalProfile?.banner ?? null;
+      // users.bannerURL resolve o perfil por dentro — servidor primeiro, animado incluso.
+      const [member, banner] = await Promise.all([
+        guildID ? ctx.resources.users.member(guildID, id).catch(() => null) : null,
+        ctx.resources.users.bannerURL(id, guildID ?? undefined, { size: 4096 }),
+      ]);
+      user = member ?? (await ctx.resources.users.user(id));
+      url = banner ?? user.bannerURL;
     } else {
       user = guildID
         ? await ctx.resources.users.member(guildID, id).catch(() => ctx.resources.users.user(id))
         : await ctx.resources.users.user(id);
+      url = user.avatarURL;
     }
   } catch {
     await ctx.reply(`${emoji.unhappy} Eu não consegui carregar ${spec.fail} deste usuário...`);
     return;
   }
   const label = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
-  const url = kind === 'banner'
-    ? profileBannerURL(ctx, id, bannerHash) ?? fixAnimatedAssetUrl(user.bannerURL)
-    : fixAnimatedAssetUrl(user.avatarURL);
   if (!url) {
     await ctx.reply(`${emoji.unhappy} ${label} não possui ${spec.asset} configurado...`);
     return;

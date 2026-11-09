@@ -1,9 +1,8 @@
 import { defineCommand, embed } from 'yuzuha';
-import { emoji } from '../src/emoji.js';
 import { guildPrefix } from '../src/guild-prefix.js';
 import { brand, prefix } from '../src/live.js';
 
-type CommandCategory = { emoji: keyof typeof emoji; commands: readonly string[] };
+type CommandCategory = { emoji: keyof typeof import('../src/emoji.js').emoji; commands: readonly string[] };
 
 const categories: CommandCategory[] = [
   { emoji: 'information', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
@@ -41,16 +40,16 @@ export default defineCommand({
       listed.add(command);
     };
     for (const category of categories) {
-      for (const command of category.commands) push(command, emoji[category.emoji]);
+      for (const command of category.commands) push(command, ctx.emoji[category.emoji]);
     }
     for (const command of descriptions.keys()) {
-      if (!listed.has(command)) push(command, emoji.happy);
+      if (!listed.has(command)) push(command, ctx.emoji.happy);
     }
 
     await ctx.reply({
       embeds: [embed({
         color: brand.primary,
-        title: `${emoji.commandline} Confira meus comandos`,
+        title: `${ctx.emoji.commandline} Confira meus comandos`,
         description: 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...',
         fields,
       })],

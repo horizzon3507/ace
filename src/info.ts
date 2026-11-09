@@ -1,18 +1,14 @@
 import { embed, type GuildInfo, type MemberInfo, type UserInfo, type UserProfileInfo } from 'yuzuha';
-import { fixAnimatedAssetUrl, fullAssetSize, profileBannerURL } from './cdn.js';
 import type { AceContext } from './context.js';
-import { emoji } from './emoji.js';
 import { formatStamp } from './format.js';
 import { brand } from './live.js';
 import { resolveAssetTarget } from './resolve.js';
 
 /** Resolve o alvo como replyUserAsset, busca perfil→membro→usuário e responde o card em embed. */
 export async function replyUserInfo(ctx: AceContext): Promise<void> {
+  const { emoji } = ctx;
   const target = await resolveAssetTarget(ctx);
-  let id: string;
-  if (target.status === 'found' || target.status === 'author') {
-    id = target.status === 'found' ? target.id : ctx.authorID;
-  } else {
+  if (target.status !== 'found') {
     const text = target.status === 'missing'
       ? `${emoji.unhappy} Eu não encontrei ninguém como ${target.query}! Use menção ou ID de usuário...`
       : target.status === 'ambiguous'
@@ -23,6 +19,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
     await ctx.reply(text);
     return;
   }
+  const { id } = target;
 
   const guildID = ctx.message.guildID;
   let profile: UserProfileInfo | null = null;
@@ -46,11 +43,10 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   }
 
   const name = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
-  const avatar = fixAnimatedAssetUrl(user.avatarURL);
-  const bannerHash = (guildID ? profile?.serverProfile?.banner : null) ?? profile?.globalProfile?.banner;
-  const banner = profileBannerURL(ctx, id, bannerHash)
-    ?? fixAnimatedAssetUrl(profile?.serverProfile?.bannerURL ?? profile?.globalProfile?.bannerURL)
-    ?? fixAnimatedAssetUrl(user.bannerURL);
+  const avatar = user.avatarURL;
+  const banner = (guildID ? profile?.serverProfile?.bannerURL : null)
+    ?? profile?.globalProfile?.bannerURL
+    ?? user.bannerURL;
 
   const lines = [`**@${user.username}** \`${user.id}\``];
   const nickname = member?.nickname?.replace(/[*_~`]/g, '');
@@ -73,7 +69,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
       color: brand.background,
       author: avatar ? { name, iconURL: avatar } : { name },
       thumbnail: avatar ? { url: avatar } : undefined,
-      image: banner ? { url: fullAssetSize(banner) } : undefined,
+      image: banner ? { url: ctx.cdn.asset(banner, { size: 4096 }) ?? banner } : undefined,
       description: lines.join('\n'),
     })],
   });
@@ -81,6 +77,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
 /** Busca a guild uma vez e responde as informações do servidor em embed. */
 export async function replyGuildInfo(ctx: AceContext): Promise<void> {
+  const { emoji } = ctx;
   const guildID = ctx.requireGuild();
   let guild: GuildInfo;
   try {
@@ -90,8 +87,8 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     return;
   }
 
-  const icon = fixAnimatedAssetUrl(guild.iconURL);
-  const banner = fixAnimatedAssetUrl(guild.bannerURL);
+  const icon = guild.iconURL;
+  const banner = guild.bannerURL;
   const lines = [
     `\`${guild.id}\``,
     `Dono <@${guild.ownerID}> · **${guild.memberCount ?? '?'}** membros`,
@@ -106,7 +103,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
       color: brand.background,
       author: icon ? { name: guild.name, iconURL: icon } : { name: guild.name },
       thumbnail: icon ? { url: icon } : undefined,
-      image: banner ? { url: fullAssetSize(banner) } : undefined,
+      image: banner ? { url: ctx.cdn.asset(banner, { size: 4096 }) ?? banner } : undefined,
       description: lines.join('\n'),
     })],
   });
