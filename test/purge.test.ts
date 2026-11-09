@@ -51,7 +51,7 @@ test('clear apaga as mensagens listadas e conta só as que existiam', async (t) 
 
   assert.equal(await fixture.send('a.clear 2'), 'success');
   const sent = fixture.messages.at(-1);
-  assert.match(sent?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* deste canal\./);
+  assert.match(sent?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* deste canal!/);
   // A mensagem do comando foi apagada: a confirmação não pode referenciá-la.
   assert.equal(sent?.replyTo, undefined);
   assert.equal(fixture.messages.length, 1); // só sobrou a resposta
@@ -64,7 +64,7 @@ test('clear com 1 apagada usa o singular', async (t) => {
   seed(fixture, '41'); // '42' estava na listagem, mas já não existia no canal.
 
   assert.equal(await fixture.send('a.clear 1'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu apaguei \*\*1 mensagem\*\* deste canal\./);
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu apaguei \*\*1 mensagem\*\* deste canal!/);
 });
 
 test('clear sem nada apagável admite que não encontrou', async (t) => {
@@ -112,7 +112,7 @@ test('purge apaga só as mensagens do membro alvo', async (t) => {
 
   assert.equal(await fixture.send('a.purge <@2> 2'), 'success');
   const sent = fixture.messages.at(-1);
-  assert.match(sent?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* de @2\./);
+  assert.match(sent?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* de @2!/);
   assert.equal(sent?.replyTo, undefined);
   assert.ok(!fixture.messages.some((message) => message.id === '50'));
   assert.ok(fixture.messages.some((message) => message.id === '51')); // de outra autora — fica
@@ -127,7 +127,7 @@ test('purge aceita a menção depois da quantidade', async (t) => {
 
   assert.equal(await fixture.send('a.purge 2 <@2>'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /Eu apaguei \*\*2 mensagens\*\* de @2\./);
+  assert.match(content, /Eu apaguei \*\*2 mensagens\*\* de @2!/);
   assert.ok(!fixture.messages.some((message) => message.id === '50'));
   assert.ok(fixture.messages.some((message) => message.id === '51')); // de outra autora — fica
   assert.ok(!fixture.messages.some((message) => message.id === '52'));
@@ -140,7 +140,7 @@ test('purge sem quantidade apaga até 10 do membro', async (t) => {
 
   assert.equal(await fixture.send('a.purge <@2>'), 'success');
   const content = fixture.messages.at(-1)?.payload.content ?? '';
-  assert.match(content, /Eu apaguei \*\*10 mensagens\*\* de @2\./);
+  assert.match(content, /Eu apaguei \*\*10 mensagens\*\* de @2!/);
   assert.equal(fixture.messages.length, 3); // 2 que sobraram + a resposta
 });
 

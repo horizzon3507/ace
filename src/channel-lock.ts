@@ -99,7 +99,7 @@ export function bindChannelLock(deps: ChannelLockDeps) {
       : voice
         ? 'A entrada está liberada novamente'
         : 'As mensagens estão liberadas novamente';
-    await ctx.reply(`${emoji[spec.mark]} Canal ${ref ? `<#${channel.id}> ` : ''}**${spec.state}**! ${body}...\n-# ╰ Motivo: ${reason}`);
+    await ctx.reply(`${emoji[spec.mark]} Canal ${ref ? `<#${channel.id}> ` : ''}**${spec.state}**! ${body}.\n-# ╰ Motivo: ${reason}`);
   };
 }
 

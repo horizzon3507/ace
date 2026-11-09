@@ -113,7 +113,7 @@ export function bindPurge(deps: PurgeDeps) {
       return;
     }
     const scope = mode === 'user' ? `de @${label}` : 'deste canal';
-    const sent = await call(() => ctx.send(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}.`));
+    const sent = await call(() => ctx.send(`${emoji.purge} Eu apaguei **${count} ${count === 1 ? 'mensagem' : 'mensagens'}** ${scope}!`));
     after(REPLY_TTL_MS, () => {
       void call(() => ctx.transport.delete(ctx.channelID, sent)).catch(() => { /* já foi apagada por outra via */ });
     });
