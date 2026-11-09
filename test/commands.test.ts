@@ -314,11 +314,34 @@ test('avatar na DM pede menção ou ID', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o usuário por menção/);
 });
 
+const noProfile = {
+  user: animatedMember('1'),
+  member: null,
+  globalProfile: { pronouns: null, bio: null, banner: null, accentColor: null, bannerColor: null, theme: null, mutualGuildIDs: [], connectedAccounts: [] },
+  serverProfile: null,
+};
+
+test('userbanner exibe o banner do perfil', async (t) => {
+  const fixture = bot({
+    users: {
+      async profile() {
+        return { ...noProfile, globalProfile: { ...noProfile.globalProfile, banner: 'a_b456' } };
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.userbanner'), 'success');
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(embed?.image?.url, 'https://fluxerusercontent.com/banners/1/a_b456.gif?size=4096');
+  assert.equal(embed?.author?.name, 'Banner de Glacial');
+});
+
 test('userbanner avisa quando falta banner', async (t) => {
   const fixture = bot({
     users: {
-      async member(_guildID: string, userID: string) {
-        return { ...animatedMember(userID), bannerURL: null };
+      async profile() {
+        return noProfile;
       },
     },
   });

@@ -48,6 +48,22 @@ const userCopy = {
   banner: { label: 'Banner', command: 'userbanner', fail: 'o banner', asset: 'um banner' },
 } as const;
 
+/** Media base da instância; sem client nativo (testes) cai no CDN hospedado. */
+function mediaBase(ctx: AceContext): string {
+  try {
+    return ctx.client.instance.endpoints.media.replace(/\/+$/, '');
+  } catch {
+    return 'https://fluxerusercontent.com';
+  }
+}
+
+/** O objeto user do Fluxer não traz o banner — o hash só sai no endpoint de perfil. */
+function profileBannerURL(ctx: AceContext, userID: string, hash: string | null | undefined): string | null {
+  if (!hash) return null;
+  const ext = hash.startsWith('a_') ? 'gif' : 'png';
+  return `${mediaBase(ctx)}/banners/${userID}/${hash}.${ext}`;
+}
+
 /** Resolve o alvo, busca membro→usuário e responde o asset em embed. */
 export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<void> {
   const spec = userCopy[kind];
@@ -69,16 +85,25 @@ export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<
 
   const guildID = ctx.message.guildID;
   let user: UserInfo;
+  let bannerHash: string | null = null;
   try {
-    user = guildID
-      ? await ctx.resources.users.member(guildID, id).catch(() => ctx.resources.users.user(id))
-      : await ctx.resources.users.user(id);
+    if (kind === 'banner') {
+      const profile = await ctx.resources.users.profile(id, guildID ?? undefined);
+      user = profile.member ?? profile.user;
+      bannerHash = (guildID ? profile.serverProfile?.banner : null) ?? profile.globalProfile?.banner ?? null;
+    } else {
+      user = guildID
+        ? await ctx.resources.users.member(guildID, id).catch(() => ctx.resources.users.user(id))
+        : await ctx.resources.users.user(id);
+    }
   } catch {
     await ctx.reply(`${emoji.unhappy} Eu não consegui carregar ${spec.fail} deste usuário...`);
     return;
   }
   const label = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
-  const url = fixAnimatedAssetUrl(kind === 'avatar' ? user.avatarURL : user.bannerURL);
+  const url = kind === 'banner'
+    ? profileBannerURL(ctx, id, bannerHash) ?? fixAnimatedAssetUrl(user.bannerURL)
+    : fixAnimatedAssetUrl(user.avatarURL);
   if (!url) {
     await ctx.reply(`${emoji.unhappy} ${label} não possui ${spec.asset} configurado...`);
     return;
