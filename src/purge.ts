@@ -10,10 +10,10 @@ export type PurgeDeps = {
   wait?: (ms: number) => Promise<void>;
 };
 
-const REPLY_TTL_MS = 10_000;
+const REPLY_TTL_MS = 7_000;
 const RETRY_DELAY_MS = 750;
 
-/** setTimeout real com unref — não segura o processo se o bot cair antes dos 10s. */
+/** setTimeout real com unref — não segura o processo se o bot cair antes dos 7s. */
 function later(ms: number, fn: () => void): void {
   setTimeout(fn, ms).unref();
 }

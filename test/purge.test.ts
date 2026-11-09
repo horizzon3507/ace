@@ -144,7 +144,7 @@ test('purge sem quantidade apaga até 10 do membro', async (t) => {
   assert.equal(fixture.messages.length, 3); // 2 que sobraram + a resposta
 });
 
-test('a resposta de sucesso se apaga sozinha depois de 10s', async () => {
+test('a resposta de sucesso se apaga sozinha depois de 7s', async () => {
   const deleted: string[] = [];
   const scheduled: Array<[number, () => void]> = [];
   const run = bindPurge({
@@ -163,7 +163,7 @@ test('a resposta de sucesso se apaga sozinha depois de 10s', async () => {
   } as unknown as Parameters<typeof run>[0], 'channel');
   assert.deepEqual(deleted, ['m1', 'm2', 'cmd']); // 2 do canal + a do comando, fora da conta
   assert.equal(scheduled.length, 1);
-  assert.equal(scheduled[0]?.[0], 10_000);
+  assert.equal(scheduled[0]?.[0], 7_000);
   scheduled[0]?.[1]();
   await Promise.resolve();
   assert.deepEqual(deleted, ['m1', 'm2', 'cmd', 'sent-1']);
