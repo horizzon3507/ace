@@ -79,7 +79,7 @@ export function bindPurge(deps: PurgeDeps) {
         return;
       }
       n = parsed;
-      label = target.label ?? target.id;
+      label = target.label ?? (await nameOf(ctx, guildID, target.id));
       const recent = await ctx.resources.messages.list(ctx.channelID, 100);
       ids = recent.filter((message) => message.authorID === target.id && message.id !== selfID).slice(0, n).map((message) => message.id);
     } else {
@@ -137,6 +137,16 @@ async function bulkDelete(ctx: AceContext, limit: number): Promise<boolean> {
     return true;
   } catch {
     return false;
+  }
+}
+
+/** Menção e ID não trazem nome — resolve o membro para exibir @nome em vez do snowflake cru. */
+async function nameOf(ctx: AceContext, guildID: string, userID: string): Promise<string> {
+  try {
+    const member = await ctx.resources.users.member(guildID, userID);
+    return member.nickname ?? member.displayName ?? member.username ?? userID;
+  } catch {
+    return userID;
   }
 }
 
