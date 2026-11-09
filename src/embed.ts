@@ -1,5 +1,5 @@
 import { embed, type UserInfo } from 'yuzuha';
-import { fixAnimatedAssetUrl, fullAssetSize } from './cdn.js';
+import { fixAnimatedAssetUrl, fullAssetSize, profileBannerURL } from './cdn.js';
 import type { AceContext } from './context.js';
 import { emoji } from './emoji.js';
 import { brand } from './live.js';
@@ -47,22 +47,6 @@ const userCopy = {
   avatar: { label: 'Avatar', command: 'avatar', fail: 'o avatar', asset: 'um avatar' },
   banner: { label: 'Banner', command: 'userbanner', fail: 'o banner', asset: 'um banner' },
 } as const;
-
-/** Media base da instância; sem client nativo (testes) cai no CDN hospedado. */
-function mediaBase(ctx: AceContext): string {
-  try {
-    return ctx.client.instance.endpoints.media.replace(/\/+$/, '');
-  } catch {
-    return 'https://fluxerusercontent.com';
-  }
-}
-
-/** O objeto user do Fluxer não traz o banner — o hash só sai no endpoint de perfil. */
-function profileBannerURL(ctx: AceContext, userID: string, hash: string | null | undefined): string | null {
-  if (!hash) return null;
-  const ext = hash.startsWith('a_') ? 'gif' : 'png';
-  return `${mediaBase(ctx)}/banners/${userID}/${hash}.${ext}`;
-}
 
 /** Resolve o alvo, busca membro→usuário e responde o asset em embed. */
 export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<void> {

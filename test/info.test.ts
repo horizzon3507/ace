@@ -12,10 +12,6 @@ function bot(resources?: MockResourceOverrides) {
   return createTestBot({ prefix: 'a.', commands, resources });
 }
 
-function field(embed: Embed | undefined, name: string) {
-  return embed?.fields?.find((item) => item.name === name);
-}
-
 const glacial = {
   id: '2',
   username: 'glacial',
@@ -42,16 +38,15 @@ const comunidade = {
 };
 
 function assertUserInfoEmbed(embed: Embed | undefined) {
-  assert.equal(embed?.color, brand.primary);
+  assert.equal(embed?.color, brand.background);
   assert.equal(embed?.author?.name, 'Glacial');
-  for (const name of ['Usuário', 'ID', 'Apelido', 'Conta criada', 'Entrou no servidor', 'Cargos']) {
-    assert.ok(field(embed, name), `faltou o campo ${name}`);
-  }
-  assert.equal(field(embed, 'Usuário')?.value, '@glacial');
-  assert.equal(field(embed, 'ID')?.value, '2');
-  assert.equal(field(embed, 'Apelido')?.value, 'Glacial');
-  assert.equal(field(embed, 'Cargos')?.value, '<@&50> <@&60>');
-  assert.equal(field(embed, 'Silenciado até'), undefined);
+  const description = embed?.description ?? '';
+  assert.match(description, /\*\*@glacial\*\* `2`/);
+  assert.match(description, /Apelido \*\*Glacial\*\*/);
+  assert.match(description, /Entrou /);
+  assert.match(description, /Conta de /);
+  assert.match(description, /Cargos: <@&50> <@&60>/);
+  assert.doesNotMatch(description, /Silenciado até/);
 }
 
 test('userinfo sem argumento mostra o autor em embed', async (t) => {
@@ -84,6 +79,30 @@ test('userinfo por menção mostra o mesmo embed', async (t) => {
   assert.deepEqual(fixture.errors, []);
 });
 
+test('userinfo mostra o banner do perfil como imagem', async (t) => {
+  const fixture = bot({
+    users: {
+      async profile() {
+        return {
+          user: glacial,
+          member: glacial,
+          globalProfile: {
+            pronouns: null, bio: null, banner: 'a_b456', bannerURL: null,
+            accentColor: null, bannerColor: null, theme: null, mutualGuildIDs: [], connectedAccounts: [],
+          },
+          serverProfile: null,
+        };
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(embed?.image?.url, 'https://fluxerusercontent.com/banners/2/a_b456.gif?size=4096');
+  assert.deepEqual(fixture.errors, []);
+});
+
 test('userinfo cai para o usuário global quando o membro falha', async (t) => {
   const fixture = bot({
     users: {
@@ -108,10 +127,11 @@ test('userinfo cai para o usuário global quando o membro falha', async (t) => {
   assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.author?.name, 'Glacial');
-  assert.ok(field(embed, 'Conta criada'), 'faltou o campo Conta criada');
-  assert.equal(field(embed, 'Entrou no servidor'), undefined);
-  assert.equal(field(embed, 'Apelido'), undefined);
-  assert.equal(field(embed, 'Cargos'), undefined);
+  const description = embed?.description ?? '';
+  assert.match(description, /Conta de /);
+  assert.doesNotMatch(description, /Entrou /);
+  assert.doesNotMatch(description, /Apelido/);
+  assert.doesNotMatch(description, /Cargos/);
   assert.deepEqual(fixture.errors, []);
 });
 
@@ -144,7 +164,7 @@ test('userinfo mostra silenciamento só quando ele é futuro', async (t) => {
   t.after(() => future.destroy());
 
   assert.equal(await future.send('a.userinfo <@2>'), 'success');
-  assert.ok(field(future.messages.at(-1)?.payload.embeds?.[0], 'Silenciado até'));
+  assert.match(future.messages.at(-1)?.payload.embeds?.[0]?.description ?? '', /Silenciado até/);
 
   const past = bot({
     users: {
@@ -156,7 +176,7 @@ test('userinfo mostra silenciamento só quando ele é futuro', async (t) => {
   t.after(() => past.destroy());
 
   assert.equal(await past.send('a.userinfo <@2>'), 'success');
-  assert.equal(field(past.messages.at(-1)?.payload.embeds?.[0], 'Silenciado até'), undefined);
+  assert.doesNotMatch(past.messages.at(-1)?.payload.embeds?.[0]?.description ?? '', /Silenciado até/);
 });
 
 test('guildinfo mostra as informações do servidor', async (t) => {
@@ -171,14 +191,14 @@ test('guildinfo mostra as informações do servidor', async (t) => {
 
   assert.equal(await fixture.send('a.guildinfo'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(embed?.color, brand.primary);
+  assert.equal(embed?.color, brand.background);
   assert.equal(embed?.author?.name, 'Comunidade Fluxer');
   assert.equal(embed?.author?.iconURL, 'https://cdn.fluxer.app/icons/server.png');
   assert.equal(embed?.thumbnail?.url, 'https://cdn.fluxer.app/icons/server.png');
-  assert.equal(field(embed, 'ID')?.value, '100');
-  assert.equal(field(embed, 'Dono')?.value, '<@1>');
-  assert.equal(field(embed, 'Membros')?.value, '**42**');
-  assert.ok(field(embed, 'Criado em')?.value);
+  const description = embed?.description ?? '';
+  assert.match(description, /`100`/);
+  assert.match(description, /Dono <@1> · \*\*42\*\* membros/);
+  assert.match(description, /Criado em /);
   assert.deepEqual(fixture.errors, []);
 });
 

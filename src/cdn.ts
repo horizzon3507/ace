@@ -1,3 +1,21 @@
+import type { AceContext } from './context.js';
+
+/** Media base da instância; sem client nativo (testes) cai no CDN hospedado. */
+export function mediaBase(ctx: AceContext): string {
+  try {
+    return ctx.client.instance.endpoints.media.replace(/\/+$/, '');
+  } catch {
+    return 'https://fluxerusercontent.com';
+  }
+}
+
+/** O objeto user do Fluxer não traz o banner — o hash só sai no endpoint de perfil. */
+export function profileBannerURL(ctx: AceContext, userID: string, hash: string | null | undefined): string | null {
+  if (!hash) return null;
+  const ext = hash.startsWith('a_') ? 'gif' : 'png';
+  return `${mediaBase(ctx)}/banners/${userID}/${hash}.${ext}`;
+}
+
 /** Sem `?size` o CDN devolve a miniatura. Força a resolução máxima do asset. */
 export function fullAssetSize(url: string): string {
   const q = url.indexOf('?');

@@ -1,12 +1,12 @@
-import { embed, type EmbedField, type GuildInfo, type MemberInfo, type UserInfo } from 'yuzuha';
-import { fixAnimatedAssetUrl } from './cdn.js';
+import { embed, type GuildInfo, type MemberInfo, type UserInfo, type UserProfileInfo } from 'yuzuha';
+import { fixAnimatedAssetUrl, fullAssetSize, profileBannerURL } from './cdn.js';
 import type { AceContext } from './context.js';
 import { emoji } from './emoji.js';
 import { formatStamp } from './format.js';
 import { brand } from './live.js';
 import { resolveAssetTarget } from './resolve.js';
 
-/** Resolve o alvo como replyUserAsset, busca membro→usuário e responde o perfil em embed. */
+/** Resolve o alvo como replyUserAsset, busca perfil→membro→usuário e responde o card em embed. */
 export async function replyUserInfo(ctx: AceContext): Promise<void> {
   const target = await resolveAssetTarget(ctx);
   let id: string;
@@ -25,14 +25,20 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   }
 
   const guildID = ctx.message.guildID;
+  let profile: UserProfileInfo | null = null;
+  try {
+    profile = await ctx.resources.users.profile(id, guildID ?? undefined);
+  } catch {
+    // Perfil indisponível: segue com member/user, só sem banner.
+  }
   let user: UserInfo;
   let member: MemberInfo | null = null;
   try {
     if (guildID) {
-      member = await ctx.resources.users.member(guildID, id).catch(() => null);
-      user = member ?? await ctx.resources.users.user(id);
+      member = profile?.member ?? await ctx.resources.users.member(guildID, id).catch(() => null);
+      user = member ?? profile?.user ?? await ctx.resources.users.user(id);
     } else {
-      user = await ctx.resources.users.user(id);
+      user = profile?.user ?? await ctx.resources.users.user(id);
     }
   } catch {
     await ctx.reply(`${emoji.unhappy} Eu não consegui carregar as informações deste usuário...`);
@@ -41,31 +47,34 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
   const name = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
   const avatar = fixAnimatedAssetUrl(user.avatarURL);
+  const bannerHash = (guildID ? profile?.serverProfile?.banner : null) ?? profile?.globalProfile?.banner;
+  const banner = profileBannerURL(ctx, id, bannerHash)
+    ?? fixAnimatedAssetUrl(profile?.serverProfile?.bannerURL ?? profile?.globalProfile?.bannerURL)
+    ?? fixAnimatedAssetUrl(user.bannerURL);
 
-  const fields: EmbedField[] = [
-    { name: 'Usuário', value: `@${user.username}`, inline: true },
-    { name: 'ID', value: user.id, inline: true },
-  ];
+  const lines = [`**@${user.username}** \`${user.id}\``];
   const nickname = member?.nickname?.replace(/[*_~`]/g, '');
   if (nickname) {
-    fields.push({ name: 'Apelido', value: nickname, inline: true });
+    lines.push(`Apelido **${nickname}**`);
   }
-  fields.push({ name: 'Conta criada', value: formatStamp(new Date(user.createdTimestamp)), inline: true });
+  lines.push(member
+    ? `Entrou ${formatStamp(new Date(member.joinedTimestamp))} · Conta de ${formatStamp(new Date(user.createdTimestamp))}`
+    : `Conta de ${formatStamp(new Date(user.createdTimestamp))}`);
   if (member) {
-    fields.push({ name: 'Entrou no servidor', value: formatStamp(new Date(member.joinedTimestamp)), inline: true });
     const roles = member.roles.slice(0, 10).map((role) => `<@&${role}>`).join(' ');
-    fields.push({ name: 'Cargos', value: roles || 'Nenhum' });
+    lines.push(`Cargos: ${roles || 'nenhum'}`);
     if (member.timedOutUntil !== null && member.timedOutUntil > Date.now()) {
-      fields.push({ name: 'Silenciado até', value: formatStamp(new Date(member.timedOutUntil)), inline: true });
+      lines.push(`Silenciado até ${formatStamp(new Date(member.timedOutUntil))}`);
     }
   }
 
   await ctx.reply({
     embeds: [embed({
-      color: brand.primary,
+      color: brand.background,
       author: avatar ? { name, iconURL: avatar } : { name },
       thumbnail: avatar ? { url: avatar } : undefined,
-      fields,
+      image: banner ? { url: fullAssetSize(banner) } : undefined,
+      description: lines.join('\n'),
     })],
   });
 }
@@ -82,22 +91,23 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   const icon = fixAnimatedAssetUrl(guild.iconURL);
-  const fields: EmbedField[] = [
-    { name: 'ID', value: guild.id, inline: true },
-    { name: 'Dono', value: `<@${guild.ownerID}>`, inline: true },
-    { name: 'Membros', value: `**${guild.memberCount ?? '?'}**`, inline: true },
-    { name: 'Criado em', value: formatStamp(new Date(guild.createdTimestamp)), inline: true },
+  const banner = fixAnimatedAssetUrl(guild.bannerURL);
+  const lines = [
+    `\`${guild.id}\``,
+    `Dono <@${guild.ownerID}> · **${guild.memberCount ?? '?'}** membros`,
+    `Criado em ${formatStamp(new Date(guild.createdTimestamp))}`,
   ];
   if (guild.features?.length) {
-    fields.push({ name: 'Recursos', value: guild.features.join(', ') });
+    lines.push(`Recursos: ${guild.features.join(', ')}`);
   }
 
   await ctx.reply({
     embeds: [embed({
-      color: brand.primary,
+      color: brand.background,
       author: icon ? { name: guild.name, iconURL: icon } : { name: guild.name },
       thumbnail: icon ? { url: icon } : undefined,
-      fields,
+      image: banner ? { url: fullAssetSize(banner) } : undefined,
+      description: lines.join('\n'),
     })],
   });
 }
