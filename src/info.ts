@@ -1,4 +1,4 @@
-import { embed, type GuildInfo, type MemberInfo, type UserInfo, type UserProfileInfo } from 'yuzuha';
+import { embed, SDK, type GuildInfo, type MemberInfo, type UserInfo, type UserProfileInfo } from 'yuzuha';
 import type { AceContext } from './context.js';
 import { formatAge, formatDayStamp, formatStamp } from './format.js';
 import { brand } from './live.js';
@@ -75,6 +75,16 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   });
 }
 
+const NEEDED_PERMISSIONS: { flag: keyof typeof SDK.PermissionFlags; label: string }[] = [
+  { flag: 'SendMessages', label: 'Enviar mensagens' },
+  { flag: 'ManageMessages', label: 'Gerenciar mensagens' },
+  { flag: 'ManageRoles', label: 'Gerenciar cargos' },
+  { flag: 'ManageGuild', label: 'Gerenciar servidor' },
+  { flag: 'KickMembers', label: 'Expulsar membros' },
+  { flag: 'BanMembers', label: 'Banir membros' },
+  { flag: 'ModerateMembers', label: 'Moderar membros' },
+];
+
 const FEATURE_LABELS: Record<string, string> = {
   ANIMATED_BANNER: 'banner animado',
   ANIMATED_ICON: 'ícone animado',
@@ -105,11 +115,12 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
-  const [counts, members, roles, channels] = await Promise.all([
+  const [counts, members, roles, channels, me] = await Promise.all([
     safe(() => ctx.resources.users.guildCounts(guildID)),
     safe(() => ctx.resources.users.members(guildID, 1000)),
     safe(() => ctx.resources.roles.list(guildID)),
     safe(() => ctx.resources.channels.list(guildID)),
+    safe(() => ctx.resources.users.me(guildID)),
   ]);
 
   const joinAnd = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}`;
@@ -117,7 +128,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
 
   const created = new Date(guild.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [
-    { name: `${emoji.information} Ficha`, value: `O diretor deste servidor é <@${guild.ownerID}>, id \`${guild.ownerID}\`!`, inline: true },
+    { name: `${emoji.information} Ficha`, value: `O diretor deste servidor é <@${guild.ownerID}>, ID \`${guild.ownerID}\`!`, inline: true },
     { name: `${emoji.time} Criado em`, value: `Este servidor foi criado em ${formatDayStamp(created)}, ${formatAge(created)}!`, inline: true },
   ];
 
@@ -163,8 +174,16 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   if (guild.features?.length) {
-    const list = guild.features.map((feature) => FEATURE_LABELS[feature] ?? `\`${feature}\``).join(' · ');
+    const list = guild.features.map((feature) => FEATURE_LABELS[feature] ?? `\`${feature}\``).join(', ');
     fields.push({ name: `${emoji.globe} Recursos`, value: list, inline: true });
+  }
+
+  if (me) {
+    const bits = BigInt(me.permissions);
+    const admin = (bits & SDK.PermissionFlags.Administrator) !== 0n;
+    const rows = NEEDED_PERMISSIONS.map(({ flag, label }) =>
+      `${admin || (bits & SDK.PermissionFlags[flag]) !== 0n ? '✓' : '✗'} ${label}`);
+    fields.push({ name: `${emoji.unban} Diagnóstico`, value: rows.join('\n'), inline: false });
   }
 
   const icon = guild.iconURL;

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { Embed } from 'yuzuha';
+import { SDK } from 'yuzuha';
 import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
 import { emoji } from '../src/emoji.js';
 import { brand } from '../src/brand.js';
@@ -211,6 +212,10 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
           { ...glacial, id: '9', bot: true },
         ];
       },
+      async me() {
+        // SendMessages + ManageMessages + BanMembers — mistura de ✓ e ✗ no diagnóstico.
+        return { ...glacial, id: '999', permissions: String(SDK.PermissionFlags.SendMessages | SDK.PermissionFlags.ManageMessages | SDK.PermissionFlags.BanMembers) };
+      },
     },
     roles: {
       async list() {
@@ -234,14 +239,28 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
 
   const fields = embed?.fields ?? [];
   const byName = (name: string) => fields.find((field) => field.name.includes(name))?.value ?? '';
-  assert.match(byName('Ficha'), /O diretor deste servidor é <@1>, id `1`!/);
+  assert.match(byName('Ficha'), /O diretor deste servidor é <@1>, ID `1`!/);
   assert.match(byName('Criado em'), /Este servidor foi criado em \*\*\d{2}\/\d{2}\/\d{4} \*\*às \*\*\d{2}:\d{2}\*\*, há \*\*\d+ anos\*\*!/);
   assert.match(byName('Pessoas'), /Há \*\*3\*\* usuários, sendo \*\*2\*\* humanos e \*\*1\*\* aplicativo\. Temos \*\*2\*\* usuários online!/);
   assert.match(byName('Cargos'), /Este servidor possui \*\*3\*\* cargos, sendo o que está no topo <@&50> e o que está na base <@&60>!/);
   assert.match(byName('Canais'), /Há \*\*4\*\* canais, sendo deles \*\*2\*\* canais de texto, \*\*1\*\* canal de voz e \*\*1\*\* categoria!/);
   const recursos = fields.find((field) => field.name.includes('Recursos'));
   assert.equal(recursos?.inline, true);
-  assert.equal(recursos?.value, 'ícone animado · banner · `MODO_SECRETO`');
+  assert.equal(recursos?.value, 'ícone animado, banner, `MODO_SECRETO`');
+
+  const diagnostico = fields.at(-1);
+  assert.equal(diagnostico?.name.includes('Diagnóstico'), true);
+  assert.equal(diagnostico?.inline, false);
+  const linhas = (diagnostico?.value ?? '').split('\n');
+  assert.deepEqual(linhas, [
+    '✓ Enviar mensagens',
+    '✓ Gerenciar mensagens',
+    '✗ Gerenciar cargos',
+    '✗ Gerenciar servidor',
+    '✗ Expulsar membros',
+    '✓ Banir membros',
+    '✗ Moderar membros',
+  ]);
   assert.deepEqual(fixture.errors, []);
 });
 
