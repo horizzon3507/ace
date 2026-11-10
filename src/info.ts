@@ -1,6 +1,6 @@
 import { embed, type GuildInfo, type MemberInfo, type UserInfo, type UserProfileInfo } from 'yuzuha';
 import type { AceContext } from './context.js';
-import { formatStamp } from './format.js';
+import { formatDayStamp, formatStamp } from './format.js';
 import { brand } from './live.js';
 import { resolveAssetTarget } from './resolve.js';
 
@@ -75,7 +75,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   });
 }
 
-/** Busca a guild uma vez e responde as informações do servidor em embed. */
+/** Ficha do servidor em campos inline: guild obrigatória, contadores degradáveis. */
 export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   const { emoji } = ctx;
   const guildID = ctx.requireGuild();
@@ -87,24 +87,61 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     return;
   }
 
-  const icon = guild.iconURL;
-  const banner = guild.bannerURL;
-  const lines = [
-    `\`${guild.id}\``,
-    `Dono <@${guild.ownerID}> · **${guild.memberCount ?? '?'}** membros`,
-    `Criado em ${formatStamp(new Date(guild.createdTimestamp))}`,
+  const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
+  const [members, roles, channels] = await Promise.all([
+    safe(() => ctx.resources.users.members(guildID, 1000)),
+    safe(() => ctx.resources.roles.list(guildID)),
+    safe(() => ctx.resources.channels.list(guildID)),
+  ]);
+
+  const fields: { name: string; value: string; inline: true }[] = [
+    { name: `${emoji.information} Ficha`, value: `**${guild.name}**\n\`${guild.id}\`\nDono <@${guild.ownerID}>`, inline: true },
+    { name: `${emoji.time} Criado em`, value: formatDayStamp(new Date(guild.createdTimestamp)), inline: true },
   ];
-  if (guild.features?.length) {
-    lines.push(`Recursos: ${guild.features.join(', ')}`);
+
+  const total = guild.memberCount ?? members?.length ?? null;
+  if (members?.length && total !== null) {
+    const bots = members.filter((member) => member.bot).length;
+    const full = members.length >= total;
+    fields.push({
+      name: `${emoji.happy} Pessoas`,
+      value: `**${total}** no total${full ? `\n**${members.length - bots}** usuários · **${bots}** apps` : ''}`,
+      inline: true,
+    });
+  } else if (total !== null) {
+    fields.push({ name: `${emoji.happy} Pessoas`, value: `**${total}** no total`, inline: true });
   }
 
+  if (roles?.length) {
+    const real = roles.filter((role) => role.id !== guildID);
+    const top = real.length ? real.reduce((a, b) => (b.position > a.position ? b : a)) : null;
+    const base = real.length ? real.reduce((a, b) => (b.position < a.position ? b : a)) : null;
+    const lines = [`**${roles.length}**`];
+    if (top && base && top.id !== base.id) lines.push(`Topo <@&${top.id}>`, `Base <@&${base.id}>`);
+    else if (top) lines.push(`Topo <@&${top.id}>`);
+    fields.push({ name: `${emoji.commandline} Cargos`, value: lines.join('\n'), inline: true });
+  }
+
+  if (channels?.length) {
+    const voice = channels.filter((channel) => channel.type === 2 || channel.type === 13).length;
+    const categories = channels.filter((channel) => channel.type === 4).length;
+    const text = channels.length - voice - categories;
+    fields.push({
+      name: `${emoji.globe} Canais`,
+      value: `**${text}** texto · **${voice}** voz\n**${categories}** ${categories === 1 ? 'categoria' : 'categorias'} — **${channels.length}** total`,
+      inline: true,
+    });
+  }
+
+  const icon = guild.iconURL;
+  const banner = guild.bannerURL;
   await ctx.reply({
     embeds: [embed({
       color: brand.background,
       author: icon ? { name: guild.name, iconURL: icon } : { name: guild.name },
       thumbnail: icon ? { url: icon } : undefined,
       image: banner ? { url: ctx.cdn.asset(banner, { size: 4096 }) ?? banner } : undefined,
-      description: lines.join('\n'),
+      fields,
     })],
   });
 }

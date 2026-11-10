@@ -185,11 +185,38 @@ test('userinfo mostra silenciamento só quando ele é futuro', async (t) => {
   assert.doesNotMatch(past.messages.at(-1)?.payload.embeds?.[0]?.description ?? '', /Silenciado até/);
 });
 
-test('guildinfo mostra as informações do servidor', async (t) => {
+const role = (id: string, position: number) => ({
+  id, name: id, color: 0, position, permissions: '0',
+  hoist: false, mentionable: false, unicodeEmoji: null, managed: false,
+});
+
+const chan = (id: string, type: number) => ({
+  id, name: id, type, guildID: '100', parentID: null, position: 0,
+  topic: null, slowmode: 0, nsfw: false,
+});
+
+test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   const fixture = bot({
     users: {
       async guild() {
-        return comunidade;
+        return { ...comunidade, memberCount: 3 };
+      },
+      async members() {
+        return [
+          { ...glacial, id: '1', bot: false },
+          { ...glacial, id: '2', bot: false },
+          { ...glacial, id: '9', bot: true },
+        ];
+      },
+    },
+    roles: {
+      async list() {
+        return [role('100', 0), role('50', 9), role('60', 1)];
+      },
+    },
+    channels: {
+      async list() {
+        return [chan('t1', 0), chan('t2', 0), chan('v1', 2), chan('c1', 4)];
       },
     },
   });
@@ -201,10 +228,32 @@ test('guildinfo mostra as informações do servidor', async (t) => {
   assert.equal(embed?.author?.name, 'Comunidade Fluxer');
   assert.equal(embed?.author?.iconURL, 'https://cdn.fluxer.app/icons/server.png');
   assert.equal(embed?.thumbnail?.url, 'https://cdn.fluxer.app/icons/server.png');
-  const description = embed?.description ?? '';
-  assert.match(description, /`100`/);
-  assert.match(description, /Dono <@1> · \*\*42\*\* membros/);
-  assert.match(description, /Criado em /);
+
+  const fields = embed?.fields ?? [];
+  assert.ok(fields.every((field) => field.inline === true));
+  const byName = (name: string) => fields.find((field) => field.name.includes(name))?.value ?? '';
+  assert.match(byName('Ficha'), /\*\*Comunidade Fluxer\*\*\n`100`\nDono <@1>/);
+  assert.match(byName('Criado em'), /\*\*\d{2}\/\d{2}\/\d{4}/);
+  assert.match(byName('Pessoas'), /\*\*3\*\* no total\n\*\*2\*\* usuários · \*\*1\*\* apps/);
+  assert.match(byName('Cargos'), /\*\*3\*\*\nTopo <@&50>\nBase <@&60>/);
+  assert.match(byName('Canais'), /\*\*2\*\* texto · \*\*1\*\* voz\n\*\*1\*\* categoria — \*\*4\*\* total/);
+  assert.deepEqual(fixture.errors, []);
+});
+
+test('guildinfo sem contadores ainda responde a ficha', async (t) => {
+  const fixture = bot({
+    users: {
+      async guild() {
+        return comunidade;
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.guildinfo'), 'success');
+  const fields = fixture.messages.at(-1)?.payload.embeds?.[0]?.fields ?? [];
+  assert.equal(fields.length, 3); // Ficha + Criado em + Pessoas (só total)
+  assert.match(fields.find((field) => field.name.includes('Pessoas'))?.value ?? '', /\*\*42\*\* no total/);
   assert.deepEqual(fixture.errors, []);
 });
 
