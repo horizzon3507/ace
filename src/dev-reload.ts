@@ -12,7 +12,7 @@ import { classifyChange, RUNTIME_FILES, type ReloadKind } from './watch-plan.js'
 export async function refreshRuntime(root: string): Promise<void> {
   const stamp = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
   const load = (file: string) => import(`${pathToFileURL(resolve(root, file)).href}?ace=${stamp}`);
-  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod, lockMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
+  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod, lockMod, formatMod, embedMod, purgeMod, infoMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
     typeof import('./mention.js'),
     typeof import('./prefix.js'),
     typeof import('./brand.js'),
@@ -21,6 +21,10 @@ export async function refreshRuntime(root: string): Promise<void> {
     typeof import('./resolve.js'),
     typeof import('./emoji.js'),
     typeof import('./channel-lock.js'),
+    typeof import('./format.js'),
+    typeof import('./embed.js'),
+    typeof import('./purge.js'),
+    typeof import('./info.js'),
   ];
   const missing = (file: string, name: string) => new Error(`${file} não exportou '${name}'.`);
   if (typeof mention.mentionMessage !== 'function') throw missing('src/mention.ts', 'mentionMessage');
@@ -33,6 +37,7 @@ export async function refreshRuntime(root: string): Promise<void> {
   if (typeof resolveMod.moderationReason !== 'function') throw missing('src/resolve.ts', 'moderationReason');
   if (typeof resolveMod.targetUserID !== 'function') throw missing('src/resolve.ts', 'targetUserID');
   if (typeof resolveMod.resolveBanTarget !== 'function') throw missing('src/resolve.ts', 'resolveBanTarget');
+  if (typeof resolveMod.resolveAssetTarget !== 'function') throw missing('src/resolve.ts', 'resolveAssetTarget');
   if (typeof punishMod.bindModeration !== 'function') throw missing('src/punish.ts', 'bindModeration');
   if (!emojiMod.emoji || typeof emojiMod.emoji !== 'object') throw missing('src/emoji.ts', 'emoji');
   for (const [key, value] of Object.entries(emojiMod.emoji)) {
@@ -45,7 +50,14 @@ export async function refreshRuntime(root: string): Promise<void> {
     throw new Error('src/punish.ts: bindModeration() não devolveu função.');
   }
   if (typeof lockMod.runChannelLock !== 'function') throw missing('src/channel-lock.ts', 'runChannelLock');
-  const runChannelLock = lockMod.runChannelLock;
+  if (typeof formatMod.formatStamp !== 'function') throw missing('src/format.ts', 'formatStamp');
+  if (typeof formatMod.formatDayStamp !== 'function') throw missing('src/format.ts', 'formatDayStamp');
+  if (typeof formatMod.formatAge !== 'function') throw missing('src/format.ts', 'formatAge');
+  if (typeof embedMod.replyUserAsset !== 'function') throw missing('src/embed.ts', 'replyUserAsset');
+  if (typeof embedMod.replyGuildAsset !== 'function') throw missing('src/embed.ts', 'replyGuildAsset');
+  if (typeof purgeMod.runPurge !== 'function') throw missing('src/purge.ts', 'runPurge');
+  if (typeof infoMod.replyUserInfo !== 'function') throw missing('src/info.ts', 'replyUserInfo');
+  if (typeof infoMod.replyGuildInfo !== 'function') throw missing('src/info.ts', 'replyGuildInfo');
   installRuntime({
     prefix: prefixMod.prefix,
     mentionMessage: mention.mentionMessage,
@@ -53,8 +65,20 @@ export async function refreshRuntime(root: string): Promise<void> {
     unknownCommandMessage: mention.unknownCommandMessage,
     grantJoinRole: joinMod.grantJoinRole,
     runModeration,
-    runChannelLock,
+    runChannelLock: lockMod.runChannelLock,
     targetUserID: resolveMod.targetUserID,
+    resolveTarget: resolveMod.resolveTarget,
+    resolveBanTarget: resolveMod.resolveBanTarget,
+    resolveAssetTarget: resolveMod.resolveAssetTarget,
+    moderationReason: resolveMod.moderationReason,
+    formatStamp: formatMod.formatStamp,
+    formatDayStamp: formatMod.formatDayStamp,
+    formatAge: formatMod.formatAge,
+    replyUserInfo: infoMod.replyUserInfo,
+    replyGuildInfo: infoMod.replyGuildInfo,
+    replyUserAsset: embedMod.replyUserAsset,
+    replyGuildAsset: embedMod.replyGuildAsset,
+    runPurge: purgeMod.runPurge,
     brand: brandMod.brand,
   });
   // Quem importa emoji segura a referência do módulo original: muta in-place só

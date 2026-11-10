@@ -1,5 +1,5 @@
 import { defineCommand } from 'yuzuha';
-import { replyUserAsset } from '../src/embed.js';
+import { replyUserAsset } from '../src/live.js';
 
 export default defineCommand({
   name: 'userbanner',

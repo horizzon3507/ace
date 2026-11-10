@@ -1,7 +1,6 @@
 import { embed, type UserInfo } from 'yuzuha';
 import type { AceContext } from './context.js';
-import { brand } from './live.js';
-import { resolveAssetTarget } from './resolve.js';
+import { brand, resolveAssetTarget } from './live.js';
 
 export async function replyAsset(ctx: AceContext, name: string, url: string, authorIcon: string | null = url): Promise<void> {
   await ctx.reply({

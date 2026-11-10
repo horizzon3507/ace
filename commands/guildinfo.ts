@@ -1,5 +1,5 @@
 import { defineCommand } from 'yuzuha';
-import { replyGuildInfo } from '../src/info.js';
+import { replyGuildInfo } from '../src/live.js';
 
 export default defineCommand({
   name: 'guildinfo',

@@ -1,5 +1,5 @@
 import { defineCommand } from 'yuzuha';
-import { runPurge } from '../src/purge.js';
+import { runPurge } from '../src/live.js';
 
 export default defineCommand({
   name: 'clear',

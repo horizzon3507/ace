@@ -1,5 +1,5 @@
 import { defineCommand } from 'yuzuha';
-import { replyGuildAsset } from '../src/embed.js';
+import { replyGuildAsset } from '../src/live.js';
 
 export default defineCommand({
   name: 'guildbanner',

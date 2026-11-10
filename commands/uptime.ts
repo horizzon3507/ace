@@ -1,5 +1,5 @@
 import { defineCommand } from 'yuzuha';
-import { formatStamp } from '../src/format.js';
+import { formatStamp } from '../src/live.js';
 
 export { formatStamp };
 

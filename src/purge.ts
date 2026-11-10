@@ -1,5 +1,5 @@
 import type { AceContext } from './context.js';
-import { resolveTarget } from './resolve.js';
+import { resolveTarget } from './live.js';
 
 export type PurgeMode = 'channel' | 'user';
 

@@ -1,8 +1,6 @@
 import { embed, SDK, type GuildInfo, type MemberInfo, type UserInfo, type UserProfileInfo } from 'yuzuha';
 import type { AceContext } from './context.js';
-import { formatAge, formatDayStamp } from './format.js';
-import { brand } from './live.js';
-import { resolveAssetTarget } from './resolve.js';
+import { brand, formatAge, formatDayStamp, resolveAssetTarget } from './live.js';
 
 const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
 const noun = (n: number, singular: string, plural = `${singular}s`) => n === 1 ? singular : plural;

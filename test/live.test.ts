@@ -14,6 +14,22 @@ const moderation = {
   targetUserID: sourceTarget,
 };
 
+// Slots novos do RuntimeInstall — os testes não exercitam, então stub resolve.
+const rest = {
+  resolveTarget: async () => ({ status: 'none' as const }),
+  resolveBanTarget: async () => ({ status: 'none' as const }),
+  resolveAssetTarget: async () => ({ status: 'invalid' as const }),
+  moderationReason: () => 'motivo',
+  formatStamp: () => 'stamp',
+  formatDayStamp: () => 'day',
+  formatAge: () => 'age',
+  replyUserInfo: async () => undefined,
+  replyGuildInfo: async () => undefined,
+  replyUserAsset: async () => undefined,
+  replyGuildAsset: async () => undefined,
+  runPurge: async () => undefined,
+};
+
 test('install troca menção, prefixo, cor e cargo no mesmo objeto', async () => {
   const previous = {
     prefix: prefix(),
@@ -28,6 +44,7 @@ test('install troca menção, prefixo, cor e cargo no mesmo objeto', async () =>
     isBareMention: () => false,
     unknownCommandMessage: (_content, commandPrefix, names) => names.length ? undefined : `faltou ${commandPrefix}`,
     grantJoinRole: async () => false,
+    ...rest,
     runModeration: async () => undefined,
     runChannelLock: async () => undefined,
     targetUserID: () => 'slot',
@@ -53,6 +70,7 @@ test('install troca menção, prefixo, cor e cargo no mesmo objeto', async () =>
     unknownCommandMessage: sourceUnknown,
     grantJoinRole: sourceGrant,
     ...moderation,
+    ...rest,
     brand: { primary: previous.primary, eyes: previous.eyes, background: previous.background },
   });
   assert.equal(await grantJoinRole(member), true);
@@ -67,6 +85,7 @@ test('install rejeita cor e prefixo inválidos e mantém o anterior', () => {
     unknownCommandMessage: sourceUnknown,
     grantJoinRole: async () => false,
     ...moderation,
+    ...rest,
     brand: { primary: 1, eyes: 1, background: 1 },
   }), /prefix/);
   assert.equal(prefix(), current);
@@ -77,6 +96,7 @@ test('install rejeita cor e prefixo inválidos e mantém o anterior', () => {
     unknownCommandMessage: sourceUnknown,
     grantJoinRole: async () => false,
     ...moderation,
+    ...rest,
     brand: { primary: 0x1000000, eyes: 1, background: 1 },
   }), /primary/);
   assert.equal(brand.primary, sourceBrand.primary);
