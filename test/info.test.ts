@@ -308,9 +308,12 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   assert.equal(recursos?.inline, true);
   assert.equal(recursos?.value, 'ícone animado, banner, `MODO_SECRETO`');
 
+  const diagnostico = fields.at(-1);
+  assert.equal(diagnostico?.name.includes('Diagnóstico'), true);
+  assert.equal(diagnostico?.inline, false);
   assert.equal(
-    embed?.footer?.text,
-    'Aqui eu consigo enviar mensagens, gerenciar mensagens e banir membros, mas não consigo gerenciar cargos, gerenciar servidor, expulsar membros nem moderar membros!',
+    diagnostico?.value,
+    'Eu ainda necessito das permissões gerenciar cargos, gerenciar servidor, expulsar membros e moderar membros para garantir o meu funcionamento estável!',
   );
   assert.deepEqual(fixture.errors, []);
 });

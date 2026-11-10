@@ -262,19 +262,20 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     fields.push({ name: `${emoji.globe} Recursos`, value: list, inline: true });
   }
 
-  let footer: string | undefined;
+  // Diagnóstico: field full-width por último — renderiza abaixo dos inline e
+  // acima do banner. users.me falhando omite o bloco sem derrubar o comando.
   if (me) {
     const bits = BigInt(me.permissions);
     const admin = (bits & SDK.PermissionFlags.Administrator) !== 0n;
     const has = (flag: keyof typeof SDK.PermissionFlags) => admin || (bits & SDK.PermissionFlags[flag]) !== 0n;
-    const consigo = NEEDED_PERMISSIONS.filter(({ flag }) => has(flag)).map(({ label }) => label.toLowerCase());
-    const naoConsigo = NEEDED_PERMISSIONS.filter(({ flag }) => !has(flag)).map(({ label }) => label.toLowerCase());
-    const joinNor = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} nem ${parts.at(-1)}`;
-    footer = naoConsigo.length === 0
-      ? `Aqui eu consigo tudo o que preciso: ${joinAnd(consigo)}!`
-      : consigo.length === 0
-        ? 'Aqui eu não consigo fazer nada do que preciso!'
-        : `Aqui eu consigo ${joinAnd(consigo)}, mas não consigo ${joinNor(naoConsigo)}!`;
+    const missing = NEEDED_PERMISSIONS.filter(({ flag }) => !has(flag)).map(({ label }) => label.toLowerCase());
+    fields.push({
+      name: `${emoji.unban} Diagnóstico`,
+      value: missing.length === 0
+        ? 'Não se preocupe com minhas permissões! Todas elas foram fornecidas corretamente, garantindo meu funcionamento estável!'
+        : `Eu ainda necessito das permissões ${joinAnd(missing)} para garantir o meu funcionamento estável!`,
+      inline: false,
+    });
   }
 
   const icon = guild.iconURL;
@@ -286,7 +287,6 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
       thumbnail: icon ? { url: ctx.cdn.asset(icon, { size: 1024 }) ?? icon } : undefined,
       image: banner ? { url: ctx.cdn.asset(banner, { size: 4096 }) ?? banner } : undefined,
       fields,
-      footer: footer ? { text: footer } : undefined,
     })],
   });
 }
