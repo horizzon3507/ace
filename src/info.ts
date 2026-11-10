@@ -109,15 +109,23 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
     const hierarquia = [
       total === 0
         ? 'Este membro não possui cargos!'
-        : mine.length > 0
-          ? `Este membro possui **${total}** ${noun(total, 'cargo', 'cargos')}, sendo o mais alto <@&${mine[0].id}>!`
-          : `Este membro possui **${total}** ${noun(total, 'cargo', 'cargos')}!`,
+        : `Este membro possui **${total}** ${noun(total, 'cargo', 'cargos')}!`,
     ];
     const privilege = topPrivilege(member.permissions);
     if (privilege) {
       hierarquia.push(`Seu maior privilégio é **${privilege}**!`);
     }
     fields.push({ name: `${emoji.lock} Hierarquia`, value: hierarquia.join('\n'), inline: true });
+
+    if (mine.length > 0) {
+      fields.push({
+        name: `${emoji.unban} Cargos`,
+        value: mine.length === 1
+          ? `Seu único cargo é <@&${mine[0].id}>!`
+          : `Seu cargo mais alto é <@&${mine[0].id}> e o mais baixo é <@&${mine.at(-1)!.id}>!`,
+        inline: true,
+      });
+    }
 
     if (member.timedOutUntil !== null && member.timedOutUntil > Date.now()) {
       fields.push({
@@ -256,12 +264,19 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     fields.push({ name: `${emoji.globe} Recursos`, value: list, inline: true });
   }
 
+  let footer: string | undefined;
   if (me) {
     const bits = BigInt(me.permissions);
     const admin = (bits & SDK.PermissionFlags.Administrator) !== 0n;
-    const rows = NEEDED_PERMISSIONS.map(({ flag, label }) =>
-      `${admin || (bits & SDK.PermissionFlags[flag]) !== 0n ? '✓' : '✗'} ${label}`);
-    fields.push({ name: `${emoji.unban} Diagnóstico`, value: rows.join('\n'), inline: false });
+    const has = (flag: keyof typeof SDK.PermissionFlags) => admin || (bits & SDK.PermissionFlags[flag]) !== 0n;
+    const consigo = NEEDED_PERMISSIONS.filter(({ flag }) => has(flag)).map(({ label }) => label.toLowerCase());
+    const naoConsigo = NEEDED_PERMISSIONS.filter(({ flag }) => !has(flag)).map(({ label }) => label.toLowerCase());
+    const joinNor = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} nem ${parts.at(-1)}`;
+    footer = naoConsigo.length === 0
+      ? `Aqui eu consigo tudo o que preciso: ${joinAnd(consigo)}!`
+      : consigo.length === 0
+        ? 'Aqui eu não consigo fazer nada do que preciso!'
+        : `Aqui eu consigo ${joinAnd(consigo)}, mas não consigo ${joinNor(naoConsigo)}!`;
   }
 
   const icon = guild.iconURL;
@@ -273,6 +288,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
       thumbnail: icon ? { url: ctx.cdn.asset(icon, { size: 1024 }) ?? icon } : undefined,
       image: banner ? { url: ctx.cdn.asset(banner, { size: 4096 }) ?? banner } : undefined,
       fields,
+      footer: footer ? { text: footer } : undefined,
     })],
   });
 }

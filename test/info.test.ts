@@ -202,9 +202,11 @@ test('userinfo mostra cargo mais alto e maior privilégio do membro', async (t) 
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
-  const hierarquia = fieldValue(fixture.messages.at(-1)?.payload.embeds?.[0], 'Hierarquia');
-  assert.match(hierarquia, /Este membro possui \*\*2\*\* cargos, sendo o mais alto <@&50>!/);
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  const hierarquia = fieldValue(embed, 'Hierarquia');
+  assert.match(hierarquia, /Este membro possui \*\*2\*\* cargos!/);
   assert.match(hierarquia, /Seu maior privilégio é \*\*Administrador\*\*!/);
+  assert.equal(fieldValue(embed, 'Cargos'), 'Seu cargo mais alto é <@&50> e o mais baixo é <@&60>!');
   assert.deepEqual(fixture.errors, []);
 });
 
@@ -306,19 +308,10 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   assert.equal(recursos?.inline, true);
   assert.equal(recursos?.value, 'ícone animado, banner, `MODO_SECRETO`');
 
-  const diagnostico = fields.at(-1);
-  assert.equal(diagnostico?.name.includes('Diagnóstico'), true);
-  assert.equal(diagnostico?.inline, false);
-  const linhas = (diagnostico?.value ?? '').split('\n');
-  assert.deepEqual(linhas, [
-    '✓ Enviar mensagens',
-    '✓ Gerenciar mensagens',
-    '✗ Gerenciar cargos',
-    '✗ Gerenciar servidor',
-    '✗ Expulsar membros',
-    '✓ Banir membros',
-    '✗ Moderar membros',
-  ]);
+  assert.equal(
+    embed?.footer?.text,
+    'Aqui eu consigo enviar mensagens, gerenciar mensagens e banir membros, mas não consigo gerenciar cargos, gerenciar servidor, expulsar membros nem moderar membros!',
+  );
   assert.deepEqual(fixture.errors, []);
 });
 
