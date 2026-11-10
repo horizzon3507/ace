@@ -39,16 +39,19 @@ const comunidade = {
   createdTimestamp: 0,
 };
 
+const fieldValue = (embed: Embed | undefined, name: string) =>
+  embed?.fields?.find((field) => field.name.includes(name))?.value ?? '';
+
 function assertUserInfoEmbed(embed: Embed | undefined) {
   assert.equal(embed?.color, brand.background);
-  assert.equal(embed?.author?.name, 'Glacial');
-  const description = embed?.description ?? '';
-  assert.match(description, /\*\*@glacial\*\* `2`/);
-  assert.match(description, /Apelido \*\*Glacial\*\*/);
-  assert.match(description, /Entrou /);
-  assert.match(description, /Conta de /);
-  assert.match(description, /Cargos: <@&50> <@&60>/);
-  assert.doesNotMatch(description, /Silenciado até/);
+  assert.equal(embed?.author?.name, 'Informações de Glacial');
+  assert.match(fieldValue(embed, 'Ficha'), /Este usuário é <@2>, ID `2`!/);
+  assert.match(fieldValue(embed, 'Ficha'), /Seu nome é \*\*Glacial\*\* `@glacial`!/);
+  assert.match(fieldValue(embed, 'Ficha'), /Seu apelido neste servidor é \*\*Glacial\*\*!/);
+  assert.match(fieldValue(embed, 'Conta criada'), /A conta deste usuário foi criada em \*\*\d{2}\/\d{2}\/\d{4} \*\*às/);
+  assert.match(fieldValue(embed, 'Entrada'), /Este membro entrou neste servidor em \*\*\d{2}\/\d{2}\/\d{4}/);
+  assert.match(fieldValue(embed, 'Hierarquia'), /Este membro possui \*\*2\*\* cargos!/);
+  assert.equal(fieldValue(embed, 'Situação'), '');
 }
 
 test('userinfo sem argumento mostra o autor em embed', async (t) => {
@@ -133,12 +136,10 @@ test('userinfo cai para o usuário global quando o membro falha', async (t) => {
 
   assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(embed?.author?.name, 'Glacial');
-  const description = embed?.description ?? '';
-  assert.match(description, /Conta de /);
-  assert.doesNotMatch(description, /Entrou /);
-  assert.doesNotMatch(description, /Apelido/);
-  assert.doesNotMatch(description, /Cargos/);
+  assert.equal(embed?.author?.name, 'Informações de Glacial');
+  const names = (embed?.fields ?? []).map((field) => field.name).join(' ');
+  assert.equal(fieldValue(embed, 'Conta criada') !== '', true);
+  assert.doesNotMatch(names, /Entrada|Hierarquia|Situação/);
   assert.deepEqual(fixture.errors, []);
 });
 
@@ -171,7 +172,7 @@ test('userinfo mostra silenciamento só quando ele é futuro', async (t) => {
   t.after(() => future.destroy());
 
   assert.equal(await future.send('a.userinfo <@2>'), 'success');
-  assert.match(future.messages.at(-1)?.payload.embeds?.[0]?.description ?? '', /Silenciado até/);
+  assert.match(fieldValue(future.messages.at(-1)?.payload.embeds?.[0], 'Situação'), /Este membro está silenciado até/);
 
   const past = bot({
     users: {
@@ -183,7 +184,65 @@ test('userinfo mostra silenciamento só quando ele é futuro', async (t) => {
   t.after(() => past.destroy());
 
   assert.equal(await past.send('a.userinfo <@2>'), 'success');
-  assert.doesNotMatch(past.messages.at(-1)?.payload.embeds?.[0]?.description ?? '', /Silenciado até/);
+  assert.equal(fieldValue(past.messages.at(-1)?.payload.embeds?.[0], 'Situação'), '');
+});
+
+test('userinfo mostra cargo mais alto e maior privilégio do membro', async (t) => {
+  const fixture = bot({
+    users: {
+      async member() {
+        return { ...glacial, permissions: String(SDK.PermissionFlags.Administrator) };
+      },
+    },
+    roles: {
+      async list() {
+        return [role('100', 0), role('50', 9), role('60', 1)];
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
+  const hierarquia = fieldValue(fixture.messages.at(-1)?.payload.embeds?.[0], 'Hierarquia');
+  assert.match(hierarquia, /Este membro possui \*\*2\*\* cargos, sendo o mais alto <@&50>!/);
+  assert.match(hierarquia, /Seu maior privilégio é \*\*Administrador\*\*!/);
+  assert.deepEqual(fixture.errors, []);
+});
+
+test('userinfo mostra bio, pronomes e conexões do perfil', async (t) => {
+  const fixture = bot({
+    users: {
+      async member() {
+        return glacial;
+      },
+      async profile() {
+        return {
+          user: glacial,
+          member: glacial,
+          globalProfile: {
+            pronouns: 'ele/dele', bio: 'dev do ace', banner: null, bannerURL: null,
+            accentColor: 0xff00ff, bannerColor: null, theme: null,
+            mutualGuildIDs: ['100', '200'],
+            connectedAccounts: [{ name: 'horizzon3507', type: 'github' }],
+          },
+          serverProfile: null,
+        };
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(embed?.color, 0xff00ff);
+  assert.match(fieldValue(embed, 'Ficha'), /Seus pronomes são ele\/dele!/);
+  assert.match(fieldValue(embed, 'Ficha'), /divide \*\*2\*\* servidores comigo!/);
+  assert.match(fieldValue(embed, 'Conexões'), /conectou `horizzon3507`!/);
+  const bio = embed?.fields?.at(-1);
+  assert.equal(bio?.name.includes('Bio'), true);
+  assert.equal(bio?.inline, false);
+  assert.equal(bio?.value, 'dev do ace');
+  assert.deepEqual(fixture.errors, []);
 });
 
 const role = (id: string, position: number) => ({

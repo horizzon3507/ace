@@ -1,10 +1,29 @@
 import { embed, SDK, type GuildInfo, type MemberInfo, type UserInfo, type UserProfileInfo } from 'yuzuha';
 import type { AceContext } from './context.js';
-import { formatAge, formatDayStamp, formatStamp } from './format.js';
+import { formatAge, formatDayStamp } from './format.js';
 import { brand } from './live.js';
 import { resolveAssetTarget } from './resolve.js';
 
-/** Resolve o alvo como replyUserAsset, busca perfil→membro→usuário e responde o card em embed. */
+const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
+const noun = (n: number, singular: string, plural = `${singular}s`) => n === 1 ? singular : plural;
+
+const PRIVILEGE_LADDER: { flag: keyof typeof SDK.PermissionFlags; label: string }[] = [
+  { flag: 'Administrator', label: 'Administrador' },
+  { flag: 'ManageGuild', label: 'Gerenciar servidor' },
+  { flag: 'ManageRoles', label: 'Gerenciar cargos' },
+  { flag: 'ManageChannels', label: 'Gerenciar canais' },
+  { flag: 'BanMembers', label: 'Banir membros' },
+  { flag: 'KickMembers', label: 'Expulsar membros' },
+  { flag: 'ModerateMembers', label: 'Moderar membros' },
+  { flag: 'ManageMessages', label: 'Gerenciar mensagens' },
+];
+
+const topPrivilege = (permissions: string): string | null => {
+  const bits = BigInt(permissions || '0');
+  return PRIVILEGE_LADDER.find(({ flag }) => (bits & SDK.PermissionFlags[flag]) !== 0n)?.label ?? null;
+};
+
+/** Card do usuário em campos inline: perfil completo de membro ou ficha global. */
 export async function replyUserInfo(ctx: AceContext): Promise<void> {
   const { emoji } = ctx;
   const target = await resolveAssetTarget(ctx);
@@ -42,35 +61,92 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
     return;
   }
 
+  const roleList = member && guildID ? await safe(() => ctx.resources.roles.list(guildID)) : null;
+
   const name = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
   const avatar = user.avatarURL;
   const banner = (guildID ? profile?.serverProfile?.bannerURL : null)
     ?? profile?.globalProfile?.bannerURL
     ?? user.bannerURL;
+  const bio = profile?.serverProfile?.bio ?? profile?.globalProfile?.bio;
+  const pronouns = profile?.serverProfile?.pronouns ?? profile?.globalProfile?.pronouns;
+  const mutuals = profile?.globalProfile?.mutualGuildIDs?.length ?? 0;
+  const accounts = profile?.globalProfile?.connectedAccounts ?? [];
+  const color = profile?.serverProfile?.accentColor ?? profile?.globalProfile?.accentColor ?? brand.background;
 
-  const lines = [`**@${user.username}** \`${user.id}\``];
+  const created = new Date(user.createdTimestamp);
+  const fields: { name: string; value: string; inline: boolean }[] = [];
+
+  const ficha = [
+    `Este ${user.bot ? 'aplicativo' : 'usuário'} é <@${user.id}>, ID \`${user.id}\`!`,
+    `Seu nome é **${name}**${name === user.username ? '' : ` \`@${user.username}\``}!`,
+  ];
   const nickname = member?.nickname?.replace(/[*_~`]/g, '');
   if (nickname) {
-    lines.push(`Apelido **${nickname}**`);
+    ficha.push(`Seu apelido neste servidor é **${nickname}**!`);
   }
-  lines.push(member
-    ? `Entrou ${formatStamp(new Date(member.joinedTimestamp))} · Conta de ${formatStamp(new Date(user.createdTimestamp))}`
-    : `Conta de ${formatStamp(new Date(user.createdTimestamp))}`);
+  if (pronouns) {
+    ficha.push(`Seus pronomes são ${pronouns}!`);
+  }
+  if (mutuals > 0) {
+    ficha.push(`Este usuário divide **${mutuals}** ${noun(mutuals, 'servidor', 'servidores')} comigo!`);
+  }
+  fields.push({ name: `${emoji.information} Ficha`, value: ficha.join('\n'), inline: true });
+  fields.push({
+    name: `${emoji.time} Conta criada`,
+    value: `A conta deste usuário foi criada em ${formatDayStamp(created)}, ${formatAge(created)}!`,
+    inline: true,
+  });
+
   if (member) {
-    const roles = member.roles.slice(0, 10).map((role) => `<@&${role}>`).join(' ');
-    lines.push(`Cargos: ${roles || 'nenhum'}`);
-    if (member.timedOutUntil !== null && member.timedOutUntil > Date.now()) {
-      lines.push(`Silenciado até ${formatStamp(new Date(member.timedOutUntil))}`);
+    const joined = new Date(member.joinedTimestamp);
+    fields.push({
+      name: `${emoji.happy} Entrada`,
+      value: `Este membro entrou neste servidor em ${formatDayStamp(joined)}, ${formatAge(joined)}!`,
+      inline: true,
+    });
+
+    const mine = (roleList ?? [])
+      .filter((role) => role.id !== guildID && member.roles.includes(role.id))
+      .sort((a, b) => b.position - a.position);
+    const total = member.roles.filter((roleID) => roleID !== guildID).length;
+    const hierarquia = [
+      total === 0
+        ? 'Este membro não possui cargos!'
+        : mine.length > 0
+          ? `Este membro possui **${total}** ${noun(total, 'cargo', 'cargos')}, sendo o mais alto <@&${mine[0].id}>!`
+          : `Este membro possui **${total}** ${noun(total, 'cargo', 'cargos')}!`,
+    ];
+    const privilege = topPrivilege(member.permissions);
+    if (privilege) {
+      hierarquia.push(`Seu maior privilégio é **${privilege}**!`);
     }
+    fields.push({ name: `${emoji.lock} Hierarquia`, value: hierarquia.join('\n'), inline: true });
+
+    if (member.timedOutUntil !== null && member.timedOutUntil > Date.now()) {
+      fields.push({
+        name: `${emoji.unban} Situação`,
+        value: `Este membro está silenciado até ${formatDayStamp(new Date(member.timedOutUntil))}!`,
+        inline: true,
+      });
+    }
+  }
+
+  if (accounts.length > 0) {
+    const list = accounts.map((account) => `\`${account.name ?? account.type ?? '?'}\``).join(', ');
+    fields.push({ name: `${emoji.globe} Conexões`, value: `Este usuário conectou ${list}!`, inline: true });
+  }
+  if (bio) {
+    fields.push({ name: `${emoji.happy} Bio`, value: bio, inline: false });
   }
 
   await ctx.reply({
     embeds: [embed({
-      color: brand.background,
-      author: avatar ? { name, iconURL: avatar } : { name },
-      thumbnail: avatar ? { url: avatar } : undefined,
+      color,
+      author: avatar ? { name: `Informações de ${name}`, iconURL: avatar } : { name: `Informações de ${name}` },
+      thumbnail: avatar ? { url: ctx.cdn.asset(avatar, { size: 1024 }) ?? avatar } : undefined,
       image: banner ? { url: ctx.cdn.asset(banner, { size: 4096 }) ?? banner } : undefined,
-      description: lines.join('\n'),
+      fields,
     })],
   });
 }
@@ -114,7 +190,6 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     return;
   }
 
-  const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
   const [counts, members, roles, channels, me] = await Promise.all([
     safe(() => ctx.resources.users.guildCounts(guildID)),
     safe(() => ctx.resources.users.members(guildID, 1000)),
@@ -124,7 +199,6 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   ]);
 
   const joinAnd = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}`;
-  const noun = (n: number, singular: string, plural = `${singular}s`) => n === 1 ? singular : plural;
 
   const created = new Date(guild.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [
