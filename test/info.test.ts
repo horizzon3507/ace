@@ -228,20 +228,20 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   assert.equal(await fixture.send('a.guildinfo'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.color, brand.background);
-  assert.equal(embed?.author?.name, 'Comunidade Fluxer');
+  assert.equal(embed?.author?.name, 'Informações de Comunidade Fluxer');
   assert.equal(embed?.author?.iconURL, 'https://cdn.fluxer.app/icons/server.png');
   assert.equal(embed?.thumbnail?.url, 'https://cdn.fluxer.app/icons/server.png?size=1024');
 
   const fields = embed?.fields ?? [];
   const byName = (name: string) => fields.find((field) => field.name.includes(name))?.value ?? '';
-  assert.match(byName('Ficha'), /O diretor deste servidor é <@1>, de ID de usuário `1`!/);
+  assert.match(byName('Ficha'), /O diretor deste servidor é <@1>, id `1`!/);
   assert.match(byName('Criado em'), /Este servidor foi criado em \*\*\d{2}\/\d{2}\/\d{4} \*\*às \*\*\d{2}:\d{2}\*\*, há \*\*\d+ anos\*\*!/);
   assert.match(byName('Pessoas'), /Há \*\*3\*\* usuários, sendo \*\*2\*\* humanos e \*\*1\*\* aplicativo\. Temos \*\*2\*\* usuários online!/);
   assert.match(byName('Cargos'), /Este servidor possui \*\*3\*\* cargos, sendo o que está no topo <@&50> e o que está na base <@&60>!/);
   assert.match(byName('Canais'), /Há \*\*4\*\* canais, sendo deles \*\*2\*\* canais de texto, \*\*1\*\* canal de voz e \*\*1\*\* categoria!/);
   const recursos = fields.find((field) => field.name.includes('Recursos'));
-  assert.equal(recursos?.inline, false);
-  assert.match(recursos?.value ?? '', /\*\*3\*\* habilitados:\nícone animado · banner · `MODO_SECRETO`/);
+  assert.equal(recursos?.inline, true);
+  assert.equal(recursos?.value, 'ícone animado · banner · `MODO_SECRETO`');
   assert.deepEqual(fixture.errors, []);
 });
 

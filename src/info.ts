@@ -117,7 +117,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
 
   const created = new Date(guild.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [
-    { name: `${emoji.information} Ficha`, value: `O diretor deste servidor é <@${guild.ownerID}>, de ID de usuário \`${guild.ownerID}\`!`, inline: true },
+    { name: `${emoji.information} Ficha`, value: `O diretor deste servidor é <@${guild.ownerID}>, id \`${guild.ownerID}\`!`, inline: true },
     { name: `${emoji.time} Criado em`, value: `Este servidor foi criado em ${formatDayStamp(created)}, ${formatAge(created)}!`, inline: true },
   ];
 
@@ -164,7 +164,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
 
   if (guild.features?.length) {
     const list = guild.features.map((feature) => FEATURE_LABELS[feature] ?? `\`${feature}\``).join(' · ');
-    fields.push({ name: `${emoji.globe} Recursos`, value: `**${guild.features.length}** habilitados:\n${list}`, inline: false });
+    fields.push({ name: `${emoji.globe} Recursos`, value: list, inline: true });
   }
 
   const icon = guild.iconURL;
@@ -172,7 +172,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   await ctx.reply({
     embeds: [embed({
       color: brand.background,
-      author: icon ? { name: guild.name, iconURL: icon } : { name: guild.name },
+      author: { name: `Informações de ${guild.name}`, iconURL: icon ?? undefined },
       thumbnail: icon ? { url: ctx.cdn.asset(icon, { size: 1024 }) ?? icon } : undefined,
       image: banner ? { url: ctx.cdn.asset(banner, { size: 4096 }) ?? banner } : undefined,
       fields,
