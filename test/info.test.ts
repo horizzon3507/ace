@@ -199,7 +199,13 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   const fixture = bot({
     users: {
       async guild() {
-        return { ...comunidade, memberCount: 3 };
+        return { ...comunidade, memberCount: 3, features: ['ANIMATED_ICON', 'BANNER', 'MODO_SECRETO'] };
+      },
+      async member(_guildID: string, userID: string) {
+        return { ...glacial, id: userID, displayName: 'Hory', nickname: null };
+      },
+      async guildCounts() {
+        return { guildID: '100', memberCount: 3, onlineCount: 2 };
       },
       async members() {
         return [
@@ -227,16 +233,18 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   assert.equal(embed?.color, brand.background);
   assert.equal(embed?.author?.name, 'Comunidade Fluxer');
   assert.equal(embed?.author?.iconURL, 'https://cdn.fluxer.app/icons/server.png');
-  assert.equal(embed?.thumbnail?.url, 'https://cdn.fluxer.app/icons/server.png');
+  assert.equal(embed?.thumbnail?.url, 'https://cdn.fluxer.app/icons/server.png?size=1024');
 
   const fields = embed?.fields ?? [];
-  assert.ok(fields.every((field) => field.inline === true));
   const byName = (name: string) => fields.find((field) => field.name.includes(name))?.value ?? '';
-  assert.match(byName('Ficha'), /\*\*Comunidade Fluxer\*\*\n`100`\nDono <@1>/);
-  assert.match(byName('Criado em'), /\*\*\d{2}\/\d{2}\/\d{4}/);
-  assert.match(byName('Pessoas'), /\*\*3\*\* no total\n\*\*2\*\* usuários · \*\*1\*\* apps/);
-  assert.match(byName('Cargos'), /\*\*3\*\*\nTopo <@&50>\nBase <@&60>/);
-  assert.match(byName('Canais'), /\*\*2\*\* texto · \*\*1\*\* voz\n\*\*1\*\* categoria — \*\*4\*\* total/);
+  assert.match(byName('Ficha'), /\*\*Comunidade Fluxer\*\*\n`100`\nDono \*\*Hory\*\* `1`/);
+  assert.match(byName('Criado em'), /\*\*\d{2}\/\d{2}\/\d{4} \*\*às \*\*\d{2}:\d{2}\*\*\nhá \*\*\d+ anos\*\*/);
+  assert.match(byName('Pessoas'), /\*\*3\*\* habitantes\n\*\*2\*\* online agora\n\*\*2\*\* usuários · \*\*1\*\* apps/);
+  assert.match(byName('Cargos'), /\*\*3\*\* no total\nTopo <@&50>\nBase <@&60>/);
+  assert.match(byName('Canais'), /\*\*2\*\* de texto · \*\*1\*\* de voz\n\*\*1\*\* categoria\n\*\*4\*\* portas no mapa/);
+  const recursos = fields.find((field) => field.name.includes('Recursos'));
+  assert.equal(recursos?.inline, false);
+  assert.match(recursos?.value ?? '', /\*\*3\*\* habilitados:\nícone animado · banner · `MODO_SECRETO`/);
   assert.deepEqual(fixture.errors, []);
 });
 
@@ -252,8 +260,9 @@ test('guildinfo sem contadores ainda responde a ficha', async (t) => {
 
   assert.equal(await fixture.send('a.guildinfo'), 'success');
   const fields = fixture.messages.at(-1)?.payload.embeds?.[0]?.fields ?? [];
-  assert.equal(fields.length, 3); // Ficha + Criado em + Pessoas (só total)
-  assert.match(fields.find((field) => field.name.includes('Pessoas'))?.value ?? '', /\*\*42\*\* no total/);
+  assert.equal(fields.length, 3); // Ficha + Criado em + Pessoas (só habitantes)
+  assert.match(fields.find((field) => field.name.includes('Pessoas'))?.value ?? '', /\*\*42\*\* habitantes/);
+  assert.match(fields.find((field) => field.name.includes('Ficha'))?.value ?? '', /Dono \*\*<@1>\*\* `1`/);
   assert.deepEqual(fixture.errors, []);
 });
 
