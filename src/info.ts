@@ -78,15 +78,11 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   const fields: { name: string; value: string; inline: boolean }[] = [];
 
   const ficha = [
-    `Este ${user.bot ? 'aplicativo' : 'usuário'} é <@${user.id}>, ID \`${user.id}\`!`,
-    `Seu nome é **${name}**${name === user.username ? '' : ` \`@${user.username}\``}!`,
+    `Este ${user.bot ? 'aplicativo' : 'usuário'} é <@${user.id}>, de nome de usuário \`${user.username}\` e ID \`${user.id}\`!`,
   ];
   const nickname = member?.nickname?.replace(/[*_~`]/g, '');
   if (nickname) {
     ficha.push(`Seu apelido neste servidor é **${nickname}**!`);
-  }
-  if (pronouns) {
-    ficha.push(`Seus pronomes são ${pronouns}!`);
   }
   if (mutuals > 0) {
     ficha.push(`Este usuário divide **${mutuals}** ${noun(mutuals, 'servidor', 'servidores')} comigo!`);
@@ -130,6 +126,14 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
         inline: true,
       });
     }
+  }
+
+  if (pronouns) {
+    fields.push({
+      name: `${emoji.happy} Pronomes`,
+      value: `Seus pronomes são "${pronouns}". Incrível, não é?`,
+      inline: true,
+    });
   }
 
   if (accounts.length > 0) {

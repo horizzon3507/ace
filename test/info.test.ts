@@ -45,8 +45,7 @@ const fieldValue = (embed: Embed | undefined, name: string) =>
 function assertUserInfoEmbed(embed: Embed | undefined) {
   assert.equal(embed?.color, brand.background);
   assert.equal(embed?.author?.name, 'Informações de Glacial');
-  assert.match(fieldValue(embed, 'Ficha'), /Este usuário é <@2>, ID `2`!/);
-  assert.match(fieldValue(embed, 'Ficha'), /Seu nome é \*\*Glacial\*\* `@glacial`!/);
+  assert.match(fieldValue(embed, 'Ficha'), /Este usuário é <@2>, de nome de usuário `glacial` e ID `2`!/);
   assert.match(fieldValue(embed, 'Ficha'), /Seu apelido neste servidor é \*\*Glacial\*\*!/);
   assert.match(fieldValue(embed, 'Conta criada'), /A conta deste usuário foi criada em \*\*\d{2}\/\d{2}\/\d{4} \*\*às/);
   assert.match(fieldValue(embed, 'Entrada'), /Este membro entrou neste servidor em \*\*\d{2}\/\d{2}\/\d{4}/);
@@ -235,7 +234,7 @@ test('userinfo mostra bio, pronomes e conexões do perfil', async (t) => {
   assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.color, 0xff00ff);
-  assert.match(fieldValue(embed, 'Ficha'), /Seus pronomes são ele\/dele!/);
+  assert.equal(fieldValue(embed, 'Pronomes'), 'Seus pronomes são "ele/dele". Incrível, não é?');
   assert.match(fieldValue(embed, 'Ficha'), /divide \*\*2\*\* servidores comigo!/);
   assert.match(fieldValue(embed, 'Conexões'), /conectou `horizzon3507`!/);
   const bio = embed?.fields?.at(-1);
