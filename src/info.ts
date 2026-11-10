@@ -105,48 +105,59 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
-  const [owner, counts, members, roles, channels] = await Promise.all([
-    safe(() => ctx.resources.users.member(guildID, guild.ownerID)),
+  const [counts, members, roles, channels] = await Promise.all([
     safe(() => ctx.resources.users.guildCounts(guildID)),
     safe(() => ctx.resources.users.members(guildID, 1000)),
     safe(() => ctx.resources.roles.list(guildID)),
     safe(() => ctx.resources.channels.list(guildID)),
   ]);
 
+  const joinAnd = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}`;
+  const noun = (n: number, singular: string, plural = `${singular}s`) => n === 1 ? singular : plural;
+
   const created = new Date(guild.createdTimestamp);
-  const ownerLabel = owner?.nickname ?? owner?.displayName ?? owner?.username ?? `<@${guild.ownerID}>`;
   const fields: { name: string; value: string; inline: boolean }[] = [
-    { name: `${emoji.information} Ficha`, value: `**${guild.name}**\n\`${guild.id}\`\nDono **${ownerLabel}** \`${guild.ownerID}\``, inline: true },
-    { name: `${emoji.time} Criado em`, value: `${formatDayStamp(created)}\n${formatAge(created)}`, inline: true },
+    { name: `${emoji.information} Ficha`, value: `O diretor deste servidor é <@${guild.ownerID}>, de ID de usuário \`${guild.ownerID}\`!`, inline: true },
+    { name: `${emoji.time} Criado em`, value: `Este servidor foi criado em ${formatDayStamp(created)}, ${formatAge(created)}!`, inline: true },
   ];
 
   const total = counts?.memberCount ?? guild.memberCount ?? members?.length ?? null;
-  const people: string[] = [];
-  if (total !== null) people.push(`**${total}** habitantes`);
-  if (counts?.onlineCount !== undefined) people.push(`**${counts.onlineCount}** online agora`);
-  if (members?.length && total !== null && members.length >= total) {
-    const bots = members.filter((member) => member.bot).length;
-    people.push(`**${members.length - bots}** usuários · **${bots}** apps`);
+  const full = members?.length && total !== null && members.length >= total;
+  if (total !== null) {
+    const bots = full ? members!.filter((member) => member.bot).length : null;
+    const humans = bots !== null ? members!.length - bots : 0;
+    const split = bots !== null ? `, sendo **${humans}** ${noun(humans, 'humano')} e **${bots}** ${noun(bots, 'aplicativo')}` : '';
+    const online = counts?.onlineCount !== undefined ? `Temos **${counts.onlineCount}** usuários online!` : '';
+    fields.push({
+      name: `${emoji.happy} Pessoas`,
+      value: `Há **${total}** ${noun(total, 'usuário')}${split}${online ? `. ${online}` : '!'}`,
+      inline: true,
+    });
   }
-  if (people.length) fields.push({ name: `${emoji.happy} Pessoas`, value: people.join('\n'), inline: true });
 
   if (roles?.length) {
     const real = roles.filter((role) => role.id !== guildID);
     const top = real.length ? real.reduce((a, b) => (b.position > a.position ? b : a)) : null;
     const base = real.length ? real.reduce((a, b) => (b.position < a.position ? b : a)) : null;
-    const lines = [`**${roles.length}** no total`];
-    if (top && base && top.id !== base.id) lines.push(`Topo <@&${top.id}>`, `Base <@&${base.id}>`);
-    else if (top) lines.push(`Topo <@&${top.id}>`);
-    fields.push({ name: `${emoji.lock} Cargos`, value: lines.join('\n'), inline: true });
+    const tail = top && base && top.id !== base.id
+      ? `, sendo o que está no topo <@&${top.id}> e o que está na base <@&${base.id}>`
+      : top ? `, sendo o que está no topo <@&${top.id}>` : '';
+    fields.push({ name: `${emoji.lock} Cargos`, value: `Este servidor possui **${roles.length}** ${noun(roles.length, 'cargo')}${tail}!`, inline: true });
   }
 
   if (channels?.length) {
-    const voice = channels.filter((channel) => channel.type === 2 || channel.type === 13).length;
-    const categories = channels.filter((channel) => channel.type === 4).length;
-    const text = channels.length - voice - categories;
+    const items: string[] = [];
+    const push = (type: number | number[], singular: string, plural: string) => {
+      const count = channels.filter((channel) => (Array.isArray(type) ? type : [type]).includes(channel.type)).length;
+      if (count) items.push(`**${count}** ${noun(count, singular, plural)}`);
+    };
+    push([0, 5], 'canal de texto', 'canais de texto');
+    push([2, 13], 'canal de voz', 'canais de voz');
+    push(15, 'fórum', 'fóruns');
+    push(4, 'categoria', 'categorias');
     fields.push({
       name: `${emoji.commandline} Canais`,
-      value: `**${text}** de texto · **${voice}** de voz\n**${categories}** ${categories === 1 ? 'categoria' : 'categorias'}\n**${channels.length}** portas no mapa`,
+      value: `Há **${channels.length}** ${noun(channels.length, 'canal', 'canais')}${items.length ? `, sendo deles ${joinAnd(items)}` : ''}!`,
       inline: true,
     });
   }
