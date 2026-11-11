@@ -6,7 +6,7 @@ type CommandCategory = { emoji: keyof typeof import('../src/emoji.js').emoji; co
 
 const categories: CommandCategory[] = [
   { emoji: 'information', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
-  { emoji: 'globe', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner'] },
+  { emoji: 'globe', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'dumpemojis'] },
   { emoji: 'ban', commands: ['kick', 'ban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
 ];
 

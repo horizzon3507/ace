@@ -13,6 +13,7 @@ export const RUNTIME_FILES = [
   'src/embed.ts',
   'src/purge.ts',
   'src/info.ts',
+  'src/emoji-dump.ts',
 ] as const;
 
 // Só-de-tipo: nada existe em runtime pra recarregar — ignora em vez de pedir

@@ -2,6 +2,7 @@ import { brand as initialBrand } from './brand.js';
 import { runChannelLock as initialLock, type LockAction } from './channel-lock.js';
 import type { AceContext } from './context.js';
 import { replyGuildAsset as initialGuildAsset, replyUserAsset as initialUserAsset, type GuildAsset, type UserAsset } from './embed.js';
+import { replyEmojiDump as initialDump } from './emoji-dump.js';
 import { formatAge as initialAge, formatDayStamp as initialDay, formatStamp as initialStamp } from './format.js';
 import { replyGuildInfo as initialGuildInfo, replyUserInfo as initialUserInfo } from './info.js';
 import { grantJoinRole as initialGrant, type JoinMember } from './join-role.js';
@@ -28,6 +29,7 @@ type InfoFn = (ctx: AceContext) => Promise<void>;
 type UserAssetFn = (ctx: AceContext, kind: UserAsset) => Promise<void>;
 type GuildAssetFn = (ctx: AceContext, kind: GuildAsset) => Promise<void>;
 type PurgeFn = (ctx: AceContext, mode: PurgeMode) => Promise<void>;
+type DumpFn = (ctx: AceContext) => Promise<void>;
 
 export type RuntimeBrand = { primary: number; eyes: number; background: number };
 
@@ -52,6 +54,7 @@ export type RuntimeInstall = {
   replyUserAsset: UserAssetFn;
   replyGuildAsset: GuildAssetFn;
   runPurge: PurgeFn;
+  replyEmojiDump: DumpFn;
   brand: RuntimeBrand;
 };
 
@@ -78,6 +81,7 @@ const slots: RuntimeInstall = {
   replyUserAsset: initialUserAsset,
   replyGuildAsset: initialGuildAsset,
   runPurge: initialPurge,
+  replyEmojiDump: initialDump,
   brand: {
     primary: initialBrand.primary,
     eyes: initialBrand.eyes,
@@ -161,6 +165,10 @@ export function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<void> 
 
 export function replyGuildAsset(ctx: AceContext, kind: GuildAsset): Promise<void> {
   return slots.replyGuildAsset(ctx, kind);
+}
+
+export function replyEmojiDump(ctx: AceContext): Promise<void> {
+  return slots.replyEmojiDump(ctx);
 }
 
 export function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
