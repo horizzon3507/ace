@@ -14,6 +14,7 @@ export const RUNTIME_FILES = [
   'src/purge.ts',
   'src/info.ts',
   'src/emoji-dump.ts',
+  'src/paginator.ts',
 ] as const;
 
 // Só-de-tipo: nada existe em runtime pra recarregar — ignora em vez de pedir

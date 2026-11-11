@@ -12,7 +12,7 @@ import { classifyChange, RUNTIME_FILES, type ReloadKind } from './watch-plan.js'
 export async function refreshRuntime(root: string): Promise<void> {
   const stamp = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
   const load = (file: string) => import(`${pathToFileURL(resolve(root, file)).href}?ace=${stamp}`);
-  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod, lockMod, formatMod, embedMod, purgeMod, infoMod, dumpMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
+  const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod, lockMod, formatMod, embedMod, purgeMod, infoMod, dumpMod, paginatorMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
     typeof import('./mention.js'),
     typeof import('./prefix.js'),
     typeof import('./brand.js'),
@@ -26,6 +26,7 @@ export async function refreshRuntime(root: string): Promise<void> {
     typeof import('./purge.js'),
     typeof import('./info.js'),
     typeof import('./emoji-dump.js'),
+    typeof import('./paginator.js'),
   ];
   const missing = (file: string, name: string) => new Error(`${file} não exportou '${name}'.`);
   if (typeof mention.mentionMessage !== 'function') throw missing('src/mention.ts', 'mentionMessage');
@@ -60,6 +61,8 @@ export async function refreshRuntime(root: string): Promise<void> {
   if (typeof infoMod.replyUserInfo !== 'function') throw missing('src/info.ts', 'replyUserInfo');
   if (typeof infoMod.replyGuildInfo !== 'function') throw missing('src/info.ts', 'replyGuildInfo');
   if (typeof dumpMod.replyEmojiDump !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiDump');
+  if (typeof dumpMod.replyEmojiList !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiList');
+  if (typeof paginatorMod.startPaginator !== 'function') throw missing('src/paginator.ts', 'startPaginator');
   installRuntime({
     prefix: prefixMod.prefix,
     mentionMessage: mention.mentionMessage,
@@ -82,6 +85,8 @@ export async function refreshRuntime(root: string): Promise<void> {
     replyGuildAsset: embedMod.replyGuildAsset,
     runPurge: purgeMod.runPurge,
     replyEmojiDump: dumpMod.replyEmojiDump,
+    replyEmojiList: dumpMod.replyEmojiList,
+    startPaginator: paginatorMod.startPaginator,
     brand: brandMod.brand,
   });
   // Quem importa emoji segura a referência do módulo original: muta in-place só

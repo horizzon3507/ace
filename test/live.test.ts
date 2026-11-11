@@ -29,6 +29,8 @@ const rest = {
   replyGuildAsset: async () => undefined,
   runPurge: async () => undefined,
   replyEmojiDump: async () => undefined,
+  replyEmojiList: async () => undefined,
+  startPaginator: async () => undefined,
 };
 
 test('install troca menção, prefixo, cor e cargo no mesmo objeto', async () => {

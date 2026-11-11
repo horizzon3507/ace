@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
 import { emoji } from '../src/emoji.js';
 import { buildZip } from '../src/emoji-dump.js';
-import dumpemojis from '../commands/dumpemojis.js';
+import emojilist from '../commands/emojilist.js';
+import emojidump from '../commands/emojidump.js';
 
 const makeEmojis = (count: number) => Array.from({ length: count }, (_, i) => ({
   id: `${1000 + i}`,
@@ -14,61 +15,82 @@ const makeEmojis = (count: number) => Array.from({ length: count }, (_, i) => ({
 
 const guild = { id: '7', name: 'Ace', ownerID: '1', iconURL: null, bannerURL: null, memberCount: 3, createdTimestamp: 0 };
 
-function bot(count: number) {
+function bot(count: number, votes: string[] = []) {
   const resources: MockResourceOverrides = {
     expressions: { emojis: async () => makeEmojis(count) },
     users: { guild: async () => guild },
+    collectors: {
+      collectReactions: async function* () { for (const vote of votes) yield { userID: 'u1', emoji: vote, messageID: '1' }; },
+    },
+    messages: { removeReaction: async () => undefined, clearReactions: async () => undefined },
   };
-  return createTestBot({ prefix: 'a.', commands: [dumpemojis], emoji, authorization: 'off', resources });
+  return createTestBot({ prefix: 'a.', commands: [emojilist, emojidump], emoji, authorization: 'off', resources });
 }
 
-test('dumpemojis lista 15 emojis por página com nome e ID', async (t) => {
+test('emojilist mostra 15 por página com nome e menção', async (t) => {
   const fixture = bot(32);
   t.after(() => fixture.destroy());
 
-  assert.equal(await fixture.send('a.dumpemojis'), 'success');
+  assert.equal(await fixture.send('a.emojilist'), 'success');
   const message = fixture.messages.at(-1)?.payload;
-  const description = message?.embeds?.[0]?.description ?? '';
-  const lines = description.split('\n');
+  const lines = (message?.embeds?.[0]?.description ?? '').split('\n');
   assert.equal(lines.length, 15);
-  assert.match(lines[0], /<a:emoji_0:1000> `emoji_0` — ID `1000`/);
-  assert.match(lines[1], /<:emoji_1:1001>/);
+  assert.equal(lines[0], '<a:emoji_0:1000> emoji_0 | Menção: `<a:emoji_0:1000>`');
+  assert.equal(lines[1], '<:emoji_1:1001> emoji_1 | Menção: `<:emoji_1:1001>`');
   assert.equal(message?.embeds?.[0]?.footer?.text, 'Página 1 de 3 — 32 emojis no total');
 });
 
-test('dumpemojis página 2 mostra a fatia seguinte', async (t) => {
+test('emojilist reage com setas de navegação', async (t) => {
   const fixture = bot(32);
   t.after(() => fixture.destroy());
 
-  assert.equal(await fixture.send('a.dumpemojis 2'), 'success');
-  const description = fixture.messages.at(-1)?.payload.embeds?.[0]?.description ?? '';
-  assert.match(description.split('\n')[0], /`emoji_15` — ID `1015`/);
-  assert.equal(description.split('\n').length, 15);
-  assert.match(fixture.messages.at(-1)?.payload.embeds?.[0]?.footer?.text ?? '', /Página 2 de 3/);
+  assert.equal(await fixture.send('a.emojilist'), 'success');
+  const reacted = fixture.transport.reactions.map((r) => r.emoji);
+  assert.ok(reacted.includes('⬅️') && reacted.includes('➡️'));
 });
 
-test('dumpemojis última página traz o resto', async (t) => {
-  const fixture = bot(32);
+test('emojilist vira a página ao votar ➡️', async (t) => {
+  const fixture = bot(32, ['➡️']);
   t.after(() => fixture.destroy());
 
-  assert.equal(await fixture.send('a.dumpemojis 3'), 'success');
-  assert.equal(fixture.messages.at(-1)?.payload.embeds?.[0]?.description?.split('\n').length, 2);
+  assert.equal(await fixture.send('a.emojilist'), 'success');
+  const payload = fixture.messages.at(-1)?.payload;
+  const lines = (payload?.embeds?.[0]?.description ?? '').split('\n');
+  assert.match(lines[0], /^<a:emoji_15:1015> emoji_15 \| Menção/);
+  assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 2 de 3/);
 });
 
-test('dumpemojis página fora do alcance avisa o total', async (t) => {
-  const fixture = bot(10);
+test('emojilist volta ao fim ao votar ⬅️ na primeira página', async (t) => {
+  const fixture = bot(32, ['⬅️']);
   t.after(() => fixture.destroy());
 
-  assert.equal(await fixture.send('a.dumpemojis 9'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não conheço a página 9/);
+  assert.equal(await fixture.send('a.emojilist'), 'success');
+  const payload = fixture.messages.at(-1)?.payload;
+  assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 3 de 3/);
 });
 
-test('dumpemojis sem emojis avisa', async (t) => {
+test('emojilist servidor sem emojis avisa', async (t) => {
   const fixture = bot(0);
   t.after(() => fixture.destroy());
 
-  assert.equal(await fixture.send('a.dumpemojis'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não tem emojis/);
+  assert.equal(await fixture.send('a.emojilist'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não tem emojis para eu listar/);
+});
+
+test('emojidump sem arquivos baixáveis avisa', async (t) => {
+  const fixture = bot(10);
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.emojidump'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não consegui baixar os arquivos/);
+});
+
+test('emojidump servidor sem emojis avisa', async (t) => {
+  const fixture = bot(0);
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.emojidump'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não tem emojis para eu empacotar/);
 });
 
 test('buildZip monta arquivo PK válido com entradas', () => {

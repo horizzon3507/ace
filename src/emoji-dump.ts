@@ -1,6 +1,6 @@
-import { embed, type EmojiInfo } from 'yuzuha';
+import { embed, type Embed, type EmojiInfo } from 'yuzuha';
 import type { AceContext } from './context.js';
-import { brand } from './live.js';
+import { brand, startPaginator } from './live.js';
 
 const PAGE_SIZE = 15;
 const DOWNLOAD_BATCH = 8;
@@ -84,38 +84,49 @@ const tag = (item: EmojiInfo) => `<${item.animated ? 'a' : ''}:${item.name}:${it
 const extOf = (item: EmojiInfo): string =>
   item.url?.match(/\.(png|gif|webp|apng|jpe?g)(?:[?#]|$)/i)?.[1]?.toLowerCase() ?? (item.animated ? 'gif' : 'png');
 
-/** Lista paginada de emojis + zip STORE com todos os arquivos do servidor. */
-export async function replyEmojiDump(ctx: AceContext): Promise<void> {
-  const { emoji } = ctx;
-  const guildID = ctx.requireGuild();
+const fetchEmojis = async (ctx: AceContext, guildID: string) => {
   const [guild, emojis] = await Promise.all([
     safe(() => ctx.resources.users.guild(guildID)),
     safe(() => ctx.resources.expressions.emojis(guildID)),
   ]);
+  return { guild, emojis };
+};
+
+/** Lista os emojis do servidor, 15 por página, navegável por reação. */
+export async function replyEmojiList(ctx: AceContext): Promise<void> {
+  const { emoji } = ctx;
+  const guildID = ctx.requireGuild();
+  const { guild, emojis } = await fetchEmojis(ctx, guildID);
+  if (!emojis || emojis.length === 0) {
+    await ctx.reply(`${emoji.unhappy} Este servidor não tem emojis para eu listar...`);
+    return;
+  }
+  const total = emojis.length;
+  const count = Math.ceil(total / PAGE_SIZE);
+  const pages: Embed[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const lines = emojis
+      .slice(i * PAGE_SIZE, (i + 1) * PAGE_SIZE)
+      .map((item) => `${tag(item)} ${item.name} | Menção: \`${tag(item)}\``);
+    pages.push(embed({
+      color: brand.background,
+      author: { name: `Emojis de ${guild?.name ?? 'este servidor'}`, iconURL: guild?.iconURL ?? undefined },
+      description: lines.join('\n'),
+      footer: { text: count > 1 ? `Página ${i + 1} de ${count} — ${total} ${noun(total, 'emoji', 'emojis')} no total` : `${total} ${noun(total, 'emoji', 'emojis')} no total` },
+    }));
+  }
+  await startPaginator(ctx, pages);
+}
+
+/** Empacota todos os emojis do servidor num zip STORE e anexa. */
+export async function replyEmojiDump(ctx: AceContext): Promise<void> {
+  const { emoji } = ctx;
+  const guildID = ctx.requireGuild();
+  const { guild, emojis } = await fetchEmojis(ctx, guildID);
   if (!emojis || emojis.length === 0) {
     await ctx.reply(`${emoji.unhappy} Este servidor não tem emojis para eu empacotar...`);
     return;
   }
-  const total = emojis.length;
-  const pages = Math.ceil(total / PAGE_SIZE);
-  const requested = Number.parseInt(ctx.tokens[0] ?? '1', 10);
-  const page = Number.isFinite(requested) && requested >= 1 ? requested : 1;
-  if (page > pages) {
-    await ctx.reply(`${emoji.unhappy} Eu não conheço a página ${page}! Este servidor tem ${pages} ${noun(pages, 'página')} de emojis...`);
-    return;
-  }
-  const lines = emojis
-    .slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-    .map((item) => `${tag(item)} \`${item.name}\` — ID \`${item.id}\``);
-  await ctx.reply({
-    embeds: [embed({
-      color: brand.background,
-      author: { name: `Emojis de ${guild?.name ?? 'este servidor'}`, iconURL: guild?.iconURL ?? undefined },
-      description: lines.join('\n'),
-      footer: { text: pages > 1 ? `Página ${page} de ${pages} — ${total} ${noun(total, 'emoji', 'emojis')} no total` : `${total} ${noun(total, 'emoji', 'emojis')} no total` },
-    })],
-  });
-
   const downloadable = emojis.filter((item) => item.url);
   const taken = new Map<string, number>();
   const nameOf = (item: EmojiInfo): string => {
@@ -136,13 +147,11 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
       for (const entry of batch) if (entry) entries.push(entry);
     }
   }
-  if (!ctx.sendStream) return;
   if (entries.length === 0) {
-    if (downloadable.length > 0) {
-      await ctx.send(`${emoji.unhappy} Eu não consegui baixar os arquivos deste servidor para empacotar...`);
-    }
+    await ctx.reply(`${emoji.unhappy} Eu não consegui baixar os arquivos deste servidor para empacotar...`);
     return;
   }
+  if (!ctx.sendStream) return;
   const slug = (guild?.name ?? 'servidor')
     .toLowerCase()
     .normalize('NFD')

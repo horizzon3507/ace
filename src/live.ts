@@ -2,11 +2,12 @@ import { brand as initialBrand } from './brand.js';
 import { runChannelLock as initialLock, type LockAction } from './channel-lock.js';
 import type { AceContext } from './context.js';
 import { replyGuildAsset as initialGuildAsset, replyUserAsset as initialUserAsset, type GuildAsset, type UserAsset } from './embed.js';
-import { replyEmojiDump as initialDump } from './emoji-dump.js';
+import { replyEmojiDump as initialDump, replyEmojiList as initialList } from './emoji-dump.js';
 import { formatAge as initialAge, formatDayStamp as initialDay, formatStamp as initialStamp } from './format.js';
 import { replyGuildInfo as initialGuildInfo, replyUserInfo as initialUserInfo } from './info.js';
 import { grantJoinRole as initialGrant, type JoinMember } from './join-role.js';
 import { isBareMention as initialBare, mentionMessage as initialMention, unknownCommandMessage as initialUnknown } from './mention.js';
+import { startPaginator as initialPaginator } from './paginator.js';
 import { prefix as initialPrefix } from './prefix.js';
 import { runPurge as initialPurge, type PurgeMode } from './purge.js';
 import { runModeration as initialModeration, type Punishment } from './punish.js';
@@ -30,6 +31,7 @@ type UserAssetFn = (ctx: AceContext, kind: UserAsset) => Promise<void>;
 type GuildAssetFn = (ctx: AceContext, kind: GuildAsset) => Promise<void>;
 type PurgeFn = (ctx: AceContext, mode: PurgeMode) => Promise<void>;
 type DumpFn = (ctx: AceContext) => Promise<void>;
+type PaginatorFn = (ctx: AceContext, pages: readonly import('yuzuha').Embed[], timeoutMs?: number) => Promise<void>;
 
 export type RuntimeBrand = { primary: number; eyes: number; background: number };
 
@@ -55,6 +57,8 @@ export type RuntimeInstall = {
   replyGuildAsset: GuildAssetFn;
   runPurge: PurgeFn;
   replyEmojiDump: DumpFn;
+  replyEmojiList: DumpFn;
+  startPaginator: PaginatorFn;
   brand: RuntimeBrand;
 };
 
@@ -82,6 +86,8 @@ const slots: RuntimeInstall = {
   replyGuildAsset: initialGuildAsset,
   runPurge: initialPurge,
   replyEmojiDump: initialDump,
+  replyEmojiList: initialList,
+  startPaginator: initialPaginator,
   brand: {
     primary: initialBrand.primary,
     eyes: initialBrand.eyes,
@@ -169,6 +175,14 @@ export function replyGuildAsset(ctx: AceContext, kind: GuildAsset): Promise<void
 
 export function replyEmojiDump(ctx: AceContext): Promise<void> {
   return slots.replyEmojiDump(ctx);
+}
+
+export function replyEmojiList(ctx: AceContext): Promise<void> {
+  return slots.replyEmojiList(ctx);
+}
+
+export function startPaginator(ctx: AceContext, pages: readonly import('yuzuha').Embed[], timeoutMs?: number): Promise<void> {
+  return slots.startPaginator(ctx, pages, timeoutMs);
 }
 
 export function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
