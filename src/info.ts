@@ -102,9 +102,9 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   if (mutuals > 0) {
     ficha.push(`Este usuário divide **${mutuals}** ${noun(mutuals, 'servidor', 'servidores')} comigo!`);
   }
-  fields.push({ name: `${emoji.information} Ficha`, value: ficha.join('\n'), inline: true });
+  fields.push({ name: `${emoji.accountCircle} Ficha`, value: ficha.join('\n'), inline: true });
   fields.push({
-    name: `${emoji.time} Conta criada`,
+    name: `${emoji.calendar} Conta criada`,
     value: `A conta deste usuário foi criada em ${formatDayStamp(created)}, ${formatAge(created)}!`,
     inline: true,
   });
@@ -112,7 +112,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   if (member) {
     const joined = new Date(member.joinedTimestamp);
     fields.push({
-      name: `${emoji.happy} Entrada`,
+      name: `${emoji.doorOpen} Entrada`,
       value: `Este membro entrou neste servidor em ${formatDayStamp(joined)}, ${formatAge(joined)}!`,
       inline: true,
     });
@@ -130,11 +130,11 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
     if (privilege) {
       hierarquia.push(`Seu maior privilégio é **${privilege}**!`);
     }
-    fields.push({ name: `${emoji.lock} Hierarquia`, value: hierarquia.join('\n'), inline: true });
+    fields.push({ name: `${emoji.trophy} Hierarquia`, value: hierarquia.join('\n'), inline: true });
 
     if (mine.length > 0) {
       fields.push({
-        name: `${emoji.unban} Cargos`,
+        name: `${emoji.priceTag} Cargos`,
         value: mine.length === 1
           ? `Seu único cargo é <@&${mine[0].id}>!`
           : `Seu cargo mais alto é <@&${mine[0].id}> e o mais baixo é <@&${mine.at(-1)!.id}>!`,
@@ -144,7 +144,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
     if (member.timedOutUntil !== null && member.timedOutUntil > Date.now()) {
       fields.push({
-        name: `${emoji.unban} Situação`,
+        name: `${emoji.micOff} Situação`,
         value: `Este membro está silenciado até ${formatDayStamp(new Date(member.timedOutUntil))}!`,
         inline: true,
       });
@@ -153,7 +153,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
   if (pronouns) {
     fields.push({
-      name: `${emoji.happy} Pronomes`,
+      name: `${emoji.openArm} Pronomes`,
       value: `Seus pronomes são "${pronouns}". Incrível, não é?`,
       inline: true,
     });
@@ -161,10 +161,10 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
   if (accounts.length > 0) {
     const list = accounts.map((account) => `\`${account.name ?? account.type ?? '?'}\``).join(', ');
-    fields.push({ name: `${emoji.globe} Conexões`, value: `Este usuário conectou ${list}!`, inline: true });
+    fields.push({ name: `${emoji.links} Conexões`, value: `Este usuário conectou ${list}!`, inline: true });
   }
   if (bio) {
-    fields.push({ name: `${emoji.happy} Bio`, value: bio, inline: false });
+    fields.push({ name: `${emoji.quillPen} Bio`, value: bio, inline: false });
   }
 
   await ctx.reply({
@@ -250,8 +250,8 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
 
   const created = new Date(guild.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [
-    { name: `${emoji.information} Ficha`, value: ownerLine, inline: true },
-    { name: `${emoji.time} Criado em`, value: `Este servidor foi criado em ${formatDayStamp(created)}, ${formatAge(created)}!`, inline: true },
+    { name: `${emoji.idCard} Ficha`, value: ownerLine, inline: true },
+    { name: `${emoji.cake2} Criado em`, value: `Este servidor foi criado em ${formatDayStamp(created)}, ${formatAge(created)}!`, inline: true },
   ];
 
   const total = counts?.memberCount ?? guild.memberCount ?? members?.length ?? null;
@@ -262,7 +262,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     const split = bots !== null ? `, sendo **${humans}** ${noun(humans, 'humano')} e **${bots}** ${noun(bots, 'aplicativo')}` : '';
     const online = counts?.onlineCount !== undefined ? `Temos **${counts.onlineCount}** usuários online!` : '';
     fields.push({
-      name: `${emoji.happy} Pessoas`,
+      name: `${emoji.team} Pessoas`,
       value: `Há **${total}** ${noun(total, 'usuário')}${split}${online ? `. ${online}` : '!'}`,
       inline: true,
     });
@@ -275,7 +275,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     const tail = top && base && top.id !== base.id
       ? `, sendo o que está no topo <@&${top.id}> e o que está na base <@&${base.id}>`
       : top ? `, sendo o que está no topo <@&${top.id}>` : '';
-    fields.push({ name: `${emoji.lock} Cargos`, value: `Este servidor possui **${roles.length}** ${noun(roles.length, 'cargo')}${tail}!`, inline: true });
+    fields.push({ name: `${emoji.vipCrown} Cargos`, value: `Este servidor possui **${roles.length}** ${noun(roles.length, 'cargo')}${tail}!`, inline: true });
   }
 
   if (channels?.length) {
@@ -289,7 +289,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     push(15, 'fórum', 'fóruns');
     push(4, 'categoria', 'categorias');
     fields.push({
-      name: `${emoji.commandline} Canais`,
+      name: `${emoji.chatThread} Canais`,
       value: `Há **${channels.length}** ${noun(channels.length, 'canal', 'canais')}${items.length ? `, sendo deles ${joinAnd(items)}` : ''}!`,
       inline: true,
     });
@@ -297,7 +297,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
 
   if (guild.features?.length) {
     const list = guild.features.map((feature) => FEATURE_LABELS[feature] ?? `\`${feature}\``).join(', ');
-    fields.push({ name: `${emoji.globe} Recursos`, value: list, inline: true });
+    fields.push({ name: `${emoji.sparkling} Recursos`, value: list, inline: true });
   }
 
   // Segurança: verificação, MFA, NSFW, filtro e notificações — o GuildInfo do
@@ -324,7 +324,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     const has = (flag: keyof typeof SDK.PermissionFlags) => admin || (bits & SDK.PermissionFlags[flag]) !== 0n;
     const missing = NEEDED_PERMISSIONS.filter(({ flag }) => !has(flag)).map(({ label }) => `**${label.toLowerCase()}**`);
     fields.push({
-      name: `${emoji.unban} Diagnóstico`,
+      name: `${emoji.stethoscope} Diagnóstico`,
       value: missing.length === 0
         ? 'Não se preocupe com minhas permissões! **Todas** elas foram fornecidas corretamente, garantindo meu funcionamento estável!'
         : `Eu ainda necessito das permissões ${joinAnd(missing)} para garantir o meu funcionamento estável!`,
