@@ -75,8 +75,13 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   const created = new Date(user.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [];
 
+  // A tag #xxxx não vem no UserInfo do port — resolve via client nativo.
+  const native = await safe(() => ctx.client?.users.resolve(user.id) ?? Promise.reject(new Error('sem client')));
+  const tag = native?.discriminator && native.discriminator !== '0'
+    ? `${user.username}#${native.discriminator}`
+    : user.username;
   const ficha = [
-    `Este ${user.bot ? 'aplicativo' : 'usuário'} é <@${user.id}>, de nome de usuário \`${user.username}\` e ID \`${user.id}\`!`,
+    `Este ${user.bot ? 'aplicativo' : 'usuário'} é <@${user.id}>, de nome de usuário \`${tag}\` e ID \`${user.id}\`!`,
   ];
   const nickname = member?.nickname?.replace(/[*_~`]/g, '');
   if (nickname) {
@@ -268,11 +273,11 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     const bits = BigInt(me.permissions);
     const admin = (bits & SDK.PermissionFlags.Administrator) !== 0n;
     const has = (flag: keyof typeof SDK.PermissionFlags) => admin || (bits & SDK.PermissionFlags[flag]) !== 0n;
-    const missing = NEEDED_PERMISSIONS.filter(({ flag }) => !has(flag)).map(({ label }) => label.toLowerCase());
+    const missing = NEEDED_PERMISSIONS.filter(({ flag }) => !has(flag)).map(({ label }) => `**${label.toLowerCase()}**`);
     fields.push({
       name: `${emoji.unban} Diagnóstico`,
       value: missing.length === 0
-        ? 'Não se preocupe com minhas permissões! Todas elas foram fornecidas corretamente, garantindo meu funcionamento estável!'
+        ? 'Não se preocupe com minhas permissões! **Todas** elas foram fornecidas corretamente, garantindo meu funcionamento estável!'
         : `Eu ainda necessito das permissões ${joinAnd(missing)} para garantir o meu funcionamento estável!`,
       inline: false,
     });

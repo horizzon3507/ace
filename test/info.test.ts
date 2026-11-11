@@ -313,7 +313,7 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   assert.equal(diagnostico?.inline, false);
   assert.equal(
     diagnostico?.value,
-    'Eu ainda necessito das permissões gerenciar cargos, gerenciar servidor, expulsar membros e moderar membros para garantir o meu funcionamento estável!',
+    'Eu ainda necessito das permissões **gerenciar cargos**, **gerenciar servidor**, **expulsar membros** e **moderar membros** para garantir o meu funcionamento estável!',
   );
   assert.deepEqual(fixture.errors, []);
 });
