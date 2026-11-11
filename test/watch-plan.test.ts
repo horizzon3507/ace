@@ -16,6 +16,7 @@ test('classifica o que a cli recarrega', () => {
   assert.equal(classifyChange('src/cli.ts'), 'restart');
   assert.equal(classifyChange('src/term.ts'), 'restart');
   assert.equal(classifyChange('src/live.ts'), 'restart');
+  assert.equal(classifyChange('src/context.ts'), 'ignore');
   assert.equal(classifyChange('commands/ping.d.ts'), 'ignore');
   assert.equal(classifyChange('node_modules/yuzuha/dist/cli.js'), 'ignore');
   assert.equal(classifyChange('assets/ace.svg'), 'ignore');

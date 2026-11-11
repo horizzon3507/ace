@@ -15,6 +15,12 @@ export const RUNTIME_FILES = [
   'src/info.ts',
 ] as const;
 
+// Só-de-tipo: nada existe em runtime pra recarregar — ignora em vez de pedir
+// restart. Se um deles ganhar código executável, sai da lista.
+export const TYPE_ONLY_FILES = [
+  'src/context.ts',
+] as const;
+
 function normalize(input: string): string {
   const parts: string[] = [];
   for (const part of input.replaceAll('\\', '/').replace(/^\.\//, '').split('/')) {
@@ -42,6 +48,9 @@ export function classifyChange(input: string, commandsDir = 'commands'): ReloadK
   if (parts[0] === 'test' || /\.(?:test|spec)\.[cm]?[jt]s$/.test(path)) return 'ignore';
   const commands = normalize(commandsDir);
   if (commands && (path === commands || path.startsWith(`${commands}/`)) && isCode(path)) return 'commands';
-  if (parts[0] === 'src' && isCode(path)) return (RUNTIME_FILES as readonly string[]).includes(path) ? 'runtime' : 'restart';
+  if (parts[0] === 'src' && isCode(path)) {
+    if ((TYPE_ONLY_FILES as readonly string[]).includes(path)) return 'ignore';
+    return (RUNTIME_FILES as readonly string[]).includes(path) ? 'runtime' : 'restart';
+  }
   return 'ignore';
 }
