@@ -304,7 +304,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   // port não traz nenhum deles, então resolve via client nativo quando há.
   if (native) {
     fields.push({
-      name: `${emoji.lock} Segurança`,
+      name: `${emoji.shield} Segurança`,
       value: [
         `Nível de verificação **${VERIFICATION_LABELS[native.verificationLevel] ?? `${native.verificationLevel}`}**`,
         `MFA **${native.mfaLevel === 1 ? 'exigido' : 'desativado'}**`,
