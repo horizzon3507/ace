@@ -276,6 +276,9 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
         // SendMessages + ManageMessages + BanMembers — mistura de ✓ e ✗ no diagnóstico.
         return { ...glacial, id: '999', permissions: String(SDK.PermissionFlags.SendMessages | SDK.PermissionFlags.ManageMessages | SDK.PermissionFlags.BanMembers) };
       },
+      async user() {
+        return { id: '1', username: 'gabriel', displayName: 'Gabriel', bot: false, avatarURL: null, bannerURL: null, createdTimestamp: 0 };
+      },
     },
     roles: {
       async list() {
@@ -299,7 +302,7 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
 
   const fields = embed?.fields ?? [];
   const byName = (name: string) => fields.find((field) => field.name.includes(name))?.value ?? '';
-  assert.match(byName('Ficha'), /O diretor deste servidor é <@1>, ID `1`!/);
+  assert.match(byName('Ficha'), /O diretor\(a\) deste servidor é <@1>, de nome de usuário `gabriel` e ID `1`!/);
   assert.match(byName('Criado em'), /Este servidor foi criado em \*\*\d{2}\/\d{2}\/\d{4} \*\*às \*\*\d{2}:\d{2}\*\*, há \*\*\d+ anos\*\*!/);
   assert.match(byName('Pessoas'), /Há \*\*3\*\* usuários, sendo \*\*2\*\* humanos e \*\*1\*\* aplicativo\. Temos \*\*2\*\* usuários online!/);
   assert.match(byName('Cargos'), /Este servidor possui \*\*3\*\* cargos, sendo o que está no topo <@&50> e o que está na base <@&60>!/);

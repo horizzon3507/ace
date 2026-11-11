@@ -176,6 +176,14 @@ const NEEDED_PERMISSIONS: { flag: keyof typeof SDK.PermissionFlags; label: strin
   { flag: 'ModerateMembers', label: 'Moderar membros' },
 ];
 
+const VERIFICATION_LABELS: Record<number, string> = {
+  0: 'nenhum', 1: 'baixo', 2: 'médio', 3: 'alto', 4: 'máximo',
+};
+
+const CONTENT_FILTER_LABELS: Record<number, string> = {
+  0: 'desativado', 1: 'membros sem cargo', 2: 'todos os membros',
+};
+
 const FEATURE_LABELS: Record<string, string> = {
   ANIMATED_BANNER: 'banner animado',
   ANIMATED_ICON: 'ícone animado',
@@ -205,19 +213,31 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     return;
   }
 
-  const [counts, members, roles, channels, me] = await Promise.all([
+  const [counts, members, roles, channels, me, ownerInfo, ownerNative, native] = await Promise.all([
     safe(() => ctx.resources.users.guildCounts(guildID)),
     safe(() => ctx.resources.users.members(guildID, 1000)),
     safe(() => ctx.resources.roles.list(guildID)),
     safe(() => ctx.resources.channels.list(guildID)),
     safe(() => ctx.resources.users.me(guildID)),
+    safe(() => ctx.resources.users.user(guild.ownerID)),
+    safe(() => ctx.client?.users.resolve(guild.ownerID) ?? Promise.reject(new Error('sem client'))),
+    safe(() => ctx.client?.guilds.resolve(guildID) ?? Promise.reject(new Error('sem client'))),
   ]);
 
   const joinAnd = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}`;
 
+  const ownerTag = ownerNative
+    ? ownerNative.discriminator && ownerNative.discriminator !== '0'
+      ? `${ownerNative.username}#${ownerNative.discriminator}`
+      : ownerNative.username
+    : ownerInfo?.username;
+  const ownerLine = ownerTag
+    ? `O diretor(a) deste servidor é <@${guild.ownerID}>, de nome de usuário \`${ownerTag}\` e ID \`${guild.ownerID}\`!`
+    : `O diretor(a) deste servidor é <@${guild.ownerID}>, ID \`${guild.ownerID}\`!`;
+
   const created = new Date(guild.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [
-    { name: `${emoji.information} Ficha`, value: `O diretor deste servidor é <@${guild.ownerID}>, ID \`${guild.ownerID}\`!`, inline: true },
+    { name: `${emoji.information} Ficha`, value: ownerLine, inline: true },
     { name: `${emoji.time} Criado em`, value: `Este servidor foi criado em ${formatDayStamp(created)}, ${formatAge(created)}!`, inline: true },
   ];
 
@@ -265,6 +285,22 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   if (guild.features?.length) {
     const list = guild.features.map((feature) => FEATURE_LABELS[feature] ?? `\`${feature}\``).join(', ');
     fields.push({ name: `${emoji.globe} Recursos`, value: list, inline: true });
+  }
+
+  // Segurança: verificação, MFA, NSFW, filtro e notificações — o GuildInfo do
+  // port não traz nenhum deles, então resolve via client nativo quando há.
+  if (native) {
+    fields.push({
+      name: `${emoji.lock} Segurança`,
+      value: [
+        `Nível de verificação **${VERIFICATION_LABELS[native.verificationLevel] ?? `${native.verificationLevel}`}**`,
+        `MFA **${native.mfaLevel === 1 ? 'exigido' : 'desativado'}**`,
+        `NSFW **${native.nsfw ? 'sim' : 'não'}**`,
+        `Filtro de conteúdo **${CONTENT_FILTER_LABELS[native.explicitContentFilter] ?? `${native.explicitContentFilter}`}**`,
+        `Notificações padrão **${native.defaultMessageNotifications === 1 ? 'apenas menções' : 'todas as mensagens'}**`,
+      ].join('\n'),
+      inline: true,
+    });
   }
 
   // Diagnóstico: field full-width por último — renderiza abaixo dos inline e
