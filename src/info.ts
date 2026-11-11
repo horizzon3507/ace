@@ -245,8 +245,8 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
       : ownerNative.username
     : ownerInfo?.username;
   const ownerLine = ownerTag
-    ? `O diretor(a) deste servidor é <@${guild.ownerID}>, de nome de usuário \`${ownerTag}\` e ID \`${guild.ownerID}\`!`
-    : `O diretor(a) deste servidor é <@${guild.ownerID}>, ID \`${guild.ownerID}\`!`;
+    ? `O detentor(a) deste servidor é <@${guild.ownerID}>, de nome de usuário \`${ownerTag}\` e ID \`${guild.ownerID}\`!`
+    : `O detentor(a) deste servidor é <@${guild.ownerID}>, ID \`${guild.ownerID}\`!`;
 
   const created = new Date(guild.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [
