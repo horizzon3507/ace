@@ -107,7 +107,7 @@ export async function replyEmojiList(ctx: AceContext): Promise<void> {
   for (let i = 0; i < count; i += 1) {
     const lines = emojis
       .slice(i * PAGE_SIZE, (i + 1) * PAGE_SIZE)
-      .map((item) => `${tag(item)} ${item.name} | Menção: \`${tag(item)}\``);
+      .map((item) => `${tag(item)} \`${item.name}\` | Menção: \`${tag(item)}\``);
     pages.push(embed({
       color: brand.background,
       author: { name: `Emojis de ${guild?.name ?? 'este servidor'}`, iconURL: guild?.iconURL ?? undefined },
@@ -118,13 +118,36 @@ export async function replyEmojiList(ctx: AceContext): Promise<void> {
   await startPaginator(ctx, pages);
 }
 
-/** Empacota todos os emojis do servidor num zip STORE e anexa. */
+/** Todos os emojis em linha reta, separados por vírgula — drop rápido pra cópia. */
+export async function replyEmojiIdDrop(ctx: AceContext): Promise<void> {
+  const { emoji } = ctx;
+  const guildID = ctx.requireGuild();
+  const { emojis } = await fetchEmojis(ctx, guildID);
+  if (!emojis || emojis.length === 0) {
+    await ctx.reply(`${emoji.unhappy} Este servidor não tem emojis para eu dropar...`);
+    return;
+  }
+  let line = '';
+  for (const item of emojis) {
+    const next = line ? `${line},${tag(item)}` : tag(item);
+    if (next.length > 1900) {
+      await ctx.send(line);
+      line = tag(item);
+    } else {
+      line = next;
+    }
+  }
+  if (line) await ctx.send(line);
+}
+
+/** Responde "espere" na hora, empacota o zip e edita a mesma mensagem com o anexo. */
 export async function replyEmojiDump(ctx: AceContext): Promise<void> {
   const { emoji } = ctx;
   const guildID = ctx.requireGuild();
+  const waiting = await ctx.reply(`${emoji.time} Me dê um momento! Estou empacotando os emojis deste servidor...`);
   const { guild, emojis } = await fetchEmojis(ctx, guildID);
   if (!emojis || emojis.length === 0) {
-    await ctx.reply(`${emoji.unhappy} Este servidor não tem emojis para eu empacotar...`);
+    await ctx.edit(waiting, `${emoji.unhappy} Este servidor não tem emojis para eu empacotar...`);
     return;
   }
   const downloadable = emojis.filter((item) => item.url);
@@ -148,20 +171,34 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
     }
   }
   if (entries.length === 0) {
-    await ctx.reply(`${emoji.unhappy} Eu não consegui baixar os arquivos deste servidor para empacotar...`);
+    await ctx.edit(waiting, `${emoji.unhappy} Eu não consegui baixar os arquivos deste servidor para empacotar...`);
     return;
   }
-  if (!ctx.sendStream) return;
   const slug = (guild?.name ?? 'servidor')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '') || 'servidor';
+  const filename = `emojis-${slug}.zip`;
   const zip = buildZip(entries);
   const missing = downloadable.length - entries.length;
-  await ctx.sendStream(new ReadableStream({ start(controller) { controller.enqueue(zip); controller.close(); } }), {
-    name: `emojis-${slug}.zip`,
-    content: `${emoji.happy} Empacotei **${entries.length}** ${noun(entries.length, 'emoji', 'emojis')} em \`emojis-${slug}.zip\`!${missing > 0 ? ` ${missing} ficaram de fora por falha no download...` : ''}`,
+  const done = `${emoji.happy} Empacotei **${entries.length}** ${noun(entries.length, 'emoji', 'emojis')} em \`${filename}\`!${missing > 0 ? ` ${missing} ficaram de fora por falha no download...` : ''}`;
+  // Anexo na própria mensagem: upload presignado + edit via client nativo.
+  const edited = await safe(async () => {
+    const client = ctx.client;
+    if (!client?.isReady()) throw new Error('client não está pronto');
+    const channel = await client.channels.resolve(ctx.channelID);
+    if (!channel.isTextBased()) throw new Error('canal sem texto');
+    const uploaded = await channel.uploadAttachmentsForSend([{ id: 0, filename, data: zip, contentType: 'application/zip' }]);
+    const message = await channel.messages.resolve(waiting);
+    await message.edit({ content: done, attachments: uploaded.map((item) => ({ id: item.id, uploadFilename: item.upload_filename, filename: item.filename })) });
+    return true;
   });
+  if (edited) return;
+  // Sem client nativo: edita o texto e manda o zip em mensagem separada.
+  await ctx.edit(waiting, done);
+  if (ctx.sendStream) {
+    await ctx.sendStream(new ReadableStream({ start(controller) { controller.enqueue(zip); controller.close(); } }), { name: filename });
+  }
 }

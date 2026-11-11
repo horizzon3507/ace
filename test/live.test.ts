@@ -30,6 +30,7 @@ const rest = {
   runPurge: async () => undefined,
   replyEmojiDump: async () => undefined,
   replyEmojiList: async () => undefined,
+  replyEmojiIdDrop: async () => undefined,
   startPaginator: async () => undefined,
 };
 

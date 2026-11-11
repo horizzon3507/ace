@@ -5,6 +5,7 @@ import { emoji } from '../src/emoji.js';
 import { buildZip } from '../src/emoji-dump.js';
 import emojilist from '../commands/emojilist.js';
 import emojidump from '../commands/emojidump.js';
+import iddrop from '../commands/iddrop.js';
 
 const makeEmojis = (count: number) => Array.from({ length: count }, (_, i) => ({
   id: `${1000 + i}`,
@@ -24,7 +25,7 @@ function bot(count: number, votes: string[] = []) {
     },
     messages: { removeReaction: async () => undefined, clearReactions: async () => undefined },
   };
-  return createTestBot({ prefix: 'a.', commands: [emojilist, emojidump], emoji, authorization: 'off', resources });
+  return createTestBot({ prefix: 'a.', commands: [emojilist, emojidump, iddrop], emoji, authorization: 'off', resources });
 }
 
 test('emojilist mostra 15 por página com nome e menção', async (t) => {
@@ -35,8 +36,8 @@ test('emojilist mostra 15 por página com nome e menção', async (t) => {
   const message = fixture.messages.at(-1)?.payload;
   const lines = (message?.embeds?.[0]?.description ?? '').split('\n');
   assert.equal(lines.length, 15);
-  assert.equal(lines[0], '<a:emoji_0:1000> emoji_0 | Menção: `<a:emoji_0:1000>`');
-  assert.equal(lines[1], '<:emoji_1:1001> emoji_1 | Menção: `<:emoji_1:1001>`');
+  assert.equal(lines[0], '<a:emoji_0:1000> `emoji_0` | Menção: `<a:emoji_0:1000>`');
+  assert.equal(lines[1], '<:emoji_1:1001> `emoji_1` | Menção: `<:emoji_1:1001>`');
   assert.equal(message?.embeds?.[0]?.footer?.text, 'Página 1 de 3 — 32 emojis no total');
 });
 
@@ -56,7 +57,7 @@ test('emojilist vira a página ao votar ➡️', async (t) => {
   assert.equal(await fixture.send('a.emojilist'), 'success');
   const payload = fixture.messages.at(-1)?.payload;
   const lines = (payload?.embeds?.[0]?.description ?? '').split('\n');
-  assert.match(lines[0], /^<a:emoji_15:1015> emoji_15 \| Menção/);
+  assert.match(lines[0], /^<a:emoji_15:1015> `emoji_15` \| Menção/);
   assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 2 de 3/);
 });
 
@@ -77,11 +78,12 @@ test('emojilist servidor sem emojis avisa', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não tem emojis para eu listar/);
 });
 
-test('emojidump sem arquivos baixáveis avisa', async (t) => {
+test('emojidump sem arquivos baixáveis edita o espere', async (t) => {
   const fixture = bot(10);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojidump'), 'success');
+  assert.equal(fixture.messages.length, 1);
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não consegui baixar os arquivos/);
 });
 
@@ -90,7 +92,19 @@ test('emojidump servidor sem emojis avisa', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojidump'), 'success');
+  assert.equal(fixture.messages.length, 1);
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não tem emojis para eu empacotar/);
+});
+
+test('iddrop junta todos os emojis em linha separada por vírgula', async (t) => {
+  const fixture = bot(4);
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.iddrop'), 'success');
+  assert.equal(
+    fixture.messages.at(-1)?.payload.content,
+    '<a:emoji_0:1000>,<:emoji_1:1001>,<:emoji_2:1002>,<:emoji_3:1003>',
+  );
 });
 
 test('buildZip monta arquivo PK válido com entradas', () => {

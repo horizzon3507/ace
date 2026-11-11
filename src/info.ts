@@ -5,6 +5,17 @@ import { brand, formatAge, formatDayStamp, resolveAssetTarget } from './live.js'
 const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
 const noun = (n: number, singular: string, plural = `${singular}s`) => n === 1 ? singular : plural;
 
+// Sem gateway, resolve/fetch do client vira request REST que nunca retorna —
+// só vale chamar quando isReady. ctx.client é getter que lança sem native.
+const nativeClient = async (ctx: AceContext) => {
+  const client = await safe(async () => ctx.client);
+  return client?.isReady() ? client : null;
+};
+const nativeUser = async (ctx: AceContext, id: string) => {
+  const client = await nativeClient(ctx);
+  return client ? safe(() => client.users.resolve(id)) : null;
+};
+
 const PRIVILEGE_LADDER: { flag: keyof typeof SDK.PermissionFlags; label: string }[] = [
   { flag: 'Administrator', label: 'Administrador' },
   { flag: 'ManageGuild', label: 'Gerenciar servidor' },
@@ -75,8 +86,9 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   const created = new Date(user.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [];
 
-  // A tag #xxxx não vem no UserInfo do port — resolve via client nativo.
-  const native = await safe(() => ctx.client?.users.resolve(user.id) ?? Promise.reject(new Error('sem client')));
+  // A tag #xxxx não vem no UserInfo do port — resolve via client nativo pronto
+  // (sem gateway, resolve vira REST pendurado; isReady filtra client offline).
+  const native = await nativeUser(ctx, user.id);
   const tag = native?.discriminator && native.discriminator !== '0'
     ? `${user.username}#${native.discriminator}`
     : user.username;
@@ -213,6 +225,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     return;
   }
 
+  const client = await nativeClient(ctx);
   const [counts, members, roles, channels, me, ownerInfo, ownerNative, native] = await Promise.all([
     safe(() => ctx.resources.users.guildCounts(guildID)),
     safe(() => ctx.resources.users.members(guildID, 1000)),
@@ -220,8 +233,8 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     safe(() => ctx.resources.channels.list(guildID)),
     safe(() => ctx.resources.users.me(guildID)),
     safe(() => ctx.resources.users.user(guild.ownerID)),
-    safe(() => ctx.client?.users.resolve(guild.ownerID) ?? Promise.reject(new Error('sem client'))),
-    safe(() => ctx.client?.guilds.resolve(guildID) ?? Promise.reject(new Error('sem client'))),
+    client ? safe(() => client.users.resolve(guild.ownerID)) : null,
+    client ? safe(() => client.guilds.resolve(guildID)) : null,
   ]);
 
   const joinAnd = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}`;

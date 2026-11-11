@@ -2,7 +2,7 @@ import { brand as initialBrand } from './brand.js';
 import { runChannelLock as initialLock, type LockAction } from './channel-lock.js';
 import type { AceContext } from './context.js';
 import { replyGuildAsset as initialGuildAsset, replyUserAsset as initialUserAsset, type GuildAsset, type UserAsset } from './embed.js';
-import { replyEmojiDump as initialDump, replyEmojiList as initialList } from './emoji-dump.js';
+import { replyEmojiDump as initialDump, replyEmojiIdDrop as initialIdDrop, replyEmojiList as initialList } from './emoji-dump.js';
 import { formatAge as initialAge, formatDayStamp as initialDay, formatStamp as initialStamp } from './format.js';
 import { replyGuildInfo as initialGuildInfo, replyUserInfo as initialUserInfo } from './info.js';
 import { grantJoinRole as initialGrant, type JoinMember } from './join-role.js';
@@ -58,6 +58,7 @@ export type RuntimeInstall = {
   runPurge: PurgeFn;
   replyEmojiDump: DumpFn;
   replyEmojiList: DumpFn;
+  replyEmojiIdDrop: DumpFn;
   startPaginator: PaginatorFn;
   brand: RuntimeBrand;
 };
@@ -87,6 +88,7 @@ const slots: RuntimeInstall = {
   runPurge: initialPurge,
   replyEmojiDump: initialDump,
   replyEmojiList: initialList,
+  replyEmojiIdDrop: initialIdDrop,
   startPaginator: initialPaginator,
   brand: {
     primary: initialBrand.primary,
@@ -179,6 +181,10 @@ export function replyEmojiDump(ctx: AceContext): Promise<void> {
 
 export function replyEmojiList(ctx: AceContext): Promise<void> {
   return slots.replyEmojiList(ctx);
+}
+
+export function replyEmojiIdDrop(ctx: AceContext): Promise<void> {
+  return slots.replyEmojiIdDrop(ctx);
 }
 
 export function startPaginator(ctx: AceContext, pages: readonly import('yuzuha').Embed[], timeoutMs?: number): Promise<void> {

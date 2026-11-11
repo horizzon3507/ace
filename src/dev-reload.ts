@@ -62,6 +62,7 @@ export async function refreshRuntime(root: string): Promise<void> {
   if (typeof infoMod.replyGuildInfo !== 'function') throw missing('src/info.ts', 'replyGuildInfo');
   if (typeof dumpMod.replyEmojiDump !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiDump');
   if (typeof dumpMod.replyEmojiList !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiList');
+  if (typeof dumpMod.replyEmojiIdDrop !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiIdDrop');
   if (typeof paginatorMod.startPaginator !== 'function') throw missing('src/paginator.ts', 'startPaginator');
   installRuntime({
     prefix: prefixMod.prefix,
@@ -86,6 +87,7 @@ export async function refreshRuntime(root: string): Promise<void> {
     runPurge: purgeMod.runPurge,
     replyEmojiDump: dumpMod.replyEmojiDump,
     replyEmojiList: dumpMod.replyEmojiList,
+    replyEmojiIdDrop: dumpMod.replyEmojiIdDrop,
     startPaginator: paginatorMod.startPaginator,
     brand: brandMod.brand,
   });
