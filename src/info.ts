@@ -153,7 +153,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
   if (pronouns) {
     fields.push({
-      name: `${emoji.openArm} Pronomes`,
+      name: `${emoji.userHeart} Pronomes`,
       value: `Seus pronomes são "**${pronouns}**". Incrível, não é?`,
       inline: true,
     });
@@ -306,17 +306,19 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     fields.push({
       name: `${emoji.shield} Segurança`,
       value: [
-        `Nível de verificação **${VERIFICATION_LABELS[native.verificationLevel] ?? `${native.verificationLevel}`}**`,
-        `MFA **${native.mfaLevel === 1 ? 'exigido' : 'desativado'}**`,
-        `NSFW **${native.nsfw ? 'sim' : 'não'}**`,
+        `O nível de verificação deste servidor é **${VERIFICATION_LABELS[native.verificationLevel] ?? `${native.verificationLevel}`}**!`,
+        `A autenticação em duas etapas está **${native.mfaLevel === 1 ? 'exigida' : 'desativada'}**!`,
+        `Este servidor **${native.nsfw ? 'é' : 'não é'}** marcado como NSFW!`,
       ].join('\n'),
       inline: true,
     });
     fields.push({
       name: `${emoji.settings} Ajustes`,
       value: [
-        `Filtro de conteúdo **${CONTENT_FILTER_LABELS[native.explicitContentFilter] ?? `${native.explicitContentFilter}`}**`,
-        `Notificações padrão **${native.defaultMessageNotifications === 1 ? 'apenas menções' : 'todas as mensagens'}**`,
+        native.explicitContentFilter === 0
+          ? 'O filtro de conteúdo explícito está **desativado**!'
+          : `O filtro de conteúdo explícito varre **${CONTENT_FILTER_LABELS[native.explicitContentFilter] ?? `${native.explicitContentFilter}`}**!`,
+        `As notificações padrão chegam para **${native.defaultMessageNotifications === 1 ? 'apenas menções' : 'todas as mensagens'}**!`,
       ].join('\n'),
       inline: true,
     });
