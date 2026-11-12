@@ -77,30 +77,51 @@ test('mensagem sem o prefixo é ignorada', async (t) => {
   assert.equal(fixture.messages.length, 0);
 });
 
-test('ajuda lista os comandos por categoria em grade', async (t) => {
-  const fixture = bot();
+test('ajuda pagina as categorias com uma página cada', async (t) => {
+  const votes: string[] = [];
+  const fixture = bot({
+    collectors: {
+      collectReactions: async function* () {
+        for (const vote of votes) yield { userID: 'u1', emoji: vote, messageID: '1' };
+      },
+    },
+    messages: { removeReaction: async () => undefined, clearReactions: async () => undefined },
+  });
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.ajuda'), 'success');
-  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(embed?.title, '<:commandline:1567301268425146368> Confira meus comandos');
-  assert.equal(embed?.description, 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...');
-  assert.equal(embed?.footer, undefined);
-  const fields = embed?.fields ?? [];
+  const page1 = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(page1?.title, '<:information2fill:1566640356991184896> Informações');
+  assert.equal(page1?.description, 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...');
+  assert.equal(page1?.footer?.text, 'Página 1 de 3 — Confira meus comandos');
+
+  votes.push('⬅️'); // ⬅️ avança (direção invertida de propósito)
+  await fixture.tick(4000);
+  assert.equal(await fixture.send('a.ajuda'), 'success');
+  const page2 = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(page2?.title, '<:globefill:1566571242956263426> Artes & Emojis');
+  assert.equal(page2?.description, undefined);
+  assert.equal(page2?.footer?.text, 'Página 2 de 3 — Confira meus comandos');
+
+  votes.push('⬅️');
+  await fixture.tick(4000);
+  assert.equal(await fixture.send('a.ajuda'), 'success');
+  const page3 = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(page3?.title, '<:userforbidfill:1566644852504932352> Moderação');
+
+  const listed = [page1, page2, page3].flatMap((page) =>
+    (page?.fields ?? []).map((field) => /`a\.(\w+)`$/.exec(field.name)?.[1] ?? ''));
   for (const command of fixture.bot.listCommands().filter((item) => !item.hidden)) {
-    const field = fields.find((item) => item.name.endsWith(` \`a.${command.name}\``));
-    assert.ok(field, `ajuda não listou ${command.name}`);
-    assert.equal(field.inline, true);
-    assert.ok(field.value, `ajuda listou ${command.name} sem descrição`);
+    const count = listed.filter((name) => name === command.name).length;
+    assert.equal(count, 1, `ajuda listou ${command.name} ${count}x`);
   }
-  const icons = Object.fromEntries(fields.map((item) => [item.name.split(' `')[0], item.name]));
-  assert.deepEqual(Object.keys(icons).sort(), [
-    '<:globefill:1566571242956263426>',
-    '<:information2fill:1566640356991184896>',
-    '<:userforbidfill:1566644852504932352>',
-  ]);
-  assert.match(fields.find((item) => item.name.endsWith('`a.setprefix`'))?.name ?? '', /^<:information2fill/);
-  assert.doesNotMatch(fields.map((item) => item.name).join(' '), /hello/);
+  for (const field of [page1, page2, page3].flatMap((page) => page?.fields ?? [])) {
+    assert.equal(field.inline, true);
+    assert.ok(field.value, 'ajuda listou comando sem descrição');
+  }
+  const reacted = fixture.transport.reactions.map((reaction) => reaction.emoji);
+  assert.ok(reacted.includes('⬅️') && reacted.includes('➡️'));
+  assert.doesNotMatch(listed.join(' '), /hello/);
   assert.deepEqual(fixture.errors, []);
 });
 

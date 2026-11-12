@@ -50,8 +50,8 @@ test('emojilist reage com setas de navegação', async (t) => {
   assert.ok(reacted.includes('⬅️') && reacted.includes('➡️'));
 });
 
-test('emojilist vira a página ao votar ➡️', async (t) => {
-  const fixture = bot(32, ['➡️']);
+test('emojilist avança ao votar ⬅️', async (t) => {
+  const fixture = bot(32, ['⬅️']);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
@@ -61,8 +61,8 @@ test('emojilist vira a página ao votar ➡️', async (t) => {
   assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 2 de 3/);
 });
 
-test('emojilist volta ao fim ao votar ⬅️ na primeira página', async (t) => {
-  const fixture = bot(32, ['⬅️']);
+test('emojilist volta ao fim ao votar ➡️ na primeira página', async (t) => {
+  const fixture = bot(32, ['➡️']);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
@@ -100,11 +100,20 @@ test('iddrop junta todos os emojis em linha separada por vírgula', async (t) =>
   const fixture = bot(4);
   t.after(() => fixture.destroy());
 
-  assert.equal(await fixture.send('a.iddrop'), 'success');
+  assert.equal(await fixture.send('a.iddrop', { authorID: '1473035660161241245' }), 'success');
   assert.equal(
     fixture.messages.at(-1)?.payload.content,
     '<a:emoji_0:1000>,<:emoji_1:1001>,<:emoji_2:1002>,<:emoji_3:1003>',
   );
+});
+
+test('iddrop é só para o detentor e some do help', async (t) => {
+  const fixture = bot(4);
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.iddrop'), 'guarded');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /só para o meu detentor/);
+  assert.equal(fixture.bot.help('a.').includes('iddrop'), false);
 });
 
 test('buildZip monta arquivo PK válido com entradas', () => {

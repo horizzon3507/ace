@@ -1,14 +1,26 @@
-import { defineCommand, embed } from 'yuzuha';
+import { defineCommand, embed, type Embed } from 'yuzuha';
+import type { emoji as catalog } from '../src/emoji.js';
 import { guildPrefix } from '../src/guild-prefix.js';
-import { brand, prefix } from '../src/live.js';
+import { brand, prefix, startPaginator } from '../src/live.js';
 
-type CommandCategory = { emoji: keyof typeof import('../src/emoji.js').emoji; commands: readonly string[] };
+type EmojiKey = keyof typeof catalog;
+type Category = { icon: EmojiKey; label: string; commands: readonly string[] };
 
-const categories: CommandCategory[] = [
-  { emoji: 'information', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
-  { emoji: 'globe', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
-  { emoji: 'ban', commands: ['kick', 'ban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
+const categories: Category[] = [
+  { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
+  { icon: 'globe', label: 'Artes & Emojis', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
+  { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
 ];
+
+// Ícone por comando quando um encaixa melhor que o da categoria.
+const commandIcons: Record<string, EmojiKey> = {
+  ajuda: 'information', ping: 'globe', uptime: 'time', setprefix: 'settings',
+  userinfo: 'accountCircle', guildinfo: 'idCard',
+  avatar: 'accountBox', userbanner: 'stickyNote', guildicon: 'medal', guildbanner: 'shining',
+  emojilist: 'sparkling', emojidump: 'sparkling',
+  kick: 'kick', ban: 'ban', lock: 'lock', unlock: 'unlock',
+  clear: 'purge', purge: 'purge', timeout: 'time', unban: 'unban',
+};
 
 export default defineCommand({
   name: 'ajuda',
@@ -31,28 +43,37 @@ export default defineCommand({
         }),
     );
 
-    const fields: { name: string; value: string; inline?: boolean }[] = [];
     const listed = new Set<string>();
-    const push = (command: string, icon: string) => {
-      const description = descriptions.get(command);
-      if (description === undefined) return;
-      fields.push({ name: `${icon} \`${p}${command}\``, value: description || '​', inline: true });
-      listed.add(command);
-    };
-    for (const category of categories) {
-      for (const command of category.commands) push(command, ctx.emoji[category.emoji]);
-    }
-    for (const command of descriptions.keys()) {
-      if (!listed.has(command)) push(command, ctx.emoji.happy);
+    const pages: { label: string; icon: EmojiKey; fields: { name: string; value: string; inline?: boolean }[] }[] = [];
+    for (const { icon, label, commands } of categories) {
+      const fields: { name: string; value: string; inline?: boolean }[] = [];
+      for (const command of commands) {
+        const description = descriptions.get(command);
+        if (description === undefined) continue;
+        listed.add(command);
+        const key = commandIcons[command] ?? icon;
+        fields.push({ name: `${ctx.emoji[key]} \`${p}${command}\``, value: description || '​', inline: true });
+      }
+      if (fields.length) pages.push({ label, icon, fields });
     }
 
-    await ctx.reply({
-      embeds: [embed({
-        color: brand.primary,
-        title: `${ctx.emoji.commandline} Confira meus comandos`,
-        description: 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...',
-        fields,
-      })],
-    });
+    const rest: { name: string; value: string; inline?: boolean }[] = [];
+    for (const [command, description] of descriptions) {
+      if (listed.has(command)) continue;
+      const key = commandIcons[command] ?? 'happy';
+      rest.push({ name: `${ctx.emoji[key]} \`${p}${command}\``, value: description || '​', inline: true });
+    }
+    if (rest.length) pages.push({ label: 'Outros', icon: 'happy', fields: rest });
+
+    const embeds: Embed[] = pages.map((page, i) => embed({
+      color: brand.primary,
+      title: `${ctx.emoji[page.icon]} ${page.label}`,
+      description: i === 0
+        ? 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...'
+        : undefined,
+      fields: page.fields,
+      footer: { text: `Página ${i + 1} de ${pages.length} — Confira meus comandos` },
+    }));
+    await startPaginator(ctx, embeds);
   },
 });
