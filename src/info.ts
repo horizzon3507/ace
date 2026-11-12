@@ -104,7 +104,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   }
   fields.push({ name: `${emoji.accountCircle} Ficha`, value: ficha.join('\n'), inline: true });
   fields.push({
-    name: `${emoji.calendar} Conta criada`,
+    name: `${emoji.calendar} Criada em`,
     value: `A conta deste usuário foi criada em ${formatDayStamp(created)}, ${formatAge(created)}!`,
     inline: true,
   });
@@ -134,10 +134,10 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
     if (mine.length > 0) {
       fields.push({
-        name: `${emoji.priceTag} Cargos`,
+        name: `${emoji.vipCrown} Cargos`,
         value: mine.length === 1
-          ? `Seu único cargo é <@&${mine[0].id}>!`
-          : `Seu cargo mais alto é <@&${mine[0].id}> e o mais baixo é <@&${mine.at(-1)!.id}>!`,
+          ? `Seu único cargo é **<@&${mine[0].id}>**!`
+          : `Seu cargo mais alto é **<@&${mine[0].id}>** e o mais baixo é **<@&${mine.at(-1)!.id}>**!`,
         inline: true,
       });
     }
@@ -154,7 +154,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   if (pronouns) {
     fields.push({
       name: `${emoji.openArm} Pronomes`,
-      value: `Seus pronomes são "${pronouns}". Incrível, não é?`,
+      value: `Seus pronomes são "**${pronouns}**". Incrível, não é?`,
       inline: true,
     });
   }
@@ -250,7 +250,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
 
   const created = new Date(guild.createdTimestamp);
   const fields: { name: string; value: string; inline: boolean }[] = [
-    { name: `${emoji.idCard} Ficha`, value: ownerLine, inline: true },
+    { name: `${emoji.accountCircle} Ficha`, value: ownerLine, inline: true },
     { name: `${emoji.cake2} Criado em`, value: `Este servidor foi criado em ${formatDayStamp(created)}, ${formatAge(created)}!`, inline: true },
   ];
 
@@ -262,7 +262,7 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     const split = bots !== null ? `, sendo **${humans}** ${noun(humans, 'humano')} e **${bots}** ${noun(bots, 'aplicativo')}` : '';
     const online = counts?.onlineCount !== undefined ? `Temos **${counts.onlineCount}** usuários online!` : '';
     fields.push({
-      name: `${emoji.team} Pessoas`,
+      name: `${emoji.team} Usuários`,
       value: `Há **${total}** ${noun(total, 'usuário')}${split}${online ? `. ${online}` : '!'}`,
       inline: true,
     });
@@ -273,8 +273,8 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     const top = real.length ? real.reduce((a, b) => (b.position > a.position ? b : a)) : null;
     const base = real.length ? real.reduce((a, b) => (b.position < a.position ? b : a)) : null;
     const tail = top && base && top.id !== base.id
-      ? `, sendo o que está no topo <@&${top.id}> e o que está na base <@&${base.id}>`
-      : top ? `, sendo o que está no topo <@&${top.id}>` : '';
+      ? `, sendo o que está no topo **<@&${top.id}>** e o que está na base **<@&${base.id}>**`
+      : top ? `, sendo o que está no topo **<@&${top.id}>**` : '';
     fields.push({ name: `${emoji.vipCrown} Cargos`, value: `Este servidor possui **${roles.length}** ${noun(roles.length, 'cargo')}${tail}!`, inline: true });
   }
 
@@ -300,8 +300,8 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     fields.push({ name: `${emoji.sparkling} Recursos`, value: list, inline: true });
   }
 
-  // Segurança: verificação, MFA, NSFW, filtro e notificações — o GuildInfo do
-  // port não traz nenhum deles, então resolve via client nativo quando há.
+  // Segurança + Ajustes: verificação, MFA, NSFW, filtro e notificações — o
+  // GuildInfo do port não traz nenhum, então resolve via client nativo quando há.
   if (native) {
     fields.push({
       name: `${emoji.shield} Segurança`,
@@ -309,6 +309,12 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
         `Nível de verificação **${VERIFICATION_LABELS[native.verificationLevel] ?? `${native.verificationLevel}`}**`,
         `MFA **${native.mfaLevel === 1 ? 'exigido' : 'desativado'}**`,
         `NSFW **${native.nsfw ? 'sim' : 'não'}**`,
+      ].join('\n'),
+      inline: true,
+    });
+    fields.push({
+      name: `${emoji.settings} Ajustes`,
+      value: [
         `Filtro de conteúdo **${CONTENT_FILTER_LABELS[native.explicitContentFilter] ?? `${native.explicitContentFilter}`}**`,
         `Notificações padrão **${native.defaultMessageNotifications === 1 ? 'apenas menções' : 'todas as mensagens'}**`,
       ].join('\n'),

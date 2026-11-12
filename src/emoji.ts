@@ -9,6 +9,7 @@ export const emoji = {
   commandline: '<:commandline:1567301268425146368>',
   lock: '<:lockfill:1567331836965687297>',
   shield: '<:shieldcheckfill:1566570436261584896>',
+  settings: '<:settingsfill:1566639634983690240>',
   unlock: '<:lockunlockfill:1567331836965687296>',
   unban: '<:lockunlockfill:1567331836965687296>',
   purge: '<:logoutboxfill:1566645144776605696>',

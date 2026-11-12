@@ -47,7 +47,7 @@ function assertUserInfoEmbed(embed: Embed | undefined) {
   assert.equal(embed?.author?.name, 'Informações de Glacial');
   assert.match(fieldValue(embed, 'Ficha'), /Este usuário é <@2>, de nome de usuário `glacial` e ID `2`!/);
   assert.match(fieldValue(embed, 'Ficha'), /Seu apelido neste servidor é \*\*Glacial\*\*!/);
-  assert.match(fieldValue(embed, 'Conta criada'), /A conta deste usuário foi criada em \*\*\d{2}\/\d{2}\/\d{4} \*\*às/);
+  assert.match(fieldValue(embed, 'Criada em'), /A conta deste usuário foi criada em \*\*\d{2}\/\d{2}\/\d{4} \*\*às/);
   assert.match(fieldValue(embed, 'Entrada'), /Este membro entrou neste servidor em \*\*\d{2}\/\d{2}\/\d{4}/);
   assert.match(fieldValue(embed, 'Hierarquia'), /Este membro possui \*\*2\*\* cargos!/);
   assert.equal(fieldValue(embed, 'Situação'), '');
@@ -137,7 +137,7 @@ test('userinfo cai para o usuário global quando o membro falha', async (t) => {
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.author?.name, 'Informações de Glacial');
   const names = (embed?.fields ?? []).map((field) => field.name).join(' ');
-  assert.equal(fieldValue(embed, 'Conta criada') !== '', true);
+  assert.equal(fieldValue(embed, 'Criada em') !== '', true);
   assert.doesNotMatch(names, /Entrada|Hierarquia|Situação/);
   assert.deepEqual(fixture.errors, []);
 });
@@ -206,7 +206,7 @@ test('userinfo mostra cargo mais alto e maior privilégio do membro', async (t) 
   const hierarquia = fieldValue(embed, 'Hierarquia');
   assert.match(hierarquia, /Este membro possui \*\*2\*\* cargos!/);
   assert.match(hierarquia, /Seu maior privilégio é \*\*Administrador\*\*!/);
-  assert.equal(fieldValue(embed, 'Cargos'), 'Seu cargo mais alto é <@&50> e o mais baixo é <@&60>!');
+  assert.equal(fieldValue(embed, 'Cargos'), 'Seu cargo mais alto é **<@&50>** e o mais baixo é **<@&60>**!');
   assert.deepEqual(fixture.errors, []);
 });
 
@@ -236,7 +236,7 @@ test('userinfo mostra bio, pronomes e conexões do perfil', async (t) => {
   assert.equal(await fixture.send('a.userinfo <@2>'), 'success');
   const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(embed?.color, 0xff00ff);
-  assert.equal(fieldValue(embed, 'Pronomes'), 'Seus pronomes são "ele/dele". Incrível, não é?');
+  assert.equal(fieldValue(embed, 'Pronomes'), 'Seus pronomes são "**ele/dele**". Incrível, não é?');
   assert.match(fieldValue(embed, 'Ficha'), /divide \*\*2\*\* servidores comigo!/);
   assert.match(fieldValue(embed, 'Conexões'), /conectou `horizzon3507`!/);
   const bio = embed?.fields?.at(-1);
@@ -304,8 +304,8 @@ test('guildinfo mostra a ficha do servidor em campos', async (t) => {
   const byName = (name: string) => fields.find((field) => field.name.includes(name))?.value ?? '';
   assert.match(byName('Ficha'), /O detentor\(a\) deste servidor é <@1>, de nome de usuário `gabriel` e ID `1`!/);
   assert.match(byName('Criado em'), /Este servidor foi criado em \*\*\d{2}\/\d{2}\/\d{4} \*\*às \*\*\d{2}:\d{2}\*\*, há \*\*\d+ anos\*\*!/);
-  assert.match(byName('Pessoas'), /Há \*\*3\*\* usuários, sendo \*\*2\*\* humanos e \*\*1\*\* aplicativo\. Temos \*\*2\*\* usuários online!/);
-  assert.match(byName('Cargos'), /Este servidor possui \*\*3\*\* cargos, sendo o que está no topo <@&50> e o que está na base <@&60>!/);
+  assert.match(byName('Usuários'), /Há \*\*3\*\* usuários, sendo \*\*2\*\* humanos e \*\*1\*\* aplicativo\. Temos \*\*2\*\* usuários online!/);
+  assert.match(byName('Cargos'), /Este servidor possui \*\*3\*\* cargos, sendo o que está no topo \*\*<@&50>\*\* e o que está na base \*\*<@&60>\*\*!/);
   assert.match(byName('Canais'), /Há \*\*4\*\* canais, sendo deles \*\*2\*\* canais de texto, \*\*1\*\* canal de voz e \*\*1\*\* categoria!/);
   const recursos = fields.find((field) => field.name.includes('Recursos'));
   assert.equal(recursos?.inline, true);
@@ -333,8 +333,8 @@ test('guildinfo sem contadores ainda responde a ficha', async (t) => {
 
   assert.equal(await fixture.send('a.guildinfo'), 'success');
   const fields = fixture.messages.at(-1)?.payload.embeds?.[0]?.fields ?? [];
-  assert.equal(fields.length, 3); // Ficha + Criado em + Pessoas (só total)
-  assert.match(fields.find((field) => field.name.includes('Pessoas'))?.value ?? '', /Há \*\*42\*\* usuários!/);
+  assert.equal(fields.length, 3); // Ficha + Criado em + Usuários (só total)
+  assert.match(fields.find((field) => field.name.includes('Usuários'))?.value ?? '', /Há \*\*42\*\* usuários!/);
   assert.deepEqual(fixture.errors, []);
 });
 
