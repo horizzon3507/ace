@@ -71,20 +71,23 @@ function App() {
 
       <main>
         <header className="hero">
-          <div className="lockup">
+          <a className="badge" href={REPO_URL}>
+            open source · AGPL-3.0 · v0.1.1{" "}
+            <span aria-hidden="true">↗</span>
+          </a>
+          <h1>
+            conheça o{" "}
             <img
               className="avatar"
               src="assets/ace-avatar-animado.png"
-              alt="Ace, a esfera azul do bot"
-            />
-            <h1>Ace</h1>
-          </div>
+              alt=""
+            />{" "}
+            ace
+          </h1>
           <p className="lede">
-            heey! eu seguro a <strong>moderação</strong> com kicks, bans, timeouts
-            e limpeza de mensagens, te conto tudo sobre <strong>usuários</strong>{" "}
-            e o <strong>servidor</strong>, busco artes como{" "}
-            <strong>avatares e banners</strong> e ainda listo e empaco os{" "}
-            <strong>emojis</strong> daqui.
+            heey! eu seguro a moderação com kicks, bans, timeouts e limpeza de
+            mensagens, te conto tudo sobre usuários e o servidor, busco
+            avatares e banners e ainda listo e empaco os emojis daqui.
           </p>
           <div className="cta">
             <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>

@@ -31,6 +31,7 @@
   --font-sans: "Geist", "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --inset: #16161a;
   --site-w: 720px;
 }
 
@@ -138,33 +139,49 @@ main {
   justify-content: center;
   text-align: center;
   padding: 96px 24px 64px;
-  background:
-    radial-gradient(85% 50% at 50% -8%, rgba(255, 255, 255, .16), transparent 62%),
-    linear-gradient(180deg, #648de5 0%, #4a6cb2 34%, #1e3a6e 68%, var(--bg) 100%);
 }
 
-.hero .lede { color: rgba(255, 255, 255, .82); }
-.hero .lede strong { color: #fff; font-weight: 600; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 34px;
+  padding: 5px 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: border-color .15s ease, color .15s ease;
+}
 
-.hero .avatar {
-  filter: drop-shadow(0 10px 28px rgba(6, 14, 40, .5));
+@media (hover: hover) and (pointer: fine) {
+  .badge:hover { color: var(--text); border-color: var(--border-hover); }
+}
+
+.avatar {
+  display: inline-block;
+  width: .86em;
+  height: .86em;
+  object-fit: contain;
+  vertical-align: -.1em;
 }
 
 .shot-frame {
-  margin-top: 46px;
-  padding: 5px;
-  width: min(600px, 100%);
-  background: rgba(255, 255, 255, .09);
-  border: 1px solid rgba(255, 255, 255, .18);
-  border-radius: 18px;
-  box-shadow: 0 24px 64px rgba(6, 14, 40, .45);
+  margin-top: 52px;
+  padding: 4px;
+  width: min(640px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
 }
 
 .hero-shot {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 13px;
+  border-radius: 12px;
 }
 
 .hero .btn-primary {
@@ -174,31 +191,11 @@ main {
 }
 .hero .btn-primary:active { background: #d9e4f8; }
 
-.hero .btn-ghost {
-  background: rgba(255, 255, 255, .12);
-  border-color: rgba(255, 255, 255, .3);
-  color: #fff;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .hero .btn-primary:hover { background: #e8effc; }
-  .hero .btn-ghost:hover { background: rgba(255, 255, 255, .18); border-color: rgba(255, 255, 255, .42); }
 }
 
 h1 { color: #fff; }
-
-.lockup {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-
-.avatar {
-  display: block;
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-}
 
 h1 {
   font-size: clamp(56px, 8vw, 76px);
@@ -270,13 +267,14 @@ h1 {
 
 /* ————— entrada do hero: stagger não-uniforme ————— */
 
-.hero .lockup, .hero .lede, .hero .cta, .hero .shot-frame {
+.hero .badge, .hero h1, .hero .lede, .hero .cta, .hero .shot-frame {
   animation: enter .55s var(--ease-out) both;
 }
-.hero .lockup { animation-delay: 0ms; }
-.hero .lede { animation-delay: 80ms; }
-.hero .cta { animation-delay: 150ms; }
-.hero .shot-frame { animation-delay: 210ms; }
+.hero .badge { animation-delay: 0ms; }
+.hero h1 { animation-delay: 60ms; }
+.hero .lede { animation-delay: 130ms; }
+.hero .cta { animation-delay: 190ms; }
+.hero .shot-frame { animation-delay: 250ms; }
 
 @keyframes enter {
   from { opacity: 0; transform: translateY(10px); }
@@ -350,7 +348,7 @@ h3 {
 
 .card-inner {
   height: 100%;
-  background: var(--bg);
+  background: var(--inset);
   border: 1px solid var(--border);
   border-radius: 10px;
   transition: transform .15s var(--ease-out), border-color .15s ease;
@@ -425,7 +423,7 @@ h3 {
 .specs dl {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--bg);
+  background: var(--inset);
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
@@ -530,8 +528,6 @@ footer {
 /* ————— responsivo ————— */
 
 @media (max-width: 720px) {
-  .lockup { flex-direction: column; gap: 16px; }
-  .avatar { width: 80px; height: 80px; }
   .hero { padding: 84px 20px 48px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
   .steps-grid { grid-template-columns: 1fr; }
@@ -544,7 +540,7 @@ footer {
 /* ————— movimento reduzido: sem deslocamento, só cor/opacidade ————— */
 
 @media (prefers-reduced-motion: reduce) {
-  .hero .lockup, .hero .lede, .hero .cta, .hero .shot-frame { animation: none; }
+  .hero .badge, .hero h1, .hero .lede, .hero .cta, .hero .shot-frame { animation: none; }
   [data-reveal] { animation: none !important; }
   .btn { transition: background .15s ease, border-color .15s ease; }
 }
