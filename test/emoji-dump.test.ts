@@ -64,7 +64,7 @@ test('emojilist reage com a seta de próxima página', async (t) => {
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
   const reacted = fixture.transport.reactions.map((r) => r.emoji);
-  assert.deepEqual(reacted, ['<:arrowrightfill:1566639126151700482>']);
+  assert.deepEqual(reacted, ['<:arrowrightfill:1566639126151700482>', '<:ace:1566575966614990848>']);
 });
 
 test('emojilist avança uma página a cada voto na seta', async (t) => {
@@ -77,10 +77,23 @@ test('emojilist avança uma página a cada voto na seta', async (t) => {
   const lines = (payload?.embeds?.[0]?.description ?? '').split('\n');
   assert.match(lines[0], /^<a:emoji_30:1030> `<a:emoji_30:1030>`/);
   assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 3 de 3/);
+  // última página: barra é [◀ 🏠], sem ▶ — reconstruída depois de cada flip
+  const reacted = fixture.transport.reactions.map((r) => r.emoji);
+  assert.deepEqual(reacted.slice(-2), ['<:arrowleftfill:1566639260100997120>', '<:ace:1566575966614990848>']);
 });
 
-test('emojilist volta à primeira página após a última', async (t) => {
-  const fixture = bot(32, ['arrowrightfill', 'arrowrightfill', 'arrowrightfill']);
+test('emojilist volta à primeira página pelo botão home', async (t) => {
+  const fixture = bot(32, ['arrowrightfill', 'arrowrightfill', 'ace']);
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.emojilist'), 'success');
+  await flush();
+  const payload = fixture.messages.at(-1)?.payload;
+  assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 1 de 3/);
+});
+
+test('emojilist volta uma página com a seta esquerda', async (t) => {
+  const fixture = bot(32, ['arrowrightfill', 'arrowleftfill']);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');

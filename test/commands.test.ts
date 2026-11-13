@@ -126,6 +126,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   }
   const reacted = fixture.transport.reactions.map((reaction) => reaction.emoji);
   assert.ok(reacted.includes('<:arrowrightfill:1566639126151700482>'));
+  assert.ok(reacted.includes('<:ace:1566575966614990848>'));
   assert.doesNotMatch(listed.join(' '), /hello/);
   assert.deepEqual(fixture.errors, []);
 });
