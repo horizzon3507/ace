@@ -71,7 +71,6 @@ function App() {
 
       <main>
         <header className="hero">
-          <span className="eyebrow">bot do fluxer</span>
           <div className="lockup">
             <img
               className="avatar"
@@ -81,8 +80,11 @@ function App() {
             <h1>Ace</h1>
           </div>
           <p className="lede">
-            moderação e utilidade pro seu servidor do fluxer: vinte e um
-            comandos em pt-br, com prefixo por servidor.
+            heey! eu seguro a <strong>moderação</strong> com kicks, bans, timeouts
+            e limpeza de mensagens, te conto tudo sobre <strong>usuários</strong>{" "}
+            e o <strong>servidor</strong>, busco artes como{" "}
+            <strong>avatares e banners</strong> e ainda listo e empaco os{" "}
+            <strong>emojis</strong> daqui.
           </p>
           <div className="cta">
             <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
@@ -92,9 +94,13 @@ function App() {
               github
             </Button>
           </div>
-          <p className="hero-meta">
-            21 comandos · prefixo por servidor · v0.1.1
-          </p>
+          <div className="shot-frame">
+            <img
+              className="hero-shot"
+              src="assets/ace-ajuda.png"
+              alt="O embed do a.ajuda no Fluxer, listando os comandos do Ace"
+            />
+          </div>
         </header>
 
         <section className="steps" data-reveal>
