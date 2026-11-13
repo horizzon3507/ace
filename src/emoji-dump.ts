@@ -1,4 +1,5 @@
 import { embed, type Embed, type EmojiInfo } from 'yuzuha';
+import { AttachmentBuilder } from '@fluxerjs/core';
 import type { AceContext } from './context.js';
 import { brand, startPaginator } from './live.js';
 
@@ -209,9 +210,17 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
   if (nativeError && nativeCode !== 'NATIVE_UNAVAILABLE') {
     console.warn('[emojidump] anexo na mensagem falhou, caindo pro envio separado:', nativeError);
   }
-  // Sem client nativo: edita o texto e manda o zip em mensagem separada.
+  // Sem anexo na própria mensagem: edita o texto e manda o zip como reply.
   await ctx.edit(waiting, done);
-  if (ctx.sendStream) {
+  const replied = await safe(async () => {
+    const client = ctx.client;
+    if (!client?.isReady()) throw new Error('client não está pronto');
+    const channel = await client.channels.resolve(ctx.channelID);
+    if (!channel.isTextBased()) throw new Error('canal sem texto');
+    const file = new AttachmentBuilder(Buffer.from(zip), { name: filename });
+    await channel.send({ files: [file], replyTo: { channelId: ctx.channelID, messageId: waiting } });
+  });
+  if (!replied && ctx.sendStream) {
     await ctx.sendStream(new ReadableStream({ start(controller) { controller.enqueue(zip); controller.close(); } }), { name: filename });
   }
 }
