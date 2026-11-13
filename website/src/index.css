@@ -28,11 +28,14 @@
   --faint: #5b6475;
   --font-sans: "Geist", "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body, #root { height: 100%; }
+
+::selection { background: rgba(100, 141, 229, .32); }
 
 body {
   background: var(--bg);
@@ -42,7 +45,20 @@ body {
   font-family: var(--font-sans);
   font-size: 14px;
   letter-spacing: -.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 50% at 50% 32%, rgba(100, 141, 229, .07), transparent 65%);
+}
+
+a { -webkit-tap-highlight-color: transparent; }
 
 main {
   min-height: 100%;
@@ -51,12 +67,20 @@ main {
   align-items: center;
   justify-content: center;
   padding: 48px 24px 32px;
-  animation: fade-in .5s ease-out both;
 }
 
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
+.avatar, h1, .lede, .cta, .chat, footer {
+  animation: enter .55s var(--ease-out) both;
+}
+.avatar { animation-delay: 0ms; }
+h1 { animation-delay: 60ms; }
+.lede { animation-delay: 110ms; }
+.cta { animation-delay: 160ms; }
+.chat { animation-delay: 230ms; }
+footer { animation-delay: 310ms; }
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(8px); }
 }
 
 .avatar {
@@ -64,6 +88,7 @@ main {
   height: 96px;
   object-fit: contain;
   margin-bottom: 18px;
+  mix-blend-mode: lighten;
 }
 
 h1 {
@@ -81,6 +106,7 @@ h1 {
   line-height: 1.55;
   max-width: 30em;
   text-align: center;
+  text-wrap: balance;
 }
 
 .cta {
@@ -100,7 +126,14 @@ h1 {
   letter-spacing: -.01em;
   font-family: var(--font-sans);
   text-decoration: none;
-  transition: background .15s ease, border-color .15s ease;
+  transition: background .15s ease, border-color .15s ease, transform .16s var(--ease-out);
+}
+
+.btn:active { transform: scale(.97); }
+
+.btn:focus-visible, footer a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .btn-primary {
@@ -108,7 +141,6 @@ h1 {
   color: #fff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
 }
-.btn-primary:hover { background: var(--primary-hover); }
 .btn-primary:active { background: var(--primary-pressed); }
 
 .btn-ghost {
@@ -116,7 +148,11 @@ h1 {
   color: var(--text);
   border: 1px solid var(--border);
 }
-.btn-ghost:hover { border-color: #3a3a3a; background: #222; }
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-ghost:hover { border-color: #3a3a3a; background: #222; }
+}
 
 .chat {
   margin-top: 30px;
@@ -126,6 +162,7 @@ h1 {
   border-radius: 12px;
   padding: 6px 16px;
   text-align: left;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .35);
 }
 
 .msg {
@@ -135,7 +172,15 @@ h1 {
   padding: 6px 0;
   display: flex;
   gap: 10px;
+  animation: enter .4s var(--ease-out) both;
 }
+
+.msg:nth-child(1) { animation-delay: 300ms; }
+.msg:nth-child(2) { animation-delay: 350ms; }
+.msg:nth-child(3) { animation-delay: 410ms; }
+.msg:nth-child(4) { animation-delay: 460ms; }
+.msg:nth-child(5) { animation-delay: 520ms; }
+.msg:nth-child(6) { animation-delay: 570ms; }
 
 .msg + .msg { border-top: 1px solid #242424; }
 
@@ -159,8 +204,15 @@ footer {
   color: var(--faint);
 }
 
-footer a { color: var(--muted); text-decoration: none; }
-footer a:hover { color: var(--primary-light); }
+footer a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  footer a:hover { color: var(--primary-light); }
+}
 
 @media (max-width: 720px) {
   .avatar { width: 80px; height: 80px; }
@@ -169,6 +221,6 @@ footer a:hover { color: var(--primary-light); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  main { animation: none; }
-  .btn { transition: none; }
+  .avatar, h1, .lede, .cta, .chat, .msg, footer { animation: none; }
+  .btn { transition: background .15s ease, border-color .15s ease; }
 }
