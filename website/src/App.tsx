@@ -13,8 +13,10 @@ function App() {
         alt="Ace, a esfera azul do bot"
       />
 
-      <h1>Ace.</h1>
-      <p className="lede">utilidade e moderação pro seu servidor do Fluxer.</p>
+      <h1>Ace</h1>
+      <p className="lede">
+        organize e modere seu servidor do Fluxer com dezoito comandos em pt-BR.
+      </p>
 
       <div className="cta">
         <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
@@ -24,13 +26,6 @@ function App() {
           github
         </Button>
       </div>
-
-      <code className="pill">a.ajuda</code>
-
-      <span className="tag">
-        <i className="dot" />
-        online e estável
-      </span>
 
       <footer>
         <a href="https://github.com/horizzon3507">horizzon</a>
