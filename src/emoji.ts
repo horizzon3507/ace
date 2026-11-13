@@ -43,4 +43,6 @@ export const emoji = {
   userHeart: '<:userheartfill:1570190682222505989>',
   vipCrown: '<:vipcrownfill:1570190682222505990>',
   volumeMute: '<:volumemutefill:1570190682222505991>',
+  arrowLeft: '<:arrowleftfill:1566639260100997120>',
+  arrowRight: '<:arrowrightfill:1566639126151700482>',
 } as const;

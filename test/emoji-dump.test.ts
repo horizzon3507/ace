@@ -36,38 +36,38 @@ test('emojilist mostra 15 por página com nome e menção', async (t) => {
   const message = fixture.messages.at(-1)?.payload;
   const lines = (message?.embeds?.[0]?.description ?? '').split('\n');
   assert.equal(lines.length, 15);
-  assert.equal(lines[0], '<a:emoji_0:1000> `emoji_0` | Menção: `<a:emoji_0:1000>`');
-  assert.equal(lines[1], '<:emoji_1:1001> `emoji_1` | Menção: `<:emoji_1:1001>`');
+  assert.equal(lines[0], '<a:emoji_0:1000> `<a:emoji_0:1000>`');
+  assert.equal(lines[1], '<:emoji_1:1001> `<:emoji_1:1001>`');
   assert.equal(message?.embeds?.[0]?.footer?.text, 'Página 1 de 3 — 32 emojis no total');
 });
 
-test('emojilist reage com setas de navegação', async (t) => {
+test('emojilist reage com a seta de próxima página', async (t) => {
   const fixture = bot(32);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
   const reacted = fixture.transport.reactions.map((r) => r.emoji);
-  assert.ok(reacted.includes('⬅️') && reacted.includes('➡️'));
+  assert.deepEqual(reacted, ['<:arrowleftfill:1566639260100997120>']);
 });
 
-test('emojilist avança ao votar ⬅️', async (t) => {
-  const fixture = bot(32, ['⬅️']);
+test('emojilist avança uma página a cada voto na seta', async (t) => {
+  const fixture = bot(32, ['arrowleftfill', 'arrowleftfill']);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
   const payload = fixture.messages.at(-1)?.payload;
   const lines = (payload?.embeds?.[0]?.description ?? '').split('\n');
-  assert.match(lines[0], /^<a:emoji_15:1015> `emoji_15` \| Menção/);
-  assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 2 de 3/);
+  assert.match(lines[0], /^<a:emoji_30:1030> `<a:emoji_30:1030>`/);
+  assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 3 de 3/);
 });
 
-test('emojilist volta ao fim ao votar ➡️ na primeira página', async (t) => {
-  const fixture = bot(32, ['➡️']);
+test('emojilist volta à primeira página após a última', async (t) => {
+  const fixture = bot(32, ['arrowleftfill', 'arrowleftfill', 'arrowleftfill']);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
   const payload = fixture.messages.at(-1)?.payload;
-  assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 3 de 3/);
+  assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 1 de 3/);
 });
 
 test('emojilist servidor sem emojis avisa', async (t) => {

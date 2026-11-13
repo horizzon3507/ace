@@ -95,7 +95,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   assert.equal(page1?.description, 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...');
   assert.equal(page1?.footer?.text, 'Página 1 de 3 — Confira meus comandos');
 
-  votes.push('⬅️'); // ⬅️ avança (direção invertida de propósito)
+  votes.push('arrowleftfill'); // a seta avança (só próxima página)
   await fixture.tick(4000);
   assert.equal(await fixture.send('a.ajuda'), 'success');
   const page2 = fixture.messages.at(-1)?.payload.embeds?.[0];
@@ -103,7 +103,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   assert.equal(page2?.description, undefined);
   assert.equal(page2?.footer?.text, 'Página 2 de 3 — Confira meus comandos');
 
-  votes.push('⬅️');
+  votes.push('arrowleftfill');
   await fixture.tick(4000);
   assert.equal(await fixture.send('a.ajuda'), 'success');
   const page3 = fixture.messages.at(-1)?.payload.embeds?.[0];
@@ -120,7 +120,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
     assert.ok(field.value, 'ajuda listou comando sem descrição');
   }
   const reacted = fixture.transport.reactions.map((reaction) => reaction.emoji);
-  assert.ok(reacted.includes('⬅️') && reacted.includes('➡️'));
+  assert.ok(reacted.includes('<:arrowleftfill:1566639260100997120>'));
   assert.doesNotMatch(listed.join(' '), /hello/);
   assert.deepEqual(fixture.errors, []);
 });

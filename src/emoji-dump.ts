@@ -107,7 +107,7 @@ export async function replyEmojiList(ctx: AceContext): Promise<void> {
   for (let i = 0; i < count; i += 1) {
     const lines = emojis
       .slice(i * PAGE_SIZE, (i + 1) * PAGE_SIZE)
-      .map((item) => `${tag(item)} \`${item.name}\` | Menção: \`${tag(item)}\``);
+      .map((item) => `${tag(item)} \`${tag(item)}\``);
     pages.push(embed({
       color: brand.background,
       author: { name: `Emojis de ${guild?.name ?? 'este servidor'}`, iconURL: guild?.iconURL ?? undefined },
