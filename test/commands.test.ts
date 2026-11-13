@@ -100,6 +100,9 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   const home = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(home?.title, '<:home4fill:1570905409848344576> Ace');
   assert.match(home?.description ?? '', /Eu sou o \*\*Ace\*\*/);
+  assert.match(home?.description ?? '', /<:dot:1566664882068131840> \*\*Prefixo:\*\* `a\.`/);
+  assert.match(home?.description ?? '', /<:dot:1566664882068131840> \*\*Detentor:\*\*/);
+  assert.equal(home?.fields?.length ?? 0, 0); // sobre-mim é lista, não fields
   assert.equal(home?.footer?.text, 'Página 1 de 4 — Sobre mim');
 
   push('arrowrightfill'); // a seta avança (só próxima página)

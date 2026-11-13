@@ -71,14 +71,15 @@ export default defineCommand({
     const home = embed({
       color: brand.primary,
       title: `${ctx.emoji.home} Ace`,
-      description: 'Heey! Eu sou o **Ace**! Eu seguro a **moderação** com kicks, bans, timeouts e limpeza de mensagens, te conto tudo sobre **usuários** e este **servidor**, busco artes como **avatares** e **banners** e listo e empacoto os **emojis** daqui...',
-      fields: [
-        { name: `${ctx.emoji.settings} Prefixo`, value: `\`${p}\``, inline: true },
-        { name: `${ctx.emoji.commandline} Comandos`, value: `**${descriptions.size}**`, inline: true },
-        { name: `${ctx.emoji.information} Versão`, value: `\`${version}\``, inline: true },
-        { name: `${ctx.emoji.time} Acordado`, value: `há ${formatUptime(process.uptime())}`, inline: true },
-        { name: `${ctx.emoji.vipCrown} Detentor`, value: '<@1473035660161241245>', inline: true },
-      ],
+      description: [
+        'Heey! Eu sou o **Ace**! Eu seguro a **moderação** com kicks, bans, timeouts e limpeza de mensagens, te conto tudo sobre **usuários** e este **servidor**, busco artes como **avatares** e **banners** e listo e empacoto os **emojis** daqui...',
+        '',
+        `${ctx.emoji.dot} **Prefixo:** \`${p}\``,
+        `${ctx.emoji.dot} **Comandos:** **${descriptions.size}**`,
+        `${ctx.emoji.dot} **Versão:** \`${version}\``,
+        `${ctx.emoji.dot} **Acordado:** há ${formatUptime(process.uptime())}`,
+        `${ctx.emoji.dot} **Detentor:** <@1473035660161241245>`,
+      ].join('\n'),
       footer: { text: `Página 1 de ${total} — Sobre mim` },
     });
     const embeds: Embed[] = [

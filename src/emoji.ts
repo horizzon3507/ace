@@ -46,4 +46,5 @@ export const emoji = {
   arrowLeft: '<:arrowleftfill:1566639260100997120>',
   arrowRight: '<:arrowrightfill:1566639126151700482>',
   home: '<:home4fill:1570905409848344576>',
+  dot: '<:dot:1566664882068131840>',
 } as const;
