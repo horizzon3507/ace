@@ -7,15 +7,36 @@
   <meta name="description" content="Ace é um bot multifuncional pro Fluxer: utilidade e moderação com prefixo por servidor.">
   <meta property="og:title" content="Ace — bot do Fluxer">
   <meta property="og:description" content="Utilidade e moderação com prefixo por servidor. Adicione o Ace no seu servidor do Fluxer.">
+  <meta property="og:image" content="assets/ace-logo-fundo-escuro-1024.png">
   <link rel="icon" type="image/svg+xml" href="assets/ace.svg">
   <style>
+    /* Marca Ace: Ace Blue #648DE5 · Ink #171717 · Eye White #F1F1F1 · Online #34B878
+       Tipografia: Geist (fallback Inter/system-ui) · Geist Mono para comandos */
+    @font-face {
+      font-family: "Geist";
+      src: url("https://cdn.jsdelivr.net/npm/geist@1/dist/fonts/geist-sans/Geist-Variable.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Geist Mono";
+      src: url("https://cdn.jsdelivr.net/npm/geist@1/dist/fonts/geist-mono/GeistMono-Variable.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+
     :root {
       --primary: #648de5;
+      --primary-deep: #2d4780;
+      --primary-light: #9eb7e5;
       --bg: #171717;
       --surface: #1f1f1f;
       --border: #2a2a2a;
       --text: #f1f1f1;
-      --muted: #9a9a9a;
+      --muted: #8c919a;
+      --online: #34b878;
+      --font-sans: "Geist", "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
+      --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,13 +46,13 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Inter", "SF Pro Text", system-ui, -apple-system, sans-serif;
+      font-family: var(--font-sans);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 32px 24px;
+      padding: 28px 24px;
       text-align: center;
       animation: fade-in .6s ease-out both;
     }
@@ -41,38 +62,43 @@
       to { opacity: 1; transform: none; }
     }
 
-    .face {
-      width: 132px;
-      height: 132px;
-      border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 0 0 6px rgba(100, 141, 229, .12), 0 16px 48px rgba(100, 141, 229, .18);
-      animation: float 5s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-7px); }
+    .avatar {
+      width: 168px;
+      height: 168px;
+      object-fit: contain;
     }
 
     h1 {
-      margin-top: 22px;
-      font-size: 2.6rem;
-      font-weight: 800;
-      letter-spacing: -.02em;
+      margin-top: 6px;
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1.15;
+    }
+
+    .status {
+      margin-top: 6px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .status strong {
+      color: var(--online);
+      font-weight: 600;
     }
 
     .tagline {
-      margin-top: 6px;
+      margin-top: 14px;
       color: var(--muted);
-      font-size: 1rem;
-      max-width: 34em;
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 36em;
     }
 
     .tagline code {
-      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-family: var(--font-mono);
       font-size: .86em;
-      color: var(--primary);
+      color: var(--primary-light);
       background: rgba(100, 141, 229, .1);
       padding: 1px 6px;
       border-radius: 6px;
@@ -92,8 +118,9 @@
       gap: 8px;
       padding: 11px 22px;
       border-radius: 12px;
-      font-size: .95rem;
+      font-size: 15px;
       font-weight: 600;
+      font-family: var(--font-sans);
       text-decoration: none;
       transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
     }
@@ -118,19 +145,18 @@
     }
 
     .commands {
-      margin-top: 36px;
+      margin-top: 34px;
       display: grid;
       grid-template-columns: repeat(2, minmax(260px, 340px));
-      gap: 14px 40px;
+      gap: 16px 48px;
       text-align: left;
     }
 
     .group h2 {
-      font-size: .72rem;
-      font-weight: 700;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--primary);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .01em;
+      color: var(--primary-light);
       margin-bottom: 10px;
     }
 
@@ -141,47 +167,49 @@
       align-items: baseline;
       gap: 10px;
       padding: 3px 0;
-      font-size: .82rem;
+      font-size: 13px;
       color: var(--muted);
     }
 
     .group li code {
-      font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: .78rem;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
       color: var(--text);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 1px 7px;
-      min-width: 7.5em;
+      min-width: 8em;
       flex-shrink: 0;
     }
 
     footer {
-      margin-top: 34px;
-      font-size: .76rem;
-      color: #6a6a6a;
+      margin-top: 32px;
+      font-size: 12px;
+      letter-spacing: .01em;
+      color: #6a6f78;
     }
 
     footer a { color: var(--muted); text-decoration: none; }
-    footer a:hover { color: var(--primary); }
+    footer a:hover { color: var(--primary-light); }
 
     @media (max-width: 720px) {
       .commands { grid-template-columns: minmax(0, 340px); }
-      .face { width: 112px; height: 112px; }
-      h1 { font-size: 2.1rem; }
+      .avatar { width: 136px; height: 136px; }
+      h1 { font-size: 36px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .face, body { animation: none; }
+      body { animation: none; }
       .btn { transition: none; }
     }
   </style>
 </head>
 <body>
-  <img class="face" src="assets/ace-face.jpg" alt="Carinha do Ace">
+  <img class="avatar" src="assets/ace-avatar-animado.gif" alt="Ace, a esfera azul do bot">
 
   <h1>Ace</h1>
+  <p class="status"><strong>online</strong> e estável</p>
   <p class="tagline">Bot multifuncional pro <strong>Fluxer</strong> — utilidade e moderação. O prefixo padrão é <code>a.</code> e cada servidor troca o seu com <code>a.setprefix</code>.</p>
 
   <div class="cta">
