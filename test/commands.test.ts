@@ -98,7 +98,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
 
   assert.equal(await fixture.send('a.ajuda'), 'success');
   const home = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(home?.title, '<:ace:1566575966614990848> Ace');
+  assert.equal(home?.title, '<:home4fill:1570905409848344576> Ace');
   assert.match(home?.description ?? '', /Eu sou o \*\*Ace\*\*/);
   assert.equal(home?.footer?.text, 'Página 1 de 4 — Sobre mim');
 
@@ -122,7 +122,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   assert.equal(page3?.title, '<:globefill:1566571242956263426> Utilidades');
   assert.equal(page3?.footer?.text, 'Página 4 de 4 — Confira meus comandos');
 
-  push('ace'); // home leva de volta à página sobre o bot
+  push('home4fill'); // home leva de volta à página sobre o bot
   await flush();
   const backHome = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(backHome?.footer?.text, 'Página 1 de 4 — Sobre mim');
@@ -139,7 +139,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   }
   const reacted = fixture.transport.reactions.map((reaction) => reaction.emoji);
   assert.ok(reacted.includes('<:arrowrightfill:1566639126151700482>'));
-  assert.ok(reacted.includes('<:ace:1566575966614990848>'));
+  assert.ok(reacted.includes('<:home4fill:1570905409848344576>'));
   assert.doesNotMatch(listed.join(' '), /hello/);
   assert.deepEqual(fixture.errors, []);
 });

@@ -90,6 +90,8 @@ const fetchEmojis = async (ctx: AceContext, guildID: string) => {
     safe(() => ctx.resources.users.guild(guildID)),
     safe(() => ctx.resources.expressions.emojis(guildID)),
   ]);
+  // Recentes primeiro — snowflake cresce com o tempo, ordem desc por id.
+  emojis?.sort((a, b) => (BigInt(b.id) > BigInt(a.id) ? 1 : BigInt(b.id) < BigInt(a.id) ? -1 : 0));
   return { guild, emojis };
 };
 

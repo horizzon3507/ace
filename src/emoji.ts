@@ -45,5 +45,5 @@ export const emoji = {
   volumeMute: '<:volumemutefill:1570190682222505991>',
   arrowLeft: '<:arrowleftfill:1566639260100997120>',
   arrowRight: '<:arrowrightfill:1566639126151700482>',
-  home: '<:ace:1566575966614990848>',
+  home: '<:home4fill:1570905409848344576>',
 } as const;
