@@ -49,7 +49,7 @@ function App() {
       <nav>
         <div className="nav-bar">
           <a className="brand" href="/">
-            <img src="assets/ace.svg" alt="" width="18" height="18" />
+            <img src="assets/ace-face.png" alt="" width="22" height="22" />
             ace
           </a>
           <div className="nav-links">
@@ -71,10 +71,6 @@ function App() {
 
       <main>
         <header className="hero">
-          <a className="badge" href={REPO_URL}>
-            open source · AGPL-3.0 · v0.1.1{" "}
-            <span aria-hidden="true">↗</span>
-          </a>
           <h1>
             conheça o{" "}
             <img
@@ -195,17 +191,25 @@ function App() {
       <footer>
         <div className="foot-top">
           <div className="foot-brand">
-            <img src="assets/ace.svg" alt="" width="22" height="22" />
+            <img src="assets/ace-face.png" alt="" width="24" height="24" />
             <div>
               <span className="foot-name">ace</span>
               <span className="foot-tag">bot do fluxer, em pt-BR</span>
             </div>
           </div>
-          <div className="foot-links">
-            <a href={INVITE_URL}>convite</a>
-            <a href={REPO_URL}>github</a>
-            <a href="https://www.npmjs.com/package/yuzuha">yuzuha</a>
-            <a href="https://github.com/horizzon3507">horizzon</a>
+          <div className="foot-cols">
+            <div className="foot-col">
+              <span className="foot-h">produto</span>
+              <a href={INVITE_URL}>convite</a>
+              <a href="#comandos">comandos</a>
+              <a href="#por-dentro">por dentro</a>
+            </div>
+            <div className="foot-col">
+              <span className="foot-h">projeto</span>
+              <a href={REPO_URL}>github</a>
+              <a href="https://www.npmjs.com/package/yuzuha">yuzuha</a>
+              <a href="https://github.com/horizzon3507">horizzon</a>
+            </div>
           </div>
         </div>
         <div className="foot-bottom">
