@@ -31,6 +31,7 @@
   --font-sans: "Geist", "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --site-w: 720px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,21 +52,31 @@ body {
 
 a { -webkit-tap-highlight-color: transparent; }
 
-/* ————— nav translúcida (material Apple): blur + saturação, sem borda dura ————— */
+/* ————— nav flutuante: barra centralizada na largura do conteúdo ————— */
 
 nav {
   position: fixed;
-  top: 0;
+  top: 12px;
   left: 0;
   right: 0;
   z-index: 10;
   display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.nav-bar {
+  pointer-events: auto;
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 24px;
-  background: rgba(10, 10, 11, .68);
+  width: min(var(--site-w), calc(100% - 32px));
+  padding: 7px 8px 7px 14px;
+  background: rgba(19, 19, 21, .72);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--border);
+  border-radius: 14px;
 }
 
 .brand {
@@ -80,12 +91,33 @@ nav {
 }
 .brand img { display: block; border-radius: 4px; }
 
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .nav-link {
   color: var(--muted);
   font-size: 13px;
   text-decoration: none;
-  transition: color .15s ease;
+  padding: 5px 10px;
+  border-radius: 8px;
+  transition: color .15s ease, background .15s ease;
 }
+
+.nav-cta {
+  margin-left: 6px;
+  padding: 5px 12px;
+  border-radius: 9px;
+  background: var(--primary);
+  color: #0b0c10;
+  font-size: 13px;
+  font-weight: 550;
+  text-decoration: none;
+  transition: background .15s ease, transform .1s ease-out;
+}
+.nav-cta:active { transform: scale(.97); }
 
 /* ————— hero ————— */
 
@@ -183,7 +215,8 @@ h1 {
 @media (hover: hover) and (pointer: fine) {
   .btn-primary:hover { background: var(--primary-hover); }
   .btn-ghost:hover { border-color: var(--border-hover); background: var(--surface-hover); }
-  .nav-link:hover { color: var(--text); }
+  .nav-link:hover { color: var(--text); background: var(--surface-hover); }
+  .nav-cta:hover { background: var(--primary-hover); }
   footer a:hover { color: var(--text); }
 }
 
@@ -203,8 +236,12 @@ h1 {
 /* ————— seções ————— */
 
 section {
-  width: min(720px, 100%);
+  width: min(var(--site-w), 100%);
   padding: 0 24px;
+}
+
+section[id] {
+  scroll-margin-top: 84px;
 }
 
 .commands { margin: 72px 0 0; }
@@ -378,7 +415,7 @@ h3 {
 }
 
 footer {
-  width: min(720px, 100%);
+  width: min(var(--site-w), 100%);
   margin: 96px auto 0;
   padding: 26px 24px 32px;
   border-top: 1px solid var(--border);
@@ -446,5 +483,5 @@ footer {
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  nav { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .nav-bar { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }

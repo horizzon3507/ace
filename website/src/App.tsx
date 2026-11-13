@@ -44,13 +44,26 @@ function App() {
   return (
     <>
       <nav>
-        <a className="brand" href="/">
-          <img src="assets/ace.svg" alt="" width="18" height="18" />
-          ace
-        </a>
-        <a className="nav-link" href={REPO_URL}>
-          github
-        </a>
+        <div className="nav-bar">
+          <a className="brand" href="/">
+            <img src="assets/ace.svg" alt="" width="18" height="18" />
+            ace
+          </a>
+          <div className="nav-links">
+            <a className="nav-link" href="#comandos">
+              comandos
+            </a>
+            <a className="nav-link" href="#por-dentro">
+              por dentro
+            </a>
+            <a className="nav-link" href={REPO_URL}>
+              github
+            </a>
+            <a className="nav-cta" href={INVITE_URL}>
+              adicionar
+            </a>
+          </div>
+        </div>
       </nav>
 
       <main>
@@ -102,7 +115,7 @@ function App() {
           </div>
         </section>
 
-        <section className="commands" data-reveal>
+        <section className="commands" id="comandos" data-reveal>
           <h2>dezoito comandos</h2>
           <p className="section-lede">
             prefixo <code>a.</code> — cada servidor troca o seu com{" "}
@@ -123,7 +136,7 @@ function App() {
           ))}
         </section>
 
-        <section className="specs" data-reveal>
+        <section className="specs" id="por-dentro" data-reveal>
           <h2>por dentro</h2>
           <dl>
             <div>
