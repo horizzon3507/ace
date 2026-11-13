@@ -1,5 +1,4 @@
 import { Button } from "@ui-sdk/react/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip";
 
 const INVITE_URL =
   "https://web.fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120";
@@ -9,7 +8,7 @@ type Command = { name: string; hint: string };
 
 const GROUPS: { title: string; commands: Command[] }[] = [
   {
-    title: "Utilidade",
+    title: "utilidade",
     commands: [
       { name: "a.ajuda", hint: "lista os comandos" },
       { name: "a.ping", hint: "latência do bot" },
@@ -23,7 +22,7 @@ const GROUPS: { title: string; commands: Command[] }[] = [
     ],
   },
   {
-    title: "Moderação",
+    title: "moderação",
     commands: [
       { name: "a.kick", hint: "expulsa um membro" },
       { name: "a.ban", hint: "bane um membro" },
@@ -38,13 +37,11 @@ const GROUPS: { title: string; commands: Command[] }[] = [
   },
 ];
 
-function CommandChip({ name, hint }: Command) {
+function CommandRow({ name, hint }: Command) {
   return (
-    <li>
-      <Tooltip>
-        <TooltipTrigger render={<code className="chip" />}>{name}</TooltipTrigger>
-        <TooltipContent>{hint}</TooltipContent>
-      </Tooltip>
+    <li className="row">
+      <code>{name}</code>
+      <span>{hint}</span>
     </li>
   );
 }
@@ -58,31 +55,38 @@ function App() {
         alt="Ace, a esfera azul do bot"
       />
 
-      <h1>Ace</h1>
-      <p className="status">
-        <strong>online</strong> e estável
-      </p>
-      <p className="tagline">
-        Bot do Fluxer — utilidade e moderação. Prefixo <code>a.</code>, troca
-        com <code>a.setprefix</code>.
+      <h1>Ace.</h1>
+      <p className="lede">
+        utilidade e moderação pro seu servidor do Fluxer. um prefixo, dezoito
+        comandos.
       </p>
 
       <div className="cta">
         <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
-          Adicionar ao servidor
+          adicionar ao servidor
         </Button>
         <Button className="btn btn-ghost" render={<a href={REPO_URL} />}>
-          GitHub
+          github
         </Button>
       </div>
 
-      <div className="commands">
+      <code className="pill">a.ajuda</code>
+
+      <span className="tag">
+        <i className="dot" />
+        online e estável
+      </span>
+
+      <div className="panels">
         {GROUPS.map((group) => (
-          <section className="group" key={group.title}>
-            <h2>{group.title}</h2>
+          <section className="panel" key={group.title}>
+            <header>
+              <h2>{group.title}</h2>
+              <span className="count">{group.commands.length}</span>
+            </header>
             <ul>
               {group.commands.map((command) => (
-                <CommandChip key={command.name} {...command} />
+                <CommandRow key={command.name} {...command} />
               ))}
             </ul>
           </section>
@@ -90,8 +94,11 @@ function App() {
       </div>
 
       <footer>
-        <a href="https://github.com/horizzon3507">horizzon</a> ·{" "}
-        <a href="https://www.npmjs.com/package/yuzuha">Yuzuha</a> · v0.1.1-alpha
+        <a href="https://github.com/horizzon3507">horizzon</a>
+        <span>·</span>
+        <a href="https://www.npmjs.com/package/yuzuha">yuzuha</a>
+        <span>·</span>
+        <span>v0.1.1-alpha</span>
       </footer>
     </main>
   );
