@@ -16,13 +16,30 @@ const makeEmojis = (count: number) => Array.from({ length: count }, (_, i) => ({
 
 const guild = { id: '7', name: 'Ace', ownerID: '1', iconURL: null, bannerURL: null, memberCount: 3, createdTimestamp: 0 };
 
+// Drena a cadeia de promises do paginador em background (tick só roda o scheduler).
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+// Fila de votos: awaitReaction espera até o teste empurrar um clique, como o
+// coletor real espera o gateway. Fila esgotada = escuta pendente (paginador vivo).
+function voteQueue(initial: string[] = []) {
+  const queue = [...initial];
+  const waiters: (() => void)[] = [];
+  return {
+    push(emoji: string) { queue.push(emoji); waiters.shift()?.(); },
+    collectors: {
+      awaitReaction: async () => {
+        while (queue.length === 0) await new Promise<void>((resolve) => waiters.push(resolve));
+        return { userID: 'u1', emoji: queue.shift()!, messageID: '1' };
+      },
+    },
+  };
+}
+
 function bot(count: number, votes: string[] = []) {
   const resources: MockResourceOverrides = {
     expressions: { emojis: async () => makeEmojis(count) },
     users: { guild: async () => guild },
-    collectors: {
-      collectReactions: async function* () { for (const vote of votes) yield { userID: 'u1', emoji: vote, messageID: '1' }; },
-    },
+    collectors: voteQueue(votes).collectors,
     messages: { removeReaction: async () => undefined, clearReactions: async () => undefined },
   };
   return createTestBot({ prefix: 'a.', commands: [emojilist, emojidump, iddrop], emoji, authorization: 'off', resources });
@@ -47,14 +64,15 @@ test('emojilist reage com a seta de próxima página', async (t) => {
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
   const reacted = fixture.transport.reactions.map((r) => r.emoji);
-  assert.deepEqual(reacted, ['<:arrowleftfill:1566639260100997120>']);
+  assert.deepEqual(reacted, ['<:arrowrightfill:1566639126151700482>']);
 });
 
 test('emojilist avança uma página a cada voto na seta', async (t) => {
-  const fixture = bot(32, ['arrowleftfill', 'arrowleftfill']);
+  const fixture = bot(32, ['arrowrightfill', 'arrowrightfill']);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
+  await flush();
   const payload = fixture.messages.at(-1)?.payload;
   const lines = (payload?.embeds?.[0]?.description ?? '').split('\n');
   assert.match(lines[0], /^<a:emoji_30:1030> `<a:emoji_30:1030>`/);
@@ -62,10 +80,11 @@ test('emojilist avança uma página a cada voto na seta', async (t) => {
 });
 
 test('emojilist volta à primeira página após a última', async (t) => {
-  const fixture = bot(32, ['arrowleftfill', 'arrowleftfill', 'arrowleftfill']);
+  const fixture = bot(32, ['arrowrightfill', 'arrowrightfill', 'arrowrightfill']);
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.emojilist'), 'success');
+  await flush();
   const payload = fixture.messages.at(-1)?.payload;
   assert.match(payload?.embeds?.[0]?.footer?.text ?? '', /Página 1 de 3/);
 });

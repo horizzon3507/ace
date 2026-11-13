@@ -27,6 +27,9 @@ function bot(resources?: MockResourceOverrides) {
   return createTestBot({ prefix: 'a.', commands, emoji, resources });
 }
 
+// Drena a cadeia de promises do paginador em background (tick só roda o scheduler).
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
 test('PREFIX define o prefixo e cai em a. quando falta', (t) => {
   const previous = process.env.PREFIX;
   t.after(() => { previous === undefined ? delete process.env.PREFIX : process.env.PREFIX = previous; });
@@ -78,11 +81,15 @@ test('mensagem sem o prefixo é ignorada', async (t) => {
 });
 
 test('ajuda pagina as categorias com uma página cada', async (t) => {
-  const votes: string[] = [];
+  const queue: string[] = [];
+  const waiters: (() => void)[] = [];
+  const push = (emoji: string) => { queue.push(emoji); waiters.shift()?.(); };
   const fixture = bot({
     collectors: {
-      collectReactions: async function* () {
-        for (const vote of votes) yield { userID: 'u1', emoji: vote, messageID: '1' };
+      // awaitReaction espera o teste empurrar um clique, como o gateway faria.
+      awaitReaction: async () => {
+        while (queue.length === 0) await new Promise<void>((resolve) => waiters.push(resolve));
+        return { userID: 'u1', emoji: queue.shift()!, messageID: '1' };
       },
     },
     messages: { removeReaction: async () => undefined, clearReactions: async () => undefined },
@@ -95,17 +102,15 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   assert.equal(page1?.description, 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...');
   assert.equal(page1?.footer?.text, 'Página 1 de 3 — Confira meus comandos');
 
-  votes.push('arrowleftfill'); // a seta avança (só próxima página)
-  await fixture.tick(4000);
-  assert.equal(await fixture.send('a.ajuda'), 'success');
+  push('arrowrightfill'); // a seta avança (só próxima página)
+  await flush();
   const page2 = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(page2?.title, '<:globefill:1566571242956263426> Artes & Emojis');
   assert.equal(page2?.description, undefined);
   assert.equal(page2?.footer?.text, 'Página 2 de 3 — Confira meus comandos');
 
-  votes.push('arrowleftfill');
-  await fixture.tick(4000);
-  assert.equal(await fixture.send('a.ajuda'), 'success');
+  push('arrowrightfill');
+  await flush();
   const page3 = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(page3?.title, '<:userforbidfill:1566644852504932352> Moderação');
 
@@ -120,7 +125,7 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
     assert.ok(field.value, 'ajuda listou comando sem descrição');
   }
   const reacted = fixture.transport.reactions.map((reaction) => reaction.emoji);
-  assert.ok(reacted.includes('<:arrowleftfill:1566639260100997120>'));
+  assert.ok(reacted.includes('<:arrowrightfill:1566639126151700482>'));
   assert.doesNotMatch(listed.join(' '), /hello/);
   assert.deepEqual(fixture.errors, []);
 });
