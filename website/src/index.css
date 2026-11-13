@@ -184,7 +184,7 @@ h1 {
   .btn-primary:hover { background: var(--primary-hover); }
   .btn-ghost:hover { border-color: var(--border-hover); background: var(--surface-hover); }
   .nav-link:hover { color: var(--text); }
-  footer a:hover { color: var(--primary-light); }
+  footer a:hover { color: var(--text); }
 }
 
 /* ————— entrada do hero: stagger não-uniforme ————— */
@@ -378,20 +378,49 @@ h3 {
 }
 
 footer {
-  margin-top: 72px;
-  padding: 0 24px 36px;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--faint);
+  width: min(720px, 100%);
+  margin: 96px auto 0;
+  padding: 26px 24px 32px;
+  border-top: 1px solid var(--border);
 }
 
-footer a {
+.foot-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.foot-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.foot-brand img { display: block; border-radius: 5px; }
+.foot-brand > div { display: flex; flex-direction: column; }
+.foot-name { font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+.foot-tag { font-size: 12px; color: var(--faint); margin-top: 1px; }
+
+.foot-links {
+  display: flex;
+  gap: 18px;
+}
+.foot-links a {
+  font-size: 13px;
   color: var(--muted);
   text-decoration: none;
   transition: color .15s ease;
+}
+
+.foot-bottom {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--faint);
 }
 
 /* ————— responsivo ————— */
@@ -405,6 +434,7 @@ footer a {
   .specs dl { grid-template-columns: 1fr 1fr; }
   .specs dl > div:nth-child(odd) { border-left: none; }
   .specs dl > div:nth-child(n + 3) { border-top: 1px solid var(--border); }
+  .foot-top { flex-direction: column; }
 }
 
 /* ————— movimento reduzido: sem deslocamento, só cor/opacidade ————— */

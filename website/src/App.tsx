@@ -154,11 +154,25 @@ function App() {
       </main>
 
       <footer>
-        <a href="https://github.com/horizzon3507">horizzon</a>
-        <span>·</span>
-        <a href="https://www.npmjs.com/package/yuzuha">yuzuha</a>
-        <span>·</span>
-        <span>v0.1.1-alpha</span>
+        <div className="foot-top">
+          <div className="foot-brand">
+            <img src="assets/ace.svg" alt="" width="22" height="22" />
+            <div>
+              <span className="foot-name">ace</span>
+              <span className="foot-tag">bot do fluxer, em pt-BR</span>
+            </div>
+          </div>
+          <div className="foot-links">
+            <a href={INVITE_URL}>convite</a>
+            <a href={REPO_URL}>github</a>
+            <a href="https://www.npmjs.com/package/yuzuha">yuzuha</a>
+            <a href="https://github.com/horizzon3507">horizzon</a>
+          </div>
+        </div>
+        <div className="foot-bottom">
+          <span>AGPL-3.0</span>
+          <span>v0.1.1-alpha</span>
+        </div>
       </footer>
     </>
   );
