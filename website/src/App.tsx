@@ -10,6 +10,7 @@ const GROUPS: { label: string; commands: { name: string; desc: string }[] }[] = 
     commands: [
       { name: "a.kick", desc: "expulsa um membro" },
       { name: "a.ban", desc: "bane um membro" },
+      { name: "a.softban", desc: "expulsa e limpa mensagens recentes" },
       { name: "a.unban", desc: "desfaz um ban" },
       { name: "a.timeout", desc: "silencia por até 28 dias" },
       { name: "a.lock", desc: "tranca o canal" },
@@ -19,23 +20,25 @@ const GROUPS: { label: string; commands: { name: string; desc: string }[] }[] = 
     ],
   },
   {
-    label: "utilidade",
+    label: "informações",
     commands: [
       { name: "a.ajuda", desc: "lista todos os comandos" },
       { name: "a.ping", desc: "latência do ace" },
       { name: "a.uptime", desc: "tempo acordado" },
-      { name: "a.avatar", desc: "avatar seu ou de outro usuário" },
-      { name: "a.userbanner", desc: "banner de usuário" },
+      { name: "a.setprefix", desc: "troca o prefixo do ace no servidor" },
       { name: "a.userinfo", desc: "infos de usuário" },
-      { name: "a.guildicon", desc: "ícone do servidor" },
-      { name: "a.guildbanner", desc: "banner do servidor" },
       { name: "a.guildinfo", desc: "infos do servidor" },
     ],
   },
   {
-    label: "servidor",
+    label: "utilidades",
     commands: [
-      { name: "a.setprefix", desc: "troca o prefixo do ace no servidor" },
+      { name: "a.avatar", desc: "avatar seu ou de outro usuário" },
+      { name: "a.userbanner", desc: "banner de usuário" },
+      { name: "a.guildicon", desc: "ícone do servidor" },
+      { name: "a.guildbanner", desc: "banner do servidor" },
+      { name: "a.emojilist", desc: "lista os emojis do servidor" },
+      { name: "a.emojidump", desc: "empacota os emojis num zip" },
     ],
   },
 ];
@@ -78,8 +81,8 @@ function App() {
             <h1>Ace</h1>
           </div>
           <p className="lede">
-            moderação e utilidade pro seu servidor do fluxer: dezoito comandos
-            em pt-br, com prefixo por servidor.
+            moderação e utilidade pro seu servidor do fluxer: vinte e um
+            comandos em pt-br, com prefixo por servidor.
           </p>
           <div className="cta">
             <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
@@ -90,7 +93,7 @@ function App() {
             </Button>
           </div>
           <p className="hero-meta">
-            18 comandos · prefixo por servidor · v0.1.1-alpha
+            21 comandos · prefixo por servidor · v0.1.1
           </p>
         </header>
 
@@ -118,7 +121,7 @@ function App() {
               <div className="card-inner">
                 <span className="num">03</span>
                 <p>
-                  <code>a.ajuda</code> mostra os dezoito comandos
+                  <code>a.ajuda</code> mostra os vinte e um comandos
                 </p>
               </div>
             </div>
@@ -126,7 +129,7 @@ function App() {
         </section>
 
         <section className="commands" id="comandos" data-reveal>
-          <h2>dezoito comandos</h2>
+          <h2>vinte e um comandos</h2>
           <p className="section-lede">
             prefixo <code>a.</code> por padrão; cada servidor define o seu com{" "}
             <code>a.setprefix</code>.
