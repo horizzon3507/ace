@@ -68,17 +68,20 @@ function App() {
 
       <main>
         <header className="hero">
+          <span className="eyebrow">bot do fluxer</span>
           <div className="lockup">
-            <img
-              className="avatar"
-              src="assets/ace-avatar-animado.png"
-              alt="Ace, a esfera azul do bot"
-            />
+            <span className="avatar-frame">
+              <img
+                className="avatar"
+                src="assets/ace-avatar-animado.png"
+                alt="Ace, a esfera azul do bot"
+              />
+            </span>
             <h1>Ace</h1>
           </div>
           <p className="lede">
-            moderação e utilidade pro seu servidor do Fluxer — dezoito comandos,
-            em pt-BR, com prefixo por servidor.
+            moderação e utilidade pro seu servidor do fluxer: dezoito comandos
+            em pt-br, com prefixo por servidor.
           </p>
           <div className="cta">
             <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
@@ -88,29 +91,38 @@ function App() {
               github
             </Button>
           </div>
+          <p className="hero-meta">
+            18 comandos · prefixo por servidor · v0.1.1-alpha
+          </p>
         </header>
 
         <section className="steps" data-reveal>
           <h2>em três passos</h2>
           <div className="steps-grid">
             <div className="step">
-              <span className="num">01</span>
-              <p>
-                <strong>adiciona o ace</strong> ao servidor pelo convite
-              </p>
+              <div className="card-inner">
+                <span className="num">01</span>
+                <p>
+                  <strong>adiciona o ace</strong> ao servidor pelo convite
+                </p>
+              </div>
             </div>
             <div className="step">
-              <span className="num">02</span>
-              <p>
-                troca o prefixo com <code>a.setprefix</code> — ou fica no{" "}
-                <code>a.</code>
-              </p>
+              <div className="card-inner">
+                <span className="num">02</span>
+                <p>
+                  troca o prefixo com <code>a.setprefix</code>, ou mantém o{" "}
+                  <code>a.</code>
+                </p>
+              </div>
             </div>
             <div className="step">
-              <span className="num">03</span>
-              <p>
-                <code>a.ajuda</code> mostra os dezoito comandos
-              </p>
+              <div className="card-inner">
+                <span className="num">03</span>
+                <p>
+                  <code>a.ajuda</code> mostra os dezoito comandos
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -118,7 +130,7 @@ function App() {
         <section className="commands" id="comandos" data-reveal>
           <h2>dezoito comandos</h2>
           <p className="section-lede">
-            prefixo <code>a.</code> — cada servidor troca o seu com{" "}
+            prefixo <code>a.</code> por padrão; cada servidor define o seu com{" "}
             <code>a.setprefix</code>.
           </p>
           {GROUPS.map((group) => (
@@ -127,8 +139,10 @@ function App() {
               <div className="grid">
                 {group.commands.map((command) => (
                   <div className="cmd" key={command.name}>
-                    <code>{command.name}</code>
-                    <p>{command.desc}</p>
+                    <div className="card-inner">
+                      <code>{command.name}</code>
+                      <p>{command.desc}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -138,7 +152,8 @@ function App() {
 
         <section className="specs" id="por-dentro" data-reveal>
           <h2>por dentro</h2>
-          <dl>
+          <div className="frame">
+            <dl>
             <div>
               <dt>framework</dt>
               <dd>yuzuha</dd>
@@ -155,7 +170,8 @@ function App() {
               <dt>licença</dt>
               <dd>AGPL-3.0</dd>
             </div>
-          </dl>
+            </dl>
+          </div>
         </section>
 
         <section className="end" data-reveal>

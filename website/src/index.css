@@ -140,16 +140,40 @@ main {
   padding: 96px 24px 64px;
 }
 
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--primary-light);
+  margin-bottom: 26px;
+}
+
 .lockup {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 22px;
+}
+
+.avatar-frame {
+  display: block;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
 }
 
 .avatar {
-  width: 104px;
-  height: 104px;
+  display: block;
+  width: 88px;
+  height: 88px;
+  padding: 8px;
+  box-sizing: border-box;
   object-fit: contain;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
 }
 
 h1 {
@@ -175,6 +199,14 @@ h1 {
   display: flex;
   gap: 10px;
   justify-content: center;
+}
+
+.hero-meta {
+  margin-top: 26px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: .04em;
+  color: var(--faint);
 }
 
 /* ————— botões pill ————— */
@@ -222,12 +254,14 @@ h1 {
 
 /* ————— entrada do hero: stagger não-uniforme ————— */
 
-.hero .lockup, .hero .lede, .hero .cta {
+.hero .eyebrow, .hero .lockup, .hero .lede, .hero .cta, .hero .hero-meta {
   animation: enter .55s var(--ease-out) both;
 }
-.hero .lockup { animation-delay: 0ms; }
-.hero .lede { animation-delay: 110ms; }
-.hero .cta { animation-delay: 160ms; }
+.hero .eyebrow { animation-delay: 0ms; }
+.hero .lockup { animation-delay: 70ms; }
+.hero .lede { animation-delay: 140ms; }
+.hero .cta { animation-delay: 190ms; }
+.hero .hero-meta { animation-delay: 240ms; }
 
 @keyframes enter {
   from { opacity: 0; transform: translateY(10px); }
@@ -289,13 +323,25 @@ h3 {
   gap: 8px;
 }
 
-.cmd {
+/* card duplo (estilo altare.sh): moldura surface + miolo recuado */
+
+.cmd, .step {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 14px;
-  transition: border-color .15s ease, background .15s ease;
+  border-radius: 16px;
+  padding: 6px;
+  transition: border-color .15s ease;
 }
+
+.card-inner {
+  height: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  transition: transform .15s var(--ease-out), border-color .15s ease;
+}
+
+.cmd .card-inner { padding: 11px 13px; }
 
 .cmd code {
   font-size: 12px;
@@ -310,7 +356,11 @@ h3 {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .cmd:hover { border-color: var(--border-hover); background: var(--surface-hover); }
+  .cmd:hover, .step:hover { border-color: var(--border-hover); }
+  .cmd:hover .card-inner, .step:hover .card-inner {
+    transform: translateY(-1px);
+    border-color: var(--border-hover);
+  }
 }
 
 /* ————— passos ————— */
@@ -322,12 +372,7 @@ h3 {
   gap: 8px;
 }
 
-.step {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-}
+.step .card-inner { padding: 14px 15px; }
 
 .step .num {
   font-family: var(--font-mono);
@@ -354,13 +399,20 @@ h3 {
 
 /* ————— specs ————— */
 
-.specs dl {
+.specs .frame {
   margin-top: 26px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  padding: 6px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 18px;
+}
+
+.specs dl {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -464,7 +516,7 @@ footer {
 
 @media (max-width: 720px) {
   .lockup { flex-direction: column; gap: 16px; }
-  .avatar { width: 88px; height: 88px; }
+  .avatar { width: 72px; height: 72px; }
   .hero { padding: 84px 20px 48px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
   .steps-grid { grid-template-columns: 1fr; }
@@ -477,7 +529,7 @@ footer {
 /* ————— movimento reduzido: sem deslocamento, só cor/opacidade ————— */
 
 @media (prefers-reduced-motion: reduce) {
-  .hero .lockup, .hero .lede, .hero .cta { animation: none; }
+  .hero .eyebrow, .hero .lockup, .hero .lede, .hero .cta, .hero .hero-meta { animation: none; }
   [data-reveal] { animation: none !important; }
   .btn { transition: background .15s ease, border-color .15s ease; }
 }
