@@ -50,6 +50,7 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 | `a.emojidump` | | Anexa um zip com todos os emojis do servidor. |
 | `a.kick` | `<usuário> [motivo]` | Expulsa um membro do servidor. |
 | `a.ban` | `<usuário> [motivo]` | Bane um membro do servidor. |
+| `a.softban` | `<usuário> [motivo]` | Expulsa um membro e limpa as mensagens recentes dele. |
 | `a.unban` | `<usuário> [motivo]` | Remove o banimento de um usuário. |
 | `a.timeout` | `<usuário> <duração> [motivo]` | Silencia um membro temporariamente (até 28 dias). |
 | `a.lock` | `[canal] [motivo]` | Tranca o canal para novas mensagens. |
@@ -60,7 +61,7 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 
 `usuário` aceita menção, ID ou nome (nome resolve por busca no servidor; no `a.unban`, na lista de bans). Sem argumento, `a.avatar`, `a.userbanner` e `a.userinfo` mostram o seu.
 
-`a.guildicon`, `a.guildbanner`, `a.userinfo`, `a.guildinfo`, `a.emojilist`, `a.emojidump`, `a.kick`, `a.ban`, `a.unban`, `a.timeout`, `a.lock`, `a.unlock`, `a.clear`, `a.purge` e `a.setprefix` só rodam dentro de um servidor. `a.kick`, `a.ban` e `a.unban` pedem a permissão equivalente; `a.timeout` pede Moderar Membros; `a.lock` e `a.unlock` pedem Gerenciar Cargos; `a.clear` e `a.purge` pedem Gerenciar Mensagens; `a.setprefix` pede Gerenciar Servidor.
+`a.guildicon`, `a.guildbanner`, `a.userinfo`, `a.guildinfo`, `a.emojilist`, `a.emojidump`, `a.kick`, `a.ban`, `a.softban`, `a.unban`, `a.timeout`, `a.lock`, `a.unlock`, `a.clear`, `a.purge` e `a.setprefix` só rodam dentro de um servidor. `a.kick`, `a.ban`, `a.softban` e `a.unban` pedem a permissão equivalente; `a.timeout` pede Moderar Membros; `a.lock` e `a.unlock` pedem Gerenciar Cargos; `a.clear` e `a.purge` pedem Gerenciar Mensagens; `a.setprefix` pede Gerenciar Servidor.
 
 ## Dados
 

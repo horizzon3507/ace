@@ -29,13 +29,18 @@ Só chamamos algo de **stable** quando é pra valer.
 
 </details>
 
-## v0.1.1-alpha · 06/11/2026
+## v0.1.1-stable · 13/11/2026
 
-Segundo corte em desenvolvimento do bot do Fluxer — ainda em construção, ainda não é release. Esta versão foi feita para CLI com canal de release alpha em 06/11/2026 (v0.1.1-alpha).
+Primeira versão estável do bot do Fluxer — dez comandos novos, listas paginadas por reação e deploy automático. Esta versão foi feita para CLI com canal de release stable em 13/11/2026 (v0.1.1-stable).
 
-- Informação `a.userinfo` (embed com conta criada, entrada no servidor, cargos e silenciamento) e `a.guildinfo` (dono, membros e criação do servidor).
-- Limpeza `a.clear` (últimas n mensagens do canal, 1–99 incluindo a do comando) e `a.purge` (mensagens recentes de um membro, padrão 10 e máximo 99); as duas exigem Gerenciar Mensagens.
-- Moderação `a.timeout` com duração `10m`/`2h`/`1d` até 28 dias, exigindo Moderar Membros, e `a.unban` por menção, ID ou nome da lista de bans, exigindo Banir Membros; os dois registram caso numerado.
+- Informação `a.userinfo` (conta criada, tag, pronomes, entrada no servidor, cargos, hierarquia e silenciamento) e `a.guildinfo` (dono, membros, criação do servidor, recursos e diagnóstico das permissões do bot).
+- Limpeza `a.clear` (últimas n mensagens do canal, 1–99 incluindo a do comando) e `a.purge` (mensagens recentes de um membro, padrão 10 e máximo 99); as duas exigem Gerenciar Mensagens e a confirmação se apaga em segundos.
+- Moderação `a.timeout` com duração `10m`/`2h`/`1d` até 28 dias, exigindo Moderar Membros; `a.unban` por menção, ID ou nome da lista de bans; e `a.softban`, que expulsa e limpa as mensagens recentes sem manter o ban — exigindo Banir Membros.
+- Emojis `a.emojilist` (lista paginada por reação, mais recentes primeiro), `a.emojidump` (zip com todos os emojis anexado na mesma mensagem) e `a.iddrop` (menções em linha reta pra cópia, oculto e restrito ao dono do bot).
+- `a.ajuda` paginado por reação: primeira página de apresentação do Ace e categorias Moderação, Informações e Utilidades. O paginador navega com ◀, ▶ e home, muda a barra por página e deixa só as reações do bot.
+- `a.lock` e `a.unlock` também cobrem canais de voz e anúncios.
+- Correção: `a.userbanner` lê o banner pelo endpoint de perfil.
+- O bot se auto-atualiza quando a branch `main` muda no GitHub (deploy watch) e o hot-reload cobre mais módulos sem reiniciar.
 
 ## v0.1.0-alpha · 03/11/2026
 
