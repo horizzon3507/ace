@@ -74,11 +74,11 @@ export default defineCommand({
       description: [
         'Heey! Eu sou o **Ace**! Eu seguro a **moderação** com kicks, bans, timeouts e limpeza de mensagens, te conto tudo sobre **usuários** e este **servidor**, busco artes como **avatares** e **banners** e listo e empacoto os **emojis** daqui...',
         '',
-        `${ctx.emoji.dot} **Prefixo:** \`${p}\``,
-        `${ctx.emoji.dot} **Comandos:** **${descriptions.size}**`,
-        `${ctx.emoji.dot} **Versão:** \`${version}\``,
-        `${ctx.emoji.dot} **Acordado:** há ${formatUptime(process.uptime())}`,
-        `${ctx.emoji.dot} **Detentor:** <@1473035660161241245>`,
+        `${ctx.emoji.dot} Prefixo: \`${p}\``,
+        `${ctx.emoji.dot} Comandos: **${descriptions.size}**`,
+        `${ctx.emoji.dot} Versão: \`${version}\``,
+        `${ctx.emoji.dot} Acordado: há ${formatUptime(process.uptime())}`,
+        `${ctx.emoji.dot} Detentor: <@1473035660161241245>`,
       ].join('\n'),
       footer: { text: `Página 1 de ${total} — Sobre mim` },
     });

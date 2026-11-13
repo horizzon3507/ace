@@ -12,7 +12,7 @@ export const emoji = {
   settings: '<:settingsfill:1566639634983690240>',
   unlock: '<:lockunlockfill:1567331836965687296>',
   unban: '<:lockunlockfill:1567331836965687296>',
-  purge: '<:logoutboxfill:1566645144776605696>',
+  purge: '<:eraserfill:1570908590410047488>',
   idCard: '<:idcardfill:1570190660303060996>',
   accountBox: '<:accountboxfill:1570190638933086208>',
   accountCircle: '<:accountcirclefill:1570190638933086209>',
