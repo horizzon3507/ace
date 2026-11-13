@@ -31,8 +31,12 @@ export async function startPaginator(ctx: AceContext, pages: readonly Embed[], t
     for await (const vote of votes) {
       if (vote.emoji !== ARROW_NAME) continue;
       page = (page + 1) % pages.length;
-      await safe(() => ctx.edit(id, { embeds: [pages[page]] }));
-      await safe(() => ctx.resources.messages.removeReaction(ctx.channelID, id, vote.emoji, vote.userID));
+      // edit e remove em paralelo; a tag resolve name:id sem listar os
+      // emojis da guild (nome puro faria um GET a mais por clique).
+      await Promise.allSettled([
+        ctx.edit(id, { embeds: [pages[page]] }),
+        ctx.resources.messages.removeReaction(ctx.channelID, id, tag, vote.userID),
+      ]);
     }
   } catch {
     // Sem coletor neste contexto — fica só a primeira página.
