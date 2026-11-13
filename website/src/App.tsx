@@ -70,13 +70,11 @@ function App() {
         <header className="hero">
           <span className="eyebrow">bot do fluxer</span>
           <div className="lockup">
-            <span className="avatar-frame">
-              <img
-                className="avatar"
-                src="assets/ace-avatar-animado.png"
-                alt="Ace, a esfera azul do bot"
-              />
-            </span>
+            <img
+              className="avatar"
+              src="assets/ace-avatar-animado.png"
+              alt="Ace, a esfera azul do bot"
+            />
             <h1>Ace</h1>
           </div>
           <p className="lede">

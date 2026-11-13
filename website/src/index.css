@@ -156,24 +156,11 @@ main {
   gap: 22px;
 }
 
-.avatar-frame {
-  display: block;
-  padding: 6px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-}
-
 .avatar {
   display: block;
-  width: 88px;
-  height: 88px;
-  padding: 8px;
-  box-sizing: border-box;
+  width: 96px;
+  height: 96px;
   object-fit: contain;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 18px;
 }
 
 h1 {
@@ -328,8 +315,8 @@ h3 {
 .cmd, .step {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 6px;
+  border-radius: 14px;
+  padding: 4px;
   transition: border-color .15s ease;
 }
 
@@ -337,7 +324,7 @@ h3 {
   height: 100%;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 10px;
   transition: transform .15s var(--ease-out), border-color .15s ease;
 }
 
@@ -401,10 +388,10 @@ h3 {
 
 .specs .frame {
   margin-top: 26px;
-  padding: 6px;
+  padding: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 16px;
 }
 
 .specs dl {
@@ -516,7 +503,7 @@ footer {
 
 @media (max-width: 720px) {
   .lockup { flex-direction: column; gap: 16px; }
-  .avatar { width: 72px; height: 72px; }
+  .avatar { width: 80px; height: 80px; }
   .hero { padding: 84px 20px 48px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
   .steps-grid { grid-template-columns: 1fr; }
