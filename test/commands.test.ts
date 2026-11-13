@@ -105,21 +105,21 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   push('arrowrightfill'); // a seta avança (só próxima página)
   await flush();
   const page1 = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(page1?.title, '<:information2fill:1566640356991184896> Informações');
+  assert.equal(page1?.title, '<:userforbidfill:1566644852504932352> Moderação');
   assert.equal(page1?.description, undefined);
   assert.equal(page1?.footer?.text, 'Página 2 de 4 — Confira meus comandos');
 
   push('arrowrightfill');
   await flush();
   const page2 = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(page2?.title, '<:globefill:1566571242956263426> Artes & Emojis');
+  assert.equal(page2?.title, '<:information2fill:1566640356991184896> Informações');
   assert.equal(page2?.description, undefined);
   assert.equal(page2?.footer?.text, 'Página 3 de 4 — Confira meus comandos');
 
   push('arrowrightfill');
   await flush();
   const page3 = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(page3?.title, '<:userforbidfill:1566644852504932352> Moderação');
+  assert.equal(page3?.title, '<:globefill:1566571242956263426> Utilidades');
   assert.equal(page3?.footer?.text, 'Página 4 de 4 — Confira meus comandos');
 
   push('ace'); // home leva de volta à página sobre o bot

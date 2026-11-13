@@ -185,17 +185,30 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
   const missing = downloadable.length - entries.length;
   const done = `${emoji.happy} Empacotei **${entries.length}** ${noun(entries.length, 'emoji', 'emojis')} em \`${filename}\`!${missing > 0 ? ` ${missing} ficaram de fora por falha no download...` : ''}`;
   // Anexo na própria mensagem: upload presignado + edit via client nativo.
-  const edited = await safe(async () => {
-    const client = ctx.client;
-    if (!client?.isReady()) throw new Error('client não está pronto');
-    const channel = await client.channels.resolve(ctx.channelID);
-    if (!channel.isTextBased()) throw new Error('canal sem texto');
-    const uploaded = await channel.uploadAttachmentsForSend([{ id: 0, filename, data: zip, contentType: 'application/zip' }]);
-    const message = await channel.messages.resolve(waiting);
-    await message.edit({ content: done, attachments: uploaded.map((item) => ({ id: item.id, uploadFilename: item.upload_filename, filename: item.filename })) });
-    return true;
-  });
+  // Confere o anexo de volta — um PATCH que ignora upload_filename não pode
+  // contar como sucesso, senão o zip some sem deixar rastro.
+  let nativeError: unknown;
+  const edited = await (async () => {
+    try {
+      const client = ctx.client;
+      if (!client?.isReady()) throw new Error('client não está pronto');
+      const channel = await client.channels.resolve(ctx.channelID);
+      if (!channel.isTextBased()) throw new Error('canal sem texto');
+      const uploaded = await channel.uploadAttachmentsForSend([{ id: 0, filename, data: zip, contentType: 'application/zip' }]);
+      const message = await channel.messages.resolve(waiting);
+      const updated = await message.edit({ content: done, attachments: uploaded.map((item) => ({ id: item.id, uploadFilename: item.upload_filename, filename: item.filename })) });
+      if (updated.attachments.size > 0) return true;
+      throw new Error('edição não anexou o arquivo');
+    } catch (error) {
+      nativeError = error;
+      return false;
+    }
+  })();
   if (edited) return;
+  const nativeCode = (nativeError as { code?: string } | undefined)?.code;
+  if (nativeError && nativeCode !== 'NATIVE_UNAVAILABLE') {
+    console.warn('[emojidump] anexo na mensagem falhou, caindo pro envio separado:', nativeError);
+  }
   // Sem client nativo: edita o texto e manda o zip em mensagem separada.
   await ctx.edit(waiting, done);
   if (ctx.sendStream) {

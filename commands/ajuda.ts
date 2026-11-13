@@ -9,9 +9,9 @@ type EmojiKey = keyof typeof catalog;
 type Category = { icon: EmojiKey; label: string; commands: readonly string[] };
 
 const categories: Category[] = [
-  { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
-  { icon: 'globe', label: 'Artes & Emojis', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
   { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
+  { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
+  { icon: 'globe', label: 'Utilidades', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
 ];
 
 // Ícone por comando quando um encaixa melhor que o da categoria.
@@ -71,7 +71,7 @@ export default defineCommand({
     const home = embed({
       color: brand.primary,
       title: `${ctx.emoji.home} Ace`,
-      description: 'Heey! Eu sou o **Ace**! Eu te conto tudo sobre **usuários** e este **servidor**, busco artes como **avatares** e **banners**, listo e empacoto os **emojis** daqui e seguro a **moderação** com kicks, bans, timeouts e limpeza de mensagens...',
+      description: 'Heey! Eu sou o **Ace**! Eu seguro a **moderação** com kicks, bans, timeouts e limpeza de mensagens, te conto tudo sobre **usuários** e este **servidor**, busco artes como **avatares** e **banners** e listo e empacoto os **emojis** daqui...',
       fields: [
         { name: `${ctx.emoji.settings} Prefixo`, value: `\`${p}\``, inline: true },
         { name: `${ctx.emoji.commandline} Comandos`, value: `**${descriptions.size}**`, inline: true },
