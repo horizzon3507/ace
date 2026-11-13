@@ -9,7 +9,7 @@ type EmojiKey = keyof typeof catalog;
 type Category = { icon: EmojiKey; label: string; commands: readonly string[] };
 
 const categories: Category[] = [
-  { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
+  { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'softban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
   { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
   { icon: 'globe', label: 'Utilidades', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
 ];
@@ -20,7 +20,7 @@ const commandIcons: Record<string, EmojiKey> = {
   userinfo: 'accountCircle', guildinfo: 'idCard',
   avatar: 'accountBox', userbanner: 'stickyNote', guildicon: 'medal', guildbanner: 'shining',
   emojilist: 'sparkling', emojidump: 'sparkling',
-  kick: 'kick', ban: 'ban', lock: 'lock', unlock: 'unlock',
+  kick: 'kick', ban: 'ban', softban: 'ban', lock: 'lock', unlock: 'unlock',
   clear: 'purge', purge: 'purge', timeout: 'time', unban: 'unban',
 };
 

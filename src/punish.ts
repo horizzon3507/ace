@@ -2,7 +2,7 @@ import { formatDuration, GuardError, isGuardReason, MAX_TIMEOUT_MS, parseDuratio
 import type { AceContext } from './context.js';
 import { moderationReason as bundledReason, resolveBanTarget as bundledBanResolve, resolveTarget as bundledResolve } from './resolve.js';
 
-export type Punishment = 'kick' | 'ban' | 'timeout' | 'unban';
+export type Punishment = 'kick' | 'ban' | 'softban' | 'timeout' | 'unban';
 
 export type ModerationDeps = {
   resolveTarget: typeof bundledResolve;
@@ -13,6 +13,7 @@ export type ModerationDeps = {
 const copy = {
   kick: { past: 'expulso', fail: 'expulsar', mark: 'kick', perm: 'Expulsar membros' },
   ban: { past: 'banido', fail: 'banir', mark: 'ban', perm: 'Banir membros' },
+  softban: { past: 'expulso', fail: 'expulsar', mark: 'ban', perm: 'Banir membros' },
   timeout: { past: 'silenciado', fail: 'silenciar', mark: 'time', perm: 'Moderar membros' },
   unban: { past: 'desbanido', fail: 'desbanir', mark: 'unban', perm: 'Banir membros' },
 } as const;
@@ -94,6 +95,10 @@ export function bindModeration(deps: ModerationDeps) {
     const name = target.label ?? id;
     try {
       if (action === 'ban') await ctx.mod.ban(id, { reason });
+      else if (action === 'softban') {
+        await ctx.mod.ban(id, { reason, deleteMessageDays: 7 });
+        await ctx.mod.unban(id, { reason });
+      }
       else if (action === 'timeout') await ctx.mod.timeout(id, { reason, duration: timeoutMs });
       else if (action === 'unban') await ctx.mod.unban(id, { reason });
       else await ctx.mod.kick(id, { reason });
@@ -101,7 +106,9 @@ export function bindModeration(deps: ModerationDeps) {
         ? `**${name}** foi **${spec.past}** por **${formatDuration(timeoutMs)}**`
         : action === 'unban'
           ? `**${name}** foi **${spec.past}** do servidor`
-          : `**${name}** foi ${spec.past} do servidor`;
+          : action === 'softban'
+            ? `**${name}** foi ${spec.past} do servidor e teve as mensagens recentes limpas`
+            : `**${name}** foi ${spec.past} do servidor`;
       await ctx.reply(`${emoji[spec.mark]} ${headline}.\n-# ╰ Motivo: ${reason} | ID: ${id}`);
     } catch (error) {
       if (error instanceof GuardError) {

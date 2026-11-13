@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createTestBot } from 'yuzuha/testing';
 import kick from '../commands/kick.js';
 import ban from '../commands/ban.js';
+import softban from '../commands/softban.js';
 import { emoji } from '../src/emoji.js';
 
 // MockTransport: autor '1' é dono/Admin rank 100, bot '999' rank 90, alvo '2' rank 1.
@@ -18,7 +19,7 @@ function memberish(id: string) {
 function bot() {
   return createTestBot({
     prefix: 'a.',
-    commands: [kick, ban],
+    commands: [kick, ban, softban],
     emoji,
     resources: {
       users: {
@@ -135,6 +136,19 @@ test('falha da API propaga como erro honesto', async (t) => {
   assert.equal(await fixture.send('a.ban <@2> spam'), 'error');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Não foi possível concluir o comando/);
   assert.ok(fixture.errors.length >= 1);
+});
+
+test('softban bane e desbane em sequência pra limpar mensagens', async (t) => {
+  const fixture = bot();
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.softban <@2> spam'), 'success');
+  const actions = fixture.transport.actions;
+  assert.equal(actions.at(-2)?.action, 'ban');
+  assert.equal(actions.at(-2)?.targetID, '2');
+  assert.equal(actions.at(-1)?.action, 'unban');
+  assert.equal(actions.at(-1)?.targetID, '2');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /foi expulso do servidor e teve as mensagens recentes limpas/);
 });
 
 test('kick sem motivo usa o default e registra caso', async (t) => {
