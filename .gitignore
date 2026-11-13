@@ -42,3 +42,10 @@ skills-lock.json
 
 # Project
 /data/
+
+# Website (Vite)
+website/node_modules/
+website/dist/
+website/.vite/
+website/.agents/
+website/skills-lock.json
