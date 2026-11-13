@@ -55,12 +55,14 @@ function App() {
 
       <main>
         <header className="hero">
-          <img
-            className="avatar"
-            src="assets/ace-avatar-animado.png"
-            alt="Ace, a esfera azul do bot"
-          />
-          <h1>Ace</h1>
+          <div className="lockup">
+            <img
+              className="avatar"
+              src="assets/ace-avatar-animado.png"
+              alt="Ace, a esfera azul do bot"
+            />
+            <h1>Ace</h1>
+          </div>
           <p className="lede">
             moderação e utilidade pro seu servidor do Fluxer — dezoito comandos,
             em pt-BR, com prefixo por servidor.
@@ -74,6 +76,31 @@ function App() {
             </Button>
           </div>
         </header>
+
+        <section className="steps" data-reveal>
+          <h2>em três passos</h2>
+          <div className="steps-grid">
+            <div className="step">
+              <span className="num">01</span>
+              <p>
+                <strong>adiciona o ace</strong> ao servidor pelo convite
+              </p>
+            </div>
+            <div className="step">
+              <span className="num">02</span>
+              <p>
+                troca o prefixo com <code>a.setprefix</code> — ou fica no{" "}
+                <code>a.</code>
+              </p>
+            </div>
+            <div className="step">
+              <span className="num">03</span>
+              <p>
+                <code>a.ajuda</code> mostra os dezoito comandos
+              </p>
+            </div>
+          </div>
+        </section>
 
         <section className="commands" data-reveal>
           <h2>dezoito comandos</h2>
@@ -94,6 +121,28 @@ function App() {
               </div>
             </div>
           ))}
+        </section>
+
+        <section className="specs" data-reveal>
+          <h2>por dentro</h2>
+          <dl>
+            <div>
+              <dt>framework</dt>
+              <dd>yuzuha</dd>
+            </div>
+            <div>
+              <dt>runtime</dt>
+              <dd>node 22.21+</dd>
+            </div>
+            <div>
+              <dt>linguagem</dt>
+              <dd>typescript</dd>
+            </div>
+            <div>
+              <dt>licença</dt>
+              <dd>AGPL-3.0</dd>
+            </div>
+          </dl>
         </section>
 
         <section className="end" data-reveal>

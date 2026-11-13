@@ -108,15 +108,20 @@ main {
   padding: 96px 24px 64px;
 }
 
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .avatar {
-  width: 112px;
-  height: 112px;
+  width: 104px;
+  height: 104px;
   object-fit: contain;
-  margin-bottom: 22px;
 }
 
 h1 {
-  font-size: clamp(52px, 9vw, 84px);
+  font-size: clamp(56px, 8vw, 76px);
   font-weight: 650;
   letter-spacing: -.045em;
   line-height: 1;
@@ -184,11 +189,10 @@ h1 {
 
 /* ————— entrada do hero: stagger não-uniforme ————— */
 
-.hero .avatar, .hero h1, .hero .lede, .hero .cta {
+.hero .lockup, .hero .lede, .hero .cta {
   animation: enter .55s var(--ease-out) both;
 }
-.hero .avatar { animation-delay: 0ms; }
-.hero h1 { animation-delay: 60ms; }
+.hero .lockup { animation-delay: 0ms; }
 .hero .lede { animation-delay: 110ms; }
 .hero .cta { animation-delay: 160ms; }
 
@@ -203,7 +207,9 @@ section {
   padding: 0 24px;
 }
 
-.commands { margin: 24px 0 0; }
+.commands { margin: 72px 0 0; }
+.steps { margin: 72px 0 0; }
+.specs { margin: 88px 0 0; }
 
 h2 {
   font-size: clamp(24px, 4vw, 30px);
@@ -270,6 +276,76 @@ h3 {
   .cmd:hover { border-color: var(--border-hover); background: var(--surface-hover); }
 }
 
+/* ————— passos ————— */
+
+.steps-grid {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.step .num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.step p {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.step strong { color: var(--text); font-weight: 550; }
+.step code {
+  font-family: var(--font-mono);
+  font-size: .9em;
+  color: var(--primary-light);
+  background: rgba(100, 141, 229, .13);
+  border-radius: 5px;
+  padding: 0 5px;
+}
+
+/* ————— specs ————— */
+
+.specs dl {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.specs dl > div {
+  padding: 16px 18px;
+}
+.specs dl > div + div { border-left: 1px solid var(--border); }
+
+.specs dt {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.specs dd {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 550;
+  letter-spacing: -.01em;
+}
+
 /* ————— reveal on scroll (scroll-driven animation, degradado p/ visível) ————— */
 
 @supports (animation-timeline: view()) {
@@ -287,7 +363,7 @@ h3 {
 /* ————— CTA final + footer ————— */
 
 .end {
-  margin: 64px 0 0;
+  margin: 88px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -321,15 +397,20 @@ footer a {
 /* ————— responsivo ————— */
 
 @media (max-width: 720px) {
-  .avatar { width: 92px; height: 92px; }
+  .lockup { flex-direction: column; gap: 16px; }
+  .avatar { width: 88px; height: 88px; }
   .hero { padding: 84px 20px 48px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+  .steps-grid { grid-template-columns: 1fr; }
+  .specs dl { grid-template-columns: 1fr 1fr; }
+  .specs dl > div:nth-child(odd) { border-left: none; }
+  .specs dl > div:nth-child(n + 3) { border-top: 1px solid var(--border); }
 }
 
 /* ————— movimento reduzido: sem deslocamento, só cor/opacidade ————— */
 
 @media (prefers-reduced-motion: reduce) {
-  .hero .avatar, .hero h1, .hero .lede, .hero .cta { animation: none; }
+  .hero .lockup, .hero .lede, .hero .cta { animation: none; }
   [data-reveal] { animation: none !important; }
   .btn { transition: background .15s ease, border-color .15s ease; }
 }
