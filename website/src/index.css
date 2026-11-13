@@ -118,6 +118,38 @@ h1 {
 }
 .btn-ghost:hover { border-color: #3a3a3a; background: #222; }
 
+.chat {
+  margin-top: 30px;
+  width: min(360px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px 16px;
+  text-align: left;
+}
+
+.msg {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 6px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.msg + .msg { border-top: 1px solid #242424; }
+
+.msg .who {
+  flex: 0 0 44px;
+  font-weight: 500;
+}
+
+.msg-user .who { color: var(--muted); }
+.msg-user { color: var(--text); }
+
+.msg-ace .who { color: var(--primary); }
+.msg-ace { color: var(--muted); }
+
 footer {
   margin-top: 40px;
   display: flex;
