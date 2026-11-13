@@ -2,6 +2,8 @@ import { defineCommand, embed, type Embed } from 'yuzuha';
 import type { emoji as catalog } from '../src/emoji.js';
 import { guildPrefix } from '../src/guild-prefix.js';
 import { brand, prefix, startPaginator } from '../src/live.js';
+import { version } from '../src/version.js';
+import { formatUptime } from './uptime.js';
 
 type EmojiKey = keyof typeof catalog;
 type Category = { icon: EmojiKey; label: string; commands: readonly string[] };
@@ -65,15 +67,29 @@ export default defineCommand({
     }
     if (rest.length) pages.push({ label: 'Outros', icon: 'happy', fields: rest });
 
-    const embeds: Embed[] = pages.map((page, i) => embed({
+    const total = pages.length + 1;
+    const home = embed({
       color: brand.primary,
-      title: `${ctx.emoji[page.icon]} ${page.label}`,
-      description: i === 0
-        ? 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...'
-        : undefined,
-      fields: page.fields,
-      footer: { text: `Página ${i + 1} de ${pages.length} — Confira meus comandos` },
-    }));
+      title: `${ctx.emoji.home} Ace`,
+      description: 'Heey! Eu sou o **Ace**! Eu te conto tudo sobre **usuários** e este **servidor**, busco artes como **avatares** e **banners**, listo e empacoto os **emojis** daqui e seguro a **moderação** com kicks, bans, timeouts e limpeza de mensagens...',
+      fields: [
+        { name: `${ctx.emoji.settings} Prefixo`, value: `\`${p}\``, inline: true },
+        { name: `${ctx.emoji.commandline} Comandos`, value: `**${descriptions.size}**`, inline: true },
+        { name: `${ctx.emoji.information} Versão`, value: `\`${version}\``, inline: true },
+        { name: `${ctx.emoji.time} Acordado`, value: `há ${formatUptime(process.uptime())}`, inline: true },
+        { name: `${ctx.emoji.vipCrown} Detentor`, value: '<@1473035660161241245>', inline: true },
+      ],
+      footer: { text: `Página 1 de ${total} — Sobre mim` },
+    });
+    const embeds: Embed[] = [
+      home,
+      ...pages.map((page, i) => embed({
+        color: brand.primary,
+        title: `${ctx.emoji[page.icon]} ${page.label}`,
+        fields: page.fields,
+        footer: { text: `Página ${i + 2} de ${total} — Confira meus comandos` },
+      })),
+    ];
     await startPaginator(ctx, embeds);
   },
 });

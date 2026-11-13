@@ -97,22 +97,35 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   t.after(() => fixture.destroy());
 
   assert.equal(await fixture.send('a.ajuda'), 'success');
-  const page1 = fixture.messages.at(-1)?.payload.embeds?.[0];
-  assert.equal(page1?.title, '<:information2fill:1566640356991184896> Informações');
-  assert.equal(page1?.description, 'Heey! Estes são os **meus comandos**. Não é uma lista infinita, é **uma lista útil**...');
-  assert.equal(page1?.footer?.text, 'Página 1 de 3 — Confira meus comandos');
+  const home = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(home?.title, '<:ace:1566575966614990848> Ace');
+  assert.match(home?.description ?? '', /Eu sou o \*\*Ace\*\*/);
+  assert.equal(home?.footer?.text, 'Página 1 de 4 — Sobre mim');
 
   push('arrowrightfill'); // a seta avança (só próxima página)
+  await flush();
+  const page1 = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(page1?.title, '<:information2fill:1566640356991184896> Informações');
+  assert.equal(page1?.description, undefined);
+  assert.equal(page1?.footer?.text, 'Página 2 de 4 — Confira meus comandos');
+
+  push('arrowrightfill');
   await flush();
   const page2 = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(page2?.title, '<:globefill:1566571242956263426> Artes & Emojis');
   assert.equal(page2?.description, undefined);
-  assert.equal(page2?.footer?.text, 'Página 2 de 3 — Confira meus comandos');
+  assert.equal(page2?.footer?.text, 'Página 3 de 4 — Confira meus comandos');
 
   push('arrowrightfill');
   await flush();
   const page3 = fixture.messages.at(-1)?.payload.embeds?.[0];
   assert.equal(page3?.title, '<:userforbidfill:1566644852504932352> Moderação');
+  assert.equal(page3?.footer?.text, 'Página 4 de 4 — Confira meus comandos');
+
+  push('ace'); // home leva de volta à página sobre o bot
+  await flush();
+  const backHome = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(backHome?.footer?.text, 'Página 1 de 4 — Sobre mim');
 
   const listed = [page1, page2, page3].flatMap((page) =>
     (page?.fields ?? []).map((field) => /`a\.(\w+)`$/.exec(field.name)?.[1] ?? ''));
