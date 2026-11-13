@@ -57,7 +57,7 @@ function App() {
         <header className="hero">
           <img
             className="avatar"
-            src="assets/ace-avatar-animado.gif"
+            src="assets/ace-avatar-animado.png"
             alt="Ace, a esfera azul do bot"
           />
           <h1>Ace</h1>

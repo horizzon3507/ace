@@ -20,11 +20,11 @@
   --primary-hover: #7ba0ec;
   --primary-pressed: #5374c9;
   --primary-light: #9eb7e5;
-  --bg: #171717;
-  --surface: #1d1d1d;
-  --surface-hover: #202020;
-  --border: #2a2a2a;
-  --border-hover: #383838;
+  --bg: #0a0a0b;
+  --surface: #131315;
+  --surface-hover: #17171a;
+  --border: #232326;
+  --border-hover: #303034;
   --text: #f1f1f1;
   --muted: #9ba1ab;
   --faint: #5b6475;
@@ -40,9 +40,7 @@ html, body, #root { min-height: 100%; }
 ::selection { background: rgba(100, 141, 229, .32); }
 
 body {
-  background:
-    linear-gradient(180deg, #1a1a1e 0%, var(--bg) 72%) no-repeat,
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 15px;
@@ -65,7 +63,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 14px 24px;
-  background: rgba(23, 23, 23, .68);
+  background: rgba(10, 10, 11, .68);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
@@ -110,24 +108,11 @@ main {
   padding: 96px 24px 64px;
 }
 
-/* a esfera emite a luz do hero — glow centrado no avatar */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(circle 190px at 50% 30%, rgba(100, 141, 229, .22), transparent 100%),
-    radial-gradient(ellipse 52% 40% at 50% 38%, rgba(100, 141, 229, .08), transparent 70%);
-}
-
 .avatar {
   width: 112px;
   height: 112px;
   object-fit: contain;
   margin-bottom: 22px;
-  mix-blend-mode: lighten;
 }
 
 h1 {
