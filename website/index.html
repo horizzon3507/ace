@@ -27,7 +27,6 @@
 
     :root {
       --primary: #648de5;
-      --primary-deep: #2d4780;
       --primary-light: #9eb7e5;
       --bg: #171717;
       --surface: #1f1f1f;
@@ -52,33 +51,31 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 28px 24px;
+      padding: 20px;
       text-align: center;
-      animation: fade-in .6s ease-out both;
+      animation: fade-in .5s ease-out both;
     }
 
     @keyframes fade-in {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: none; }
     }
 
     .avatar {
-      width: 168px;
-      height: 168px;
+      width: 112px;
+      height: 112px;
       object-fit: contain;
     }
 
     h1 {
-      margin-top: 6px;
-      font-size: 48px;
+      margin-top: 2px;
+      font-size: 30px;
       font-weight: 700;
       letter-spacing: -.01em;
-      line-height: 1.15;
     }
 
     .status {
-      margin-top: 6px;
-      font-size: 14px;
+      font-size: 12px;
       color: var(--muted);
     }
 
@@ -88,41 +85,39 @@
     }
 
     .tagline {
-      margin-top: 14px;
+      margin-top: 8px;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 13.5px;
       line-height: 1.5;
-      max-width: 36em;
+      max-width: 34em;
     }
 
     .tagline code {
       font-family: var(--font-mono);
-      font-size: .86em;
+      font-size: .88em;
       color: var(--primary-light);
       background: rgba(100, 141, 229, .1);
-      padding: 1px 6px;
-      border-radius: 6px;
+      padding: 1px 5px;
+      border-radius: 5px;
     }
 
     .cta {
-      margin-top: 22px;
+      margin-top: 16px;
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 10px;
       justify-content: center;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 11px 22px;
-      border-radius: 12px;
-      font-size: 15px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
       font-weight: 600;
       font-family: var(--font-sans);
       text-decoration: none;
-      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
     }
 
     .btn-primary {
@@ -130,8 +125,8 @@
       color: #fff;
     }
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(100, 141, 229, .35);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(100, 141, 229, .35);
     }
 
     .btn-ghost {
@@ -141,67 +136,70 @@
     }
     .btn-ghost:hover {
       background: #252525;
-      transform: translateY(-2px);
+      transform: translateY(-1px);
     }
 
     .commands {
-      margin-top: 34px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(260px, 340px));
-      gap: 16px 48px;
+      margin-top: 24px;
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .group {
       text-align: left;
+      max-width: 320px;
     }
 
     .group h2 {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       letter-spacing: .01em;
       color: var(--primary-light);
-      margin-bottom: 10px;
+      margin-bottom: 7px;
     }
 
-    .group ul { list-style: none; }
-
-    .group li {
+    .group ul {
+      list-style: none;
       display: flex;
-      align-items: baseline;
-      gap: 10px;
-      padding: 3px 0;
-      font-size: 13px;
-      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 5px;
     }
 
     .group li code {
       font-family: var(--font-mono);
-      font-size: 12.5px;
+      font-size: 11.5px;
       color: var(--text);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 1px 7px;
-      min-width: 8em;
-      flex-shrink: 0;
+      padding: 2px 7px;
+      cursor: default;
+      transition: border-color .15s ease;
     }
 
+    .group li code:hover { border-color: var(--primary-light); }
+
     footer {
-      margin-top: 32px;
-      font-size: 12px;
-      letter-spacing: .01em;
-      color: #6a6f78;
+      margin-top: 24px;
+      font-size: 11px;
+      color: #5b6475;
     }
 
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--primary-light); }
 
     @media (max-width: 720px) {
-      .commands { grid-template-columns: minmax(0, 340px); }
-      .avatar { width: 136px; height: 136px; }
-      h1 { font-size: 36px; }
+      .commands { flex-direction: column; gap: 14px; align-items: center; }
+      .group { max-width: 340px; width: 100%; }
+      .avatar { width: 92px; height: 92px; }
+      h1 { font-size: 26px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       body { animation: none; }
-      .btn { transition: none; }
+      .btn, .group li code { transition: none; }
     }
   </style>
 </head>
@@ -210,7 +208,7 @@
 
   <h1>Ace</h1>
   <p class="status"><strong>online</strong> e estável</p>
-  <p class="tagline">Bot multifuncional pro <strong>Fluxer</strong> — utilidade e moderação. O prefixo padrão é <code>a.</code> e cada servidor troca o seu com <code>a.setprefix</code>.</p>
+  <p class="tagline">Bot do Fluxer — utilidade e moderação. Prefixo <code>a.</code>, troca com <code>a.setprefix</code>.</p>
 
   <div class="cta">
     <a class="btn btn-primary" href="https://web.fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120">Adicionar ao servidor</a>
@@ -221,35 +219,35 @@
     <section class="group">
       <h2>Utilidade</h2>
       <ul>
-        <li><code>a.ajuda</code>lista os comandos</li>
-        <li><code>a.ping</code>latência do bot</li>
-        <li><code>a.uptime</code>tempo acordado</li>
-        <li><code>a.avatar</code>avatar seu ou de alguém</li>
-        <li><code>a.userbanner</code>banner seu ou de alguém</li>
-        <li><code>a.guildicon</code>ícone do servidor</li>
-        <li><code>a.guildbanner</code>banner do servidor</li>
-        <li><code>a.userinfo</code>infos suas ou de alguém</li>
-        <li><code>a.guildinfo</code>infos do servidor</li>
+        <li><code title="lista os comandos">a.ajuda</code></li>
+        <li><code title="latência do bot">a.ping</code></li>
+        <li><code title="tempo acordado">a.uptime</code></li>
+        <li><code title="avatar seu ou de alguém">a.avatar</code></li>
+        <li><code title="banner seu ou de alguém">a.userbanner</code></li>
+        <li><code title="ícone do servidor">a.guildicon</code></li>
+        <li><code title="banner do servidor">a.guildbanner</code></li>
+        <li><code title="infos suas ou de alguém">a.userinfo</code></li>
+        <li><code title="infos do servidor">a.guildinfo</code></li>
       </ul>
     </section>
     <section class="group">
       <h2>Moderação</h2>
       <ul>
-        <li><code>a.kick</code>expulsa um membro</li>
-        <li><code>a.ban</code>bane um membro</li>
-        <li><code>a.unban</code>remove o ban</li>
-        <li><code>a.timeout</code>silencia temporariamente</li>
-        <li><code>a.lock</code>tranca o canal</li>
-        <li><code>a.unlock</code>destranca o canal</li>
-        <li><code>a.clear</code>apaga as últimas mensagens</li>
-        <li><code>a.purge</code>apaga msgs de um membro</li>
-        <li><code>a.setprefix</code>troca o prefixo do servidor</li>
+        <li><code title="expulsa um membro">a.kick</code></li>
+        <li><code title="bane um membro">a.ban</code></li>
+        <li><code title="remove o ban">a.unban</code></li>
+        <li><code title="silencia temporariamente">a.timeout</code></li>
+        <li><code title="tranca o canal">a.lock</code></li>
+        <li><code title="destranca o canal">a.unlock</code></li>
+        <li><code title="apaga as últimas mensagens">a.clear</code></li>
+        <li><code title="apaga msgs de um membro">a.purge</code></li>
+        <li><code title="troca o prefixo do servidor">a.setprefix</code></li>
       </ul>
     </section>
   </div>
 
   <footer>
-    feito por <a href="https://github.com/horizzon3507">horizzon</a> em cima do <a href="https://www.npmjs.com/package/yuzuha">Yuzuha</a> · v0.1.1-alpha
+    <a href="https://github.com/horizzon3507">horizzon</a> · <a href="https://www.npmjs.com/package/yuzuha">Yuzuha</a> · v0.1.1-alpha
   </footer>
 </body>
 </html>
