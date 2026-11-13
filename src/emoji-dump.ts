@@ -85,9 +85,22 @@ const tag = (item: EmojiInfo) => `<${item.animated ? 'a' : ''}:${item.name}:${it
 const extOf = (item: EmojiInfo): string =>
   item.url?.match(/\.(png|gif|webp|apng|jpe?g)(?:[?#]|$)/i)?.[1]?.toLowerCase() ?? (item.animated ? 'gif' : 'png');
 
+// Mesma regra do fixAnimatedAssetUrl da yuzuha: hash a_* em .png aponta pro .gif.
+const fixGif = (url?: string | null) => url?.replace(/\/(a_[^/.]+)\.png(\?|$)/, '/$1.gif$2') ?? null;
+
 const fetchEmojis = async (ctx: AceContext, guildID: string) => {
   const [guild, emojis] = await Promise.all([
-    safe(() => ctx.resources.users.guild(guildID)),
+    safe(async () => {
+      // guilds.resolve bate no cache do gateway: nome+ícone sem REST extra.
+      // A porta (users.guild) sempre faz fetch force — só serve de fallback.
+      const client = ctx.client;
+      if (client?.isReady()) {
+        const g = await client.guilds.resolve(guildID);
+        return { name: g.name, iconURL: fixGif(g.iconURL()) };
+      }
+      const info = await ctx.resources.users.guild(guildID);
+      return info ? { name: info.name, iconURL: info.iconURL } : null;
+    }),
     safe(() => ctx.resources.expressions.emojis(guildID)),
   ]);
   // Recentes primeiro — snowflake cresce com o tempo, ordem desc por id.

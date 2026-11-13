@@ -1,4 +1,4 @@
-import { EmbedBuilder } from '@fluxerjs/core';
+import { EmbedBuilder, Message, ReactionCollector } from '@fluxerjs/core';
 import type { Embed } from 'yuzuha';
 import type { AceContext } from './context.js';
 
@@ -63,12 +63,26 @@ function toBuilder(e: Embed): EmbedBuilder {
   return b;
 }
 
+type Ops = {
+  react(tag: string): Promise<unknown>;
+  edit(page: Embed): Promise<unknown>;
+  removeVote(tag: string, userID: string): Promise<unknown>;
+  wipe(): Promise<unknown>;
+};
+
+// Cada método da Message nativa é uma request só — sem fetchMessage prévio.
+const nativeOps = (msg: Message): Ops => ({
+  react: (tag) => msg.react(tag),
+  edit: (page) => msg.edit({ embeds: [toBuilder(page)] }),
+  removeVote: (tag, userID) => msg.removeReaction(tag, userID),
+  wipe: () => msg.removeAllReactions(),
+});
+
 /**
- * Operações sobre a mensagem do paginador. As portas (ctx.edit/react/messages)
- * fazem fetchMessage ANTES de cada chamada — REST a dobro. Com a Message
- * nativa resolvida uma única vez, cada operação é uma request só.
+ * Fallback das portas pra quando a Message nativa não está acessível (testes).
+ * Tenta resolver a nativa uma vez; se der, volta a custar uma request por op.
  */
-async function makeOps(ctx: AceContext, id: string) {
+async function makeOps(ctx: AceContext, id: string): Promise<Ops> {
   const msg = await safe(async () => {
     const client = ctx.client;
     if (!client?.isReady()) return null;
@@ -85,15 +99,64 @@ async function makeOps(ctx: AceContext, id: string) {
       wipe: () => ctx.resources.messages.clearReactions(ctx.channelID, id),
     };
   }
+  return nativeOps(msg);
+}
+
+type Vote = { emoji: string; userID: string };
+type VoteSource = { next(): Promise<Vote | null>; close(): void };
+
+/**
+ * Um ReactionCollector único pra sessão inteira: o dedup dele por user+emoji
+ * vive em `collected` — soltar a chave no handler deixa o mesmo clique valer
+ * de novo. Sem collector novo nem listeners rearmados a cada voto.
+ */
+function nativeVotes(msg: Message, authorID: string, timeoutMs: number): VoteSource {
+  const wanted = new Set(NAMES);
+  const queue: (Vote | null)[] = [];
+  let wake: (() => void) | undefined;
+  const collector = new ReactionCollector(msg.client, msg.id, msg.channelId, {
+    time: timeoutMs,
+    filter: (reaction, user) =>
+      user.id === authorID && wanted.has(reaction.emoji.name.toLowerCase()),
+  });
+  const push = (vote: Vote | null) => {
+    queue.push(vote);
+    const notify = wake;
+    wake = undefined;
+    notify?.();
+  };
+  collector.on('collect', (reaction, user) => {
+    collector.collected.delete(`${user.id}:${reaction.emoji.id ?? reaction.emoji.name}`);
+    push({ emoji: reaction.emoji.name.toLowerCase(), userID: user.id });
+  });
+  collector.on('end', () => push(null));
   return {
-    react: (tag: string) => msg.react(tag),
-    edit: (page: Embed) => msg.edit({ embeds: [toBuilder(page)] }),
-    removeVote: (tag: string, userID: string) => msg.removeReaction(tag, userID),
-    wipe: () => msg.removeAllReactions(),
+    next() {
+      const vote = queue.shift();
+      if (vote !== undefined) return Promise.resolve(vote);
+      return new Promise<Vote | null>((resolve) => {
+        wake = () => {
+          wake = undefined;
+          resolve(queue.shift() ?? null);
+        };
+      });
+    },
+    close: () => collector.stop('user'),
   };
 }
 
-type Ops = Awaited<ReturnType<typeof makeOps>>;
+// Sem client: awaitReaction por clique — coletor novo zera o dedup do SDK.
+function portVotes(ctx: AceContext, id: string, deadline: number): VoteSource {
+  return {
+    next() {
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) return Promise.resolve(null);
+      return safe(() =>
+        ctx.resources.collectors.awaitReaction(ctx.channelID, id, NAMES, remaining, ctx.authorID));
+    },
+    close() {},
+  };
+}
 
 async function place(ops: Ops, bar: Button[]): Promise<void> {
   for (const button of bar) await safe(() => ops.react(button.tag));
@@ -102,35 +165,53 @@ async function place(ops: Ops, bar: Button[]): Promise<void> {
 /**
  * Paginador por reação: responde com a primeira página, arma a barra e devolve
  * o controle — os votos correm em background (se o run esperasse o coletor
- * morrer, o comando só logaria 'ok' depois de 60s). Cada escuta é um
- * awaitReaction novo: o ReactionCollector do SDK deduplica user+emoji, então
- * um coletor único engoliria todo clique depois do primeiro. Quando a barra
- * muda (entrada/saída de ponta) ela é refeita do zero; no miolo só o voto
- * do usuário sai, e só sobram as reações do bot.
+ * morrer, o comando só logaria 'ok' depois de 60s). Quando a barra muda
+ * (entrada/saída de ponta) ela é refeita do zero; no miolo só o voto do
+ * usuário sai, e só sobram as reações do bot.
  */
 export async function startPaginator(ctx: AceContext, pages: readonly Embed[], timeoutMs = DEFAULT_TIMEOUT_MS): Promise<void> {
   if (pages.length === 0) return;
+  const all = buttons(ctx);
+  const bar = barFor(0, pages.length, all);
+
+  // Caminho quente: o raw da mensagem do comando já é a Message nativa — o
+  // reply devolve a Message do paginador na MESMA request, sem resolve de
+  // canal nem de mensagem. A barra monta em background e vira o tail inicial
+  // da fila: nenhum flip corre na frente da montagem.
+  const raw = ctx.message?.raw;
+  const sent = raw instanceof Message
+    ? await safe(() => raw.reply({ embeds: [toBuilder(pages[0])] }, { ping: false }))
+    : null;
+
+  if (sent) {
+    if (pages.length < 2) return;
+    const ops = nativeOps(sent);
+    void watch(pages, all, ops, bar, nativeVotes(sent, ctx.authorID, timeoutMs), place(ops, bar));
+    return;
+  }
+
   const id = await ctx.reply({ embeds: [pages[0]] });
   if (pages.length < 2) return;
-  const all = buttons(ctx);
   const ops = await makeOps(ctx, id);
-  const bar = barFor(0, pages.length, all);
   await place(ops, bar);
-  void watch(ctx, id, pages, all, ops, bar, timeoutMs);
+  void watch(pages, all, ops, bar, portVotes(ctx, id, Date.now() + timeoutMs), Promise.resolve());
 }
 
-async function watch(ctx: AceContext, id: string, pages: readonly Embed[], all: Record<string, Button>, ops: Ops, bar: Button[], timeoutMs: number): Promise<void> {
-  let tail: Promise<unknown> = Promise.resolve();
+async function watch(
+  pages: readonly Embed[],
+  all: Record<string, Button>,
+  ops: Ops,
+  bar: Button[],
+  source: VoteSource,
+  initialTail: Promise<unknown>,
+): Promise<void> {
+  let tail = initialTail;
   let page = 0;
   let currentBar = bar;
-  const deadline = Date.now() + timeoutMs;
   const warn = (error: unknown) => console.warn('[paginador] flip falhou:', error);
   try {
     for (;;) {
-      const remaining = deadline - Date.now();
-      if (remaining <= 0) break;
-      const vote = await safe(() =>
-        ctx.resources.collectors.awaitReaction(ctx.channelID, id, NAMES, remaining, ctx.authorID));
+      const vote = await source.next();
       if (!vote) break;
       const clicked = all[vote.emoji];
       if (!clicked) continue;
@@ -167,6 +248,7 @@ async function watch(ctx: AceContext, id: string, pages: readonly Embed[], all: 
       });
     }
   } finally {
+    source.close();
     await tail;
     await safe(() => ops.wipe());
   }
