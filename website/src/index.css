@@ -161,42 +161,6 @@ main {
 .d:nth-child(2n) { animation-delay: -3s; }
 .d:nth-child(5n) { animation-delay: -5s; }
 
-.ring {
-  width: 34px;
-  height: 34px;
-  border: 3px solid rgba(14, 18, 44, .5);
-  border-radius: 50%;
-}
-.ring-sm { width: 22px; height: 22px; border-width: 2.5px; }
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(14, 18, 44, .55);
-}
-.dot-sm { width: 5px; height: 5px; }
-.dot-cyan { background: rgba(20, 24, 56, .6); }
-
-.plus {
-  width: 16px;
-  height: 16px;
-}
-.plus::before, .plus::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
-  background: rgba(14, 18, 44, .55);
-  border-radius: 2px;
-}
-.plus::before { width: 16px; height: 3px; }
-.plus::after { width: 3px; height: 16px; }
-.plus-sm { width: 11px; height: 11px; }
-.plus-sm::before { width: 11px; height: 2.5px; }
-.plus-sm::after { width: 2.5px; height: 11px; }
-
 .star { width: 18px; height: 18px; fill: rgba(14, 18, 44, .55); }
 .star-sm { width: 11px; height: 11px; }
 
@@ -235,7 +199,7 @@ h1 { color: var(--hero-ink); }
 
 h1 {
   font-size: clamp(56px, 8vw, 76px);
-  font-weight: 650;
+  font-weight: 750;
   letter-spacing: -.045em;
   line-height: 1;
   font-optical-sizing: auto;
@@ -245,6 +209,7 @@ h1 {
   margin-top: 16px;
   color: var(--hero-muted);
   font-size: clamp(15px, 2.4vw, 18px);
+  font-weight: 500;
   line-height: 1.5;
   letter-spacing: -.005em;
   max-width: 26em;
@@ -347,7 +312,7 @@ section[id] {
 
 h2 {
   font-size: clamp(24px, 4vw, 30px);
-  font-weight: 620;
+  font-weight: 680;
   letter-spacing: -.03em;
   line-height: 1.1;
   text-align: center;

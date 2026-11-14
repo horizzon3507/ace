@@ -69,30 +69,6 @@ function App() {
       <main>
         <header className="hero">
           <div className="decor" aria-hidden="true">
-            <span className="d ring" style={{ left: "7%", top: "26%" }} />
-            <span
-              className="d ring ring-sm"
-              style={{ left: "90%", top: "18%" }}
-            />
-            <span
-              className="d ring"
-              style={{ left: "84%", top: "72%" }}
-            />
-            <span className="d dot" style={{ left: "16%", top: "14%" }} />
-            <span
-              className="d dot dot-cyan"
-              style={{ left: "88%", top: "56%" }}
-            />
-            <span
-              className="d dot dot-sm"
-              style={{ left: "6%", top: "78%" }}
-            />
-            <span className="d plus" style={{ left: "12%", top: "58%" }} />
-            <span
-              className="d plus plus-sm"
-              style={{ left: "86%", top: "34%" }}
-            />
-            <span className="d plus" style={{ left: "24%", top: "86%" }} />
             <svg
               className="d star"
               style={{ left: "78%", top: "10%" }}
@@ -114,6 +90,27 @@ function App() {
             >
               <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
             </svg>
+            <svg
+              className="d star star-sm"
+              style={{ left: "14%", top: "80%" }}
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
+            </svg>
+            <svg
+              className="d star"
+              style={{ left: "88%", top: "38%" }}
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
+            </svg>
+            <svg
+              className="d star star-sm"
+              style={{ left: "22%", top: "12%" }}
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
+            </svg>
           </div>
           <h1>
             Introduzindo:{" "}
@@ -125,10 +122,9 @@ function App() {
             Ace
           </h1>
           <p className="lede">
-            O bot que segura seu servidor inteiro. Moderação firme com kicks,
-            bans e timeouts, respostas completas sobre usuários e o servidor,
-            e utilidades que vão de avatares a emojis. 21 comandos, direto ao
-            ponto.
+            A aplicação perfeita para gerenciar o seu servidor! Moderação
+            rápida e intuitiva, utilidades prontas para uso, manipulação de
+            avatares e emojis, entre outros, tudo direto ao ponto.
           </p>
           <div className="cta">
             <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
