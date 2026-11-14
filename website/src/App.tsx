@@ -250,11 +250,70 @@ function App() {
                   </p>
                 </div>
                 <div className="feat-media">
-                  <div className="shot-frame feat-shot">
-                    <img
-                      src="assets/ace-ajuda.png"
-                      alt="O embed do a.ajuda no Fluxer, listando os comandos do Ace"
-                    />
+                  <div className="chat" aria-label="Prévia do embed do a.ajuda no Fluxer">
+                    <div className="msg">
+                      <span className="m-av m-av-user" aria-hidden="true" />
+                      <p className="m-text">
+                        <b className="m-user">horizzon3507</b>
+                        <span className="m-cmd">a.ajuda</span>
+                      </p>
+                    </div>
+                    <div className="msg">
+                      <img
+                        className="m-av"
+                        src="assets/ace-face.png"
+                        alt=""
+                        width="36"
+                        height="36"
+                      />
+                      <div className="m-col">
+                        <div className="m-head">
+                          <b>Ace</b>
+                          <span className="m-tag">Bot</span>
+                          <span className="m-time">Hoje às 19:07</span>
+                        </div>
+                        <div className="embx">
+                          <p className="e-title">
+                            <svg viewBox="0 0 16 16" aria-hidden="true">
+                              <path d="M8 1.6 1.8 7v7.4h4.4v-3.8h3.6v3.8h4.4V7z" />
+                            </svg>
+                            Ace
+                          </p>
+                          <p className="e-desc">
+                            Heey! Eu sou o <b>Ace</b>! Eu seguro a{" "}
+                            <b>moderação</b> com kicks, bans, timeouts e limpeza
+                            de mensagens, te conto tudo sobre <b>usuários</b> e
+                            este <b>servidor</b>, busco artes como{" "}
+                            <b>avatares</b> e <b>banners</b> e listo e empaco os{" "}
+                            <b>emojis</b> daqui…
+                          </p>
+                          <ul className="e-list">
+                            <li>
+                              Prefixo: <code>a.</code>
+                            </li>
+                            <li>
+                              Comandos: <b>21</b>
+                            </li>
+                            <li>
+                              Versão: <code>0.1.1</code>
+                            </li>
+                            <li>
+                              Acordado: <b>há 5 minutos e 26 segundos</b>
+                            </li>
+                            <li>
+                              Detentor:{" "}
+                              <span className="e-mention">@horizzon3507</span>
+                            </li>
+                          </ul>
+                          <p className="e-foot">Página 1 de 4 — Sobre mim</p>
+                        </div>
+                        <div className="reacts" aria-hidden="true">
+                          <span className="rct">→ 1</span>
+                          <span className="rct">⌂ 1</span>
+                          <span className="rct">☺</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -382,8 +441,26 @@ function App() {
             </div>
           </div>
           <div className="foot-bottom">
-            <span>Open source, AGPL-3.0</span>
-            <span>v0.1.1-alpha</span>
+            <span>
+              Open source,{" "}
+              <a href="https://github.com/horizzon3507/ace/blob/main/LICENSE">
+                AGPL-3.0
+              </a>
+            </span>
+            <span>
+              v0.1.1-alpha
+              {__COMMIT_SHA__ && (
+                <>
+                  {" · "}
+                  <a
+                    href={`${REPO_URL}/commit/${__COMMIT_SHA__}`}
+                    className="foot-commit"
+                  >
+                    {__COMMIT_SHA__.slice(0, 7)}
+                  </a>
+                </>
+              )}
+            </span>
           </div>
         </div>
       </footer>
