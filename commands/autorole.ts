@@ -43,12 +43,12 @@ export default defineCommand({
     const usage = `${ctx.emoji.unhappy} Me informe a categoria: \`all\` (todos), \`user\` (usuários) ou \`app\` (bots)...\n-# ╰ Ex: \`${p}autorole user @Membros\``;
 
     const line = async (category: AutoroleCategory): Promise<string> =>
-      `> **${labels[category]}**: ${mention(autoroleCategory(await guildAutorole(guildID), guildID, category))}`;
+      `${ctx.emoji.dot} **${labels[category]}**: ${mention(autoroleCategory(await guildAutorole(guildID), guildID, category))}`;
 
     if (!action) {
       const lines = await Promise.all(CATEGORIES.map(line));
       await ctx.reply([
-        `${ctx.emoji.team} Autorole deste servidor:`,
+        `${ctx.emoji.team} O Autorole deste servidor está configurado para...`,
         ...lines,
         `-# ╰ Configure com \`${p}autorole <all|user|app> <cargos>\` | Limpe com \`${p}autorole reset <categoria>\``,
       ].join('\n'));
