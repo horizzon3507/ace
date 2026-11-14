@@ -22,20 +22,20 @@
   --primary-light: #9eb7e5;
   --hero-blue: #a3bdf4;
   --hero-blue-deep: #7da2ef;
-  --hero-ink: #10131c;
-  --hero-muted: rgba(16, 19, 28, .66);
-  --bg: #0a0a0b;
-  --surface: #131315;
-  --surface-hover: #17171a;
-  --border: #232326;
-  --border-hover: #303034;
-  --text: #f1f1f1;
-  --muted: #9ba1ab;
-  --faint: #5b6475;
+  --hero-ink: #14203f;
+  --hero-muted: rgba(20, 32, 63, .64);
+  --bg: #0a0c12;
+  --surface: #12141c;
+  --surface-hover: #171a23;
+  --border: #222634;
+  --border-hover: #2e3345;
+  --text: #eceff6;
+  --muted: #98a0b3;
+  --faint: #5d6a82;
   --font-sans: "Geist", "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --inset: #16161a;
+  --inset: #161926;
   --site-w: 720px;
 }
 
@@ -182,7 +182,7 @@ main {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(16, 19, 28, .35);
+  box-shadow: 0 20px 60px rgba(15, 24, 48, .4);
 }
 
 .hero-shot {
@@ -257,7 +257,7 @@ h1 {
 .hero .btn-ghost {
   background: rgba(255, 255, 255, .3);
   color: var(--hero-ink);
-  border: 1px solid rgba(16, 19, 28, .14);
+  border: 1px solid rgba(20, 32, 63, .16);
 }
 
 .btn-ghost {
@@ -270,7 +270,7 @@ h1 {
   .btn-primary:hover { background: var(--primary-hover); }
   .hero .btn-primary:hover { background: #4a72d6; }
   .btn-ghost:hover { border-color: var(--border-hover); background: var(--surface-hover); }
-  .hero .btn-ghost:hover { background: rgba(255, 255, 255, .45); border-color: rgba(16, 19, 28, .22); }
+  .hero .btn-ghost:hover { background: rgba(255, 255, 255, .45); border-color: rgba(20, 32, 63, .26); }
   .nav-link:hover { color: var(--text); background: var(--surface-hover); }
   .nav-cta:hover { background: var(--primary-hover); }
   footer a:hover { color: var(--text); }
