@@ -35,6 +35,7 @@ Terceiro corte em desenvolvimento do bot do Fluxer — ainda em construção, ai
 
 - `a.ajuda` aceita o número da página (`a.ajuda 3`) e já abre nela com a barra de reações certa; página fora do intervalo avisa quantas existem.
 - Autorole por servidor em três categorias — `a.autorole all|user|app <cargos>` define até 15 cargos (menção, ID ou nome) pra quem entra (`all` cobre usuários e apps, `user` só usuários, `app` só bots); `a.autorole` mostra as três listas e `a.autorole reset <categoria>` desliga. Recusa cargo gerenciado, `@everyone` ou acima da hierarquia do bot ou do autor.
+- Correção: os exemplos nas mensagens de erro respeitam o prefixo do servidor em vez de assumir `a.`.
 
 ## v0.1.1-stable · 13/11/2026
 

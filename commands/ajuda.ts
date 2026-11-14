@@ -74,7 +74,7 @@ export default defineCommand({
     if (requested !== undefined) {
       const n = /^\d+$/.test(requested) ? Number.parseInt(requested, 10) : 0;
       if (n < 1 || n > total) {
-        await ctx.reply(`${ctx.emoji.unhappy} Essa página não existe! O ajuda vai de 1 a ${total}...\n-# ╰ Ex: \`a.ajuda 2\``);
+        await ctx.reply(`${ctx.emoji.unhappy} Essa página não existe! O ajuda vai de 1 a ${total}...\n-# ╰ Ex: \`${p}ajuda 2\``);
         return;
       }
       startPage = n - 1;

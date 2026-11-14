@@ -1,5 +1,6 @@
 import type { AceContext } from './context.js';
-import { resolveTarget } from './live.js';
+import { guildPrefix } from './guild-prefix.js';
+import { prefix, resolveTarget } from './live.js';
 
 export type PurgeMode = 'channel' | 'user';
 
@@ -9,6 +10,7 @@ const MENTION = /^<@!?\d+>$/;
 export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
   const { emoji } = ctx;
   const guildID = ctx.requireGuild();
+  const p = await guildPrefix(guildID) ?? prefix();
   let n: number;
   let label: string | undefined;
   let of: string | undefined;
@@ -18,7 +20,7 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
     const mention = ctx.tokens.find((token) => MENTION.test(token));
     const target = await resolveTarget(ctx, guildID, mention ? [mention] : ctx.tokens);
     if (target.status === 'none') {
-      await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro cujas mensagens apagar...\n-# ╰ Ex: \`a.purge @usuario 10\``);
+      await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro cujas mensagens apagar...\n-# ╰ Ex: \`${p}purge @usuario 10\``);
       return;
     }
     if (target.status === 'missing') {
@@ -33,7 +35,7 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
     const countRaw = ctx.tokens.find((token) => token !== targetToken);
     const parsed = countRaw === undefined ? 10 : amount(countRaw);
     if (parsed === undefined) {
-      await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)...\n-# ╰ Ex: \`a.purge @usuario 10\``);
+      await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)...\n-# ╰ Ex: \`${p}purge @usuario 10\``);
       return;
     }
     n = parsed;
@@ -42,7 +44,7 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
   } else {
     const parsed = amount(ctx.tokens[0]);
     if (parsed === undefined) {
-      await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)...\n-# ╰ Ex: \`a.clear 20\``);
+      await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)...\n-# ╰ Ex: \`${p}clear 20\``);
       return;
     }
     n = parsed;

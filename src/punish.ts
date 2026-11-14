@@ -1,5 +1,7 @@
 import { formatDuration, GuardError, isGuardReason, MAX_TIMEOUT_MS, parseDuration, YuzuhaError } from 'yuzuha';
 import type { AceContext } from './context.js';
+import { guildPrefix } from './guild-prefix.js';
+import { prefix } from './live.js';
 import { moderationReason as bundledReason, resolveBanTarget as bundledBanResolve, resolveTarget as bundledResolve } from './resolve.js';
 
 export type Punishment = 'kick' | 'ban' | 'softban' | 'timeout' | 'unban';
@@ -58,9 +60,10 @@ export function bindModeration(deps: ModerationDeps) {
     const spec = copy[action];
     const guildID = ctx.requireGuild();
     const emoji = ctx.emoji;
+    const p = await guildPrefix(guildID) ?? prefix();
     const target = await (action === 'unban' ? resolveBanTarget : resolveTarget)(ctx, guildID, ctx.tokens);
     if (target.status === 'none') {
-      await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro a ser ${spec.past}...\n-# ╰ Ex: \`a.${action} @usuario motivo\``);
+      await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro a ser ${spec.past}...\n-# ╰ Ex: \`${p}${action} @usuario motivo\``);
       return;
     }
     if (target.status === 'missing') {
@@ -83,7 +86,7 @@ export function bindModeration(deps: ModerationDeps) {
       try {
         timeoutMs = parseDuration(ctx.tokens[1] ?? '');
       } catch {
-        await ctx.reply(`${emoji.unhappy} Por favor, me informe a duração do silenciamento...\n-# ╰ Ex: \`a.timeout @usuario 10m motivo\``);
+        await ctx.reply(`${emoji.unhappy} Por favor, me informe a duração do silenciamento...\n-# ╰ Ex: \`${p}timeout @usuario 10m motivo\``);
         return;
       }
       if (timeoutMs > MAX_TIMEOUT_MS) {
