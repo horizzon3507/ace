@@ -6,39 +6,39 @@ const REPO_URL = "https://github.com/horizzon3507/ace";
 
 const GROUPS: { label: string; commands: { name: string; desc: string }[] }[] = [
   {
-    label: "moderação",
+    label: "Moderação",
     commands: [
-      { name: "a.kick", desc: "expulsa um membro" },
-      { name: "a.ban", desc: "bane um membro" },
-      { name: "a.softban", desc: "expulsa e limpa mensagens recentes" },
-      { name: "a.unban", desc: "desfaz um ban" },
-      { name: "a.timeout", desc: "silencia por até 28 dias" },
-      { name: "a.lock", desc: "tranca o canal" },
-      { name: "a.unlock", desc: "destranca o canal" },
-      { name: "a.clear", desc: "apaga as últimas mensagens" },
-      { name: "a.purge", desc: "limpa mensagens de um membro" },
+      { name: "a.kick", desc: "Expulsa um membro" },
+      { name: "a.ban", desc: "Bane um membro" },
+      { name: "a.softban", desc: "Expulsa e limpa mensagens recentes" },
+      { name: "a.unban", desc: "Desfaz um ban" },
+      { name: "a.timeout", desc: "Silencia por até 28 dias" },
+      { name: "a.lock", desc: "Tranca o canal" },
+      { name: "a.unlock", desc: "Destranca o canal" },
+      { name: "a.clear", desc: "Apaga as últimas mensagens" },
+      { name: "a.purge", desc: "Limpa mensagens de um membro" },
     ],
   },
   {
-    label: "informações",
+    label: "Informações",
     commands: [
-      { name: "a.ajuda", desc: "lista todos os comandos" },
-      { name: "a.ping", desc: "latência do ace" },
-      { name: "a.uptime", desc: "tempo acordado" },
-      { name: "a.setprefix", desc: "troca o prefixo do ace no servidor" },
-      { name: "a.userinfo", desc: "infos de usuário" },
-      { name: "a.guildinfo", desc: "infos do servidor" },
+      { name: "a.ajuda", desc: "Lista todos os comandos" },
+      { name: "a.ping", desc: "Latência do Ace" },
+      { name: "a.uptime", desc: "Tempo acordado" },
+      { name: "a.setprefix", desc: "Troca o prefixo do Ace no servidor" },
+      { name: "a.userinfo", desc: "Infos de usuário" },
+      { name: "a.guildinfo", desc: "Infos do servidor" },
     ],
   },
   {
-    label: "utilidades",
+    label: "Utilidades",
     commands: [
-      { name: "a.avatar", desc: "avatar seu ou de outro usuário" },
-      { name: "a.userbanner", desc: "banner de usuário" },
-      { name: "a.guildicon", desc: "ícone do servidor" },
-      { name: "a.guildbanner", desc: "banner do servidor" },
-      { name: "a.emojilist", desc: "lista os emojis do servidor" },
-      { name: "a.emojidump", desc: "empacota os emojis num zip" },
+      { name: "a.avatar", desc: "Avatar seu ou de outro usuário" },
+      { name: "a.userbanner", desc: "Banner de usuário" },
+      { name: "a.guildicon", desc: "Ícone do servidor" },
+      { name: "a.guildbanner", desc: "Banner do servidor" },
+      { name: "a.emojilist", desc: "Lista os emojis do servidor" },
+      { name: "a.emojidump", desc: "Empacota os emojis num zip" },
     ],
   },
 ];
@@ -51,16 +51,16 @@ function App() {
           <a className="brand" href="/">Ace</a>
           <div className="nav-links">
             <a className="nav-link" href="#comandos">
-              comandos
+              Comandos
             </a>
             <a className="nav-link" href="#por-dentro">
-              por dentro
+              Por dentro
             </a>
             <a className="nav-link" href={REPO_URL}>
-              github
+              GitHub
             </a>
             <a className="nav-cta" href={INVITE_URL}>
-              adicionar
+              Adicionar
             </a>
           </div>
         </div>
@@ -78,17 +78,17 @@ function App() {
             Ace
           </h1>
           <p className="lede">
-            o bot que segura seu servidor inteiro. moderação firme com kicks,
+            O bot que segura seu servidor inteiro. Moderação firme com kicks,
             bans e timeouts, respostas completas sobre usuários e o servidor,
             e utilidades que vão de avatares a emojis. 21 comandos, direto ao
             ponto.
           </p>
           <div className="cta">
             <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
-              adicionar ao servidor
+              Adicionar ao servidor
             </Button>
             <Button className="btn btn-ghost" render={<a href={REPO_URL} />}>
-              github
+              GitHub
             </Button>
           </div>
           <div className="shot-frame">
@@ -112,13 +112,13 @@ function App() {
         </header>
 
         <section className="steps" data-reveal>
-          <h2>em três passos</h2>
+          <h2>Em três passos</h2>
           <div className="steps-grid">
             <div className="step">
               <div className="card-inner">
                 <span className="num">01</span>
                 <p>
-                  <strong>adiciona o ace</strong> ao servidor pelo convite
+                  <strong>Adiciona o Ace</strong> ao servidor pelo convite
                 </p>
               </div>
             </div>
@@ -126,7 +126,7 @@ function App() {
               <div className="card-inner">
                 <span className="num">02</span>
                 <p>
-                  troca o prefixo com <code>a.setprefix</code>, ou mantém o{" "}
+                  Troca o prefixo com <code>a.setprefix</code>, ou mantém o{" "}
                   <code>a.</code>
                 </p>
               </div>
@@ -143,9 +143,9 @@ function App() {
         </section>
 
         <section className="commands" id="comandos" data-reveal>
-          <h2>vinte e um comandos</h2>
+          <h2>Vinte e um comandos</h2>
           <p className="section-lede">
-            prefixo <code>a.</code> por padrão; cada servidor define o seu com{" "}
+            Prefixo <code>a.</code> por padrão; cada servidor define o seu com{" "}
             <code>a.setprefix</code>.
           </p>
           {GROUPS.map((group) => (
@@ -166,7 +166,7 @@ function App() {
         </section>
 
         <section className="specs" id="por-dentro" data-reveal>
-          <h2>por dentro</h2>
+          <h2>Por dentro</h2>
           <div className="frame">
             <dl>
             <div>
@@ -190,9 +190,9 @@ function App() {
         </section>
 
         <section className="end" data-reveal>
-          <p className="end-title">open source, AGPL-3.0, feito no yuzuha.</p>
+          <p className="end-title">Open source, AGPL-3.0, feito no Yuzuha.</p>
           <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
-            adicionar ao servidor
+            Adicionar ao servidor
           </Button>
         </section>
       </main>
@@ -204,21 +204,21 @@ function App() {
             <img src="assets/ace-face.png" alt="" width="24" height="24" />
             <div>
               <span className="foot-name">Ace</span>
-              <span className="foot-tag">bot do fluxer, em pt-BR</span>
+              <span className="foot-tag">Bot do Fluxer, em pt-BR</span>
             </div>
           </div>
           <div className="foot-cols">
             <div className="foot-col">
-              <span className="foot-h">produto</span>
-              <a href={INVITE_URL}>convite</a>
-              <a href="#comandos">comandos</a>
-              <a href="#por-dentro">por dentro</a>
+              <span className="foot-h">Produto</span>
+              <a href={INVITE_URL}>Convite</a>
+              <a href="#comandos">Comandos</a>
+              <a href="#por-dentro">Por dentro</a>
             </div>
             <div className="foot-col">
-              <span className="foot-h">projeto</span>
-              <a href={REPO_URL}>github</a>
-              <a href="https://www.npmjs.com/package/yuzuha">yuzuha</a>
-              <a href="https://github.com/horizzon3507">horizzon</a>
+              <span className="foot-h">Projeto</span>
+              <a href={REPO_URL}>GitHub</a>
+              <a href="https://www.npmjs.com/package/yuzuha">Yuzuha</a>
+              <a href="https://github.com/horizzon3507">Horizzon</a>
             </div>
           </div>
         </div>
