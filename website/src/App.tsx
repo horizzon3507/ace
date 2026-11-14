@@ -68,6 +68,53 @@ function App() {
 
       <main>
         <header className="hero">
+          <div className="decor" aria-hidden="true">
+            <span className="d ring" style={{ left: "7%", top: "26%" }} />
+            <span
+              className="d ring ring-sm"
+              style={{ left: "90%", top: "18%" }}
+            />
+            <span
+              className="d ring"
+              style={{ left: "84%", top: "72%" }}
+            />
+            <span className="d dot" style={{ left: "16%", top: "14%" }} />
+            <span
+              className="d dot dot-cyan"
+              style={{ left: "88%", top: "56%" }}
+            />
+            <span
+              className="d dot dot-sm"
+              style={{ left: "6%", top: "78%" }}
+            />
+            <span className="d plus" style={{ left: "12%", top: "58%" }} />
+            <span
+              className="d plus plus-sm"
+              style={{ left: "86%", top: "34%" }}
+            />
+            <span className="d plus" style={{ left: "24%", top: "86%" }} />
+            <svg
+              className="d star"
+              style={{ left: "78%", top: "10%" }}
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
+            </svg>
+            <svg
+              className="d star star-sm"
+              style={{ left: "5%", top: "44%" }}
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
+            </svg>
+            <svg
+              className="d star"
+              style={{ left: "94%", top: "84%" }}
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
+            </svg>
+          </div>
           <h1>
             Introduzindo:{" "}
             <img
