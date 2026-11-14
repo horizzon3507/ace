@@ -238,7 +238,7 @@ function App() {
                   </p>
                 </div>
                 <div className="feat-media">
-                  <div className="chat" aria-label="Prévia do a.setprefix no chat">
+                  <div className="chat chat-lg" aria-label="Prévia do a.setprefix no chat">
                     <div className="msg">
                       <img
                         className="m-av"
@@ -276,7 +276,8 @@ function App() {
                               <circle cx="7" cy="7" r="6" />
                               <path d="M4.4 7.2l1.8 1.8 3.4-3.6" />
                             </svg>
-                            Prefixo trocado para <code>!</code> neste servidor.
+                            Prefixo trocado de <code>a.</code> para{" "}
+                            <code>!</code> neste servidor.
                           </p>
                         </div>
                       </div>
@@ -287,7 +288,7 @@ function App() {
               <div className="feat" data-reveal>
                 <div className="feat-text">
                   <span className="num">03</span>
-                  <h3>Roda o a.ajuda</h3>
+                  <h3>Abra o menu de ajuda</h3>
                   <p>
                     Perdido? O <code>a.ajuda</code> abre o painel completo no
                     chat: a descrição do Ace, o prefixo do servidor, a versão,

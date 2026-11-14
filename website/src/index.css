@@ -438,8 +438,10 @@ h3 {
   display: grid;
   grid-template-columns: 1fr 1.15fr;
   gap: 48px;
-  align-items: center;
+  align-items: start;
 }
+
+.feat .feat-text { padding-top: 18px; }
 
 .feat:nth-child(2) .feat-text { order: 2; }
 .feat:nth-child(2) .feat-media { order: 1; }
@@ -512,7 +514,7 @@ h3 {
   stroke-linecap: round;
 }
 
-.o-perms { margin-top: 14px; }
+.o-perms { margin-top: 14px; list-style: none; padding-left: 0; }
 .o-perms li {
   position: relative;
   padding-left: 16px;
@@ -617,7 +619,7 @@ h3 {
 }
 .e-desc b { color: #f4f6ff; }
 
-.e-list { margin-top: 8px; }
+.e-list { margin-top: 8px; list-style: none; padding-left: 0; }
 .e-list li {
   position: relative;
   padding-left: 14px;
@@ -693,6 +695,18 @@ h3 {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.chat-lg { font-size: 14px; padding: 16px 18px; }
+.chat-lg .m-av { width: 34px; height: 34px; }
+.chat-lg .m-text { padding-top: 5px; }
+.chat-lg .m-text .m-user { font-size: 12px; }
+.chat-lg .m-cmd { font-size: 13.5px; }
+.chat-lg .m-head b { font-size: 15px; }
+.chat-lg .m-tag { font-size: 10.5px; }
+.chat-lg .m-time { font-size: 11.5px; }
+.chat-lg .embx { padding: 12px 14px; margin-top: 8px; }
+.chat-lg .e-desc { font-size: 13.5px; }
+.chat-lg .e-check { width: 15px; height: 15px; }
 
 .chat.compact { font-size: 10.5px; padding: 10px 12px; }
 .chat.compact .m-av { width: 24px; height: 24px; }
