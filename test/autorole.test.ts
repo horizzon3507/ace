@@ -17,7 +17,14 @@ const member = (id: string, roles: string[], permissions = '0') => ({
   nickname: null, joinedTimestamp: 0, roles, permissions, timedOutUntil: null,
 });
 
-// Servidor com cargo do bot na posição 10, do autor na 9 e alvo na 5; dono é '2'.
+const resolve = (positions: Record<string, number>, extra: Record<string, object> = {}) =>
+  async (_g: string, query: string) => {
+    const id = query.replace(/<@&|>/g, '');
+    if (id in positions) return role(id, positions[id], extra[id] ?? {});
+    throw new Error('nope');
+  };
+
+// Servidor com cargo do bot na posição 10, do autor na 9 e alvos baixos; dono é '2'.
 const hierarchy: MockResourceOverrides = {
   users: {
     async guild() {
@@ -28,12 +35,9 @@ const hierarchy: MockResourceOverrides = {
     },
   },
   roles: {
-    async resolve(_g: string, query: string) {
-      if (query.replace(/<@&|>/g, '') === '42') return role('42', 5);
-      throw new Error('nope');
-    },
+    resolve: resolve({ '42': 5, '43': 4 }),
     async list() {
-      return [role('8', 10), role('7', 9), role('42', 5)];
+      return [role('8', 10), role('7', 9), role('42', 5), role('43', 4)];
     },
   },
 };
@@ -44,51 +48,90 @@ function bot(resources?: MockResourceOverrides) {
   bindGuildAutoroles(fixture.store);
   return fixture;
 }
+const clean = (fixture: { destroy(): Promise<unknown> | unknown }) =>
+  () => { setGuildAutoroleCache('100', undefined); return fixture.destroy(); };
 
-test('a.autorole define o cargo, confirma e mostra a config atual', async (t) => {
+test('a.autorole lista as três categorias', async (t) => {
+  const fixture = bot();
+  t.after(clean(fixture));
+
+  assert.equal(await fixture.send('a.autorole'), 'success');
+  const content = fixture.messages.at(-1)?.payload.content ?? '';
+  assert.match(content, /\*\*Todos\*\*: desligado/);
+  assert.match(content, /\*\*Usuários\*\*: desligado/);
+  assert.match(content, /\*\*Apps\*\*: desligado/);
+  assert.match(content, /`a\.autorole reset <categoria>`/);
+});
+
+test('a.autorole user grava vários cargos e a categoria aparece configurada', async (t) => {
   const fixture = bot(hierarchy);
-  t.after(() => { setGuildAutoroleCache('100', undefined); return fixture.destroy(); });
+  t.after(clean(fixture));
 
-  assert.equal(await fixture.send('a.autorole <@&42>'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /recebe \*\*cargo42\*\* automaticamente/);
-  assert.equal(await fixture.store.read((state) => state.variables[VAR]), '42');
-  assert.equal(await guildAutorole('100'), '42');
+  assert.equal(await fixture.send('a.autorole user <@&42> <@&43>'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Usuários\*\* configurado: <@&42> <@&43>/);
+  assert.deepEqual(await fixture.store.read((state) => state.variables[VAR]), { user: ['42', '43'] });
+  assert.deepEqual(await guildAutorole('100'), { user: ['42', '43'] });
 
   await fixture.tick(3_100);
   assert.equal(await fixture.send('a.autorole'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /recebe <@&42> automaticamente/);
+  const content = fixture.messages.at(-1)?.payload.content ?? '';
+  assert.match(content, /\*\*Todos\*\*: desligado/);
+  assert.match(content, /\*\*Usuários\*\*: <@&42> <@&43>/);
+  assert.match(content, /\*\*Apps\*\*: desligado/);
   assert.deepEqual(fixture.errors, []);
 });
 
-test('a.autorole sem cargo avisa que está desligado', async (t) => {
-  const fixture = bot();
-  t.after(() => { setGuildAutoroleCache('100', undefined); return fixture.destroy(); });
+test('a.autorole <categoria> mostra só ela e reset a desliga', async (t) => {
+  const fixture = bot(hierarchy);
+  t.after(clean(fixture));
 
-  assert.equal(await fixture.send('a.autorole'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /autorole está desligado/);
+  assert.equal(await fixture.send('a.autorole app <@&42>'), 'success');
+  await fixture.tick(3_100);
+  assert.equal(await fixture.send('a.autorole app'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Apps\*\*: <@&42>/);
+
+  await fixture.tick(3_100);
+  assert.equal(await fixture.send('a.autorole reset app'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /\*\*Apps\*\* desligado/);
+  assert.deepEqual(await fixture.store.read((state) => state.variables[VAR]), { app: 'off' });
+  assert.deepEqual(await guildAutorole('100'), { app: 'off' });
 });
 
-test('a.autorole off grava off e desliga a entrega', async (t) => {
-  const fixture = bot(hierarchy);
-  t.after(() => { setGuildAutoroleCache('100', undefined); return fixture.destroy(); });
+test('sem categoria ou categoria inválida pede all, user ou app', async (t) => {
+  const fixture = bot();
+  t.after(clean(fixture));
 
-  assert.equal(await fixture.send('a.autorole off'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Autorole desligado/);
-  assert.equal(await fixture.store.read((state) => state.variables[VAR]), 'off');
-  assert.equal(await guildAutorole('100'), 'off');
+  assert.equal(await fixture.send('a.autorole 42'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /`all` \(todos\), `user` \(usuários\) ou `app` \(bots\)/);
+  await fixture.tick(3_100);
+  assert.equal(await fixture.send('a.autorole reset'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /categoria a limpar/);
+});
+
+test('mais de 15 cargos, gerenciado e desconhecido são recusados', async (t) => {
+  const fixture = bot({
+    users: hierarchy.users,
+    roles: { resolve: resolve({ '42': 5, '43': 5 }, { '43': { managed: true } }), list: hierarchy.roles!.list },
+  });
+  t.after(clean(fixture));
+
+  assert.equal(await fixture.send(`a.autorole user ${'x '.repeat(16)}`), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /até 15 cargos/);
+
+  await fixture.tick(3_100);
+  assert.equal(await fixture.send('a.autorole user <@&43>'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não consigo entregar/);
+
+  await fixture.tick(3_100);
+  assert.equal(await fixture.send('a.autorole user <@&99>'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não encontrei nenhum cargo como <@&99>/);
 });
 
 test('cargo acima do bot ou do autor é recusado', async (t) => {
-  const fixture = bot({
-    users: hierarchy.users,
-    roles: {
-      async resolve() { return role('42', 12); },
-      list: hierarchy.roles!.list,
-    },
-  });
-  t.after(() => { setGuildAutoroleCache('100', undefined); return fixture.destroy(); });
+  const fixture = bot({ users: hierarchy.users, roles: { resolve: resolve({ '42': 12 }), list: hierarchy.roles!.list } });
+  t.after(clean(fixture));
 
-  assert.equal(await fixture.send('a.autorole 42'), 'success');
+  assert.equal(await fixture.send('a.autorole all 42'), 'success');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /acima do meu maior cargo/);
 
   const authorLower = bot({
@@ -98,31 +141,10 @@ test('cargo acima do bot ou do autor é recusado', async (t) => {
         return member(userID, userID === '999' ? ['8'] : []);
       },
     },
-    roles: {
-      async resolve() { return role('42', 9); },
-      list: hierarchy.roles!.list,
-    },
+    roles: { resolve: resolve({ '42': 9 }), list: hierarchy.roles!.list },
   });
-  t.after(() => { setGuildAutoroleCache('100', undefined); return authorLower.destroy(); });
+  t.after(clean(authorLower));
   await authorLower.tick(3_100);
-  assert.equal(await authorLower.send('a.autorole 42'), 'success');
+  assert.equal(await authorLower.send('a.autorole all 42'), 'success');
   assert.match(authorLower.messages.at(-1)?.payload.content ?? '', /acima do seu maior cargo/);
-});
-
-test('cargo gerenciado ou desconhecido é recusado', async (t) => {
-  const fixture = bot({
-    roles: { async resolve() { return role('42', 5, { managed: true }); } },
-  });
-  t.after(() => { setGuildAutoroleCache('100', undefined); return fixture.destroy(); });
-
-  assert.equal(await fixture.send('a.autorole 42'), 'success');
-  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não consigo entregar/);
-
-  const missing = bot({
-    roles: { async resolve() { throw new Error('nope'); } },
-  });
-  t.after(() => { setGuildAutoroleCache('100', undefined); return missing.destroy(); });
-  await missing.tick(3_100);
-  assert.equal(await missing.send('a.autorole 42'), 'success');
-  assert.match(missing.messages.at(-1)?.payload.content ?? '', /não encontrei nenhum cargo/);
 });

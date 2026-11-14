@@ -9,8 +9,8 @@ type EmojiKey = keyof typeof catalog;
 type Category = { icon: EmojiKey; label: string; commands: readonly string[] };
 
 const categories: Category[] = [
-  { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'softban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban', 'autorole'] },
-  { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo'] },
+  { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'softban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
+  { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo', 'autorole'] },
   { icon: 'globe', label: 'Utilidades', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
 ];
 

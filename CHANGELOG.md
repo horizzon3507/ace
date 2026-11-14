@@ -34,7 +34,7 @@ Só chamamos algo de **stable** quando é pra valer.
 Terceiro corte em desenvolvimento do bot do Fluxer — ainda em construção, ainda não é release. Esta versão foi feita para CLI com canal de release alpha em 13/11/2026 (v0.1.2-alpha).
 
 - `a.ajuda` aceita o número da página (`a.ajuda 3`) e já abre nela com a barra de reações certa; página fora do intervalo avisa quantas existem.
-- Autorole por servidor com `a.autorole <cargo>` (menção, ID ou nome): quem entra ganha o cargo na hora, `a.autorole off` desliga, e o comando recusa cargo gerenciado, `@everyone` ou acima da hierarquia do bot ou do autor.
+- Autorole por servidor em três categorias — `a.autorole all|user|app <cargos>` define até 15 cargos (menção, ID ou nome) pra quem entra (`all` cobre usuários e apps, `user` só usuários, `app` só bots); `a.autorole` mostra as três listas e `a.autorole reset <categoria>` desliga. Recusa cargo gerenciado, `@everyone` ou acima da hierarquia do bot ou do autor.
 
 ## v0.1.1-stable · 13/11/2026
 

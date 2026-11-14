@@ -1,16 +1,27 @@
-import { guildAutorole } from './guild-autorole.js';
+import { guildAutorole, type AutoroleCategory, type AutoroleConfig } from './guild-autorole.js';
 
-// Par fixo do servidor original — padrão enquanto `a.autorole` não configura nada.
+// Par fixo do servidor original — padrão do 'all' enquanto nada foi configurado.
 export const joinRole = {
   guildId: '1473036495175913548',
   roleId: '1473381708310396982',
 } as const;
 
-/** Cargo de entrada efetivo: o configurado por `a.autorole`, 'off' desliga e o par fixo cobre o servidor original. */
-export async function joinRoleFor(guildID: string): Promise<string | undefined> {
-  const stored = await guildAutorole(guildID);
-  if (stored === 'off') return undefined;
-  return stored ?? (guildID === joinRole.guildId ? joinRole.roleId : undefined);
+/** Cargos efetivos de uma categoria; o par fixo cobre o 'all' não configurado do servidor original. */
+export function autoroleCategory(config: AutoroleConfig | undefined, guildID: string, category: AutoroleCategory): string[] {
+  const value = config?.[category];
+  if (value === undefined) {
+    return category === 'all' && guildID === joinRole.guildId ? [joinRole.roleId] : [];
+  }
+  return value === 'off' ? [] : value;
+}
+
+/** Cargos de entrada efetivos: all+user pra humano, all+app pra bot. */
+export async function joinRolesFor(guildID: string, bot: boolean): Promise<string[]> {
+  const config = await guildAutorole(guildID);
+  return [...new Set([
+    ...autoroleCategory(config, guildID, 'all'),
+    ...autoroleCategory(config, guildID, bot ? 'app' : 'user'),
+  ])];
 }
 
 export type JoinMember = {
@@ -23,9 +34,12 @@ export type JoinMember = {
 };
 
 export async function grantJoinRole(member: JoinMember): Promise<boolean> {
-  if (member.user.bot) return false;
-  const roleId = await joinRoleFor(member.guild.id);
-  if (!roleId || member.roles.has(roleId)) return false;
-  await member.roles.add(roleId);
-  return true;
+  const roleIds = await joinRolesFor(member.guild.id, member.user.bot);
+  let granted = false;
+  for (const roleId of roleIds) {
+    if (member.roles.has(roleId)) continue;
+    await member.roles.add(roleId);
+    granted = true;
+  }
+  return granted;
 }
