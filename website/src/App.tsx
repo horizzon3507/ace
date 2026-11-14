@@ -52,22 +52,23 @@ ALL_COMMANDS.forEach((c, i) => STRIPS[i % 3].push(c));
 
 function App() {
   useEffect(() => {
-    const els = document.querySelectorAll("[data-reveal]");
+    const els = Array.from(document.querySelectorAll("[data-reveal]"));
     document.documentElement.classList.add("io");
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            e.target.classList.add("revealed");
-            io.unobserve(e.target);
-          }
+    const check = () => {
+      for (const el of els) {
+        if (el.classList.contains("revealed")) continue;
+        const r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.88) {
+          el.classList.add("revealed");
         }
-      },
-      { threshold: 0.15 }
-    );
-    els.forEach((el) => io.observe(el));
+      }
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    const t = window.setTimeout(check, 400);
     return () => {
-      io.disconnect();
+      window.removeEventListener("scroll", check);
+      window.clearTimeout(t);
       document.documentElement.classList.remove("io");
     };
   }, []);
@@ -89,8 +90,8 @@ function App() {
             <a className="nav-link" href="#comandos">
               Comandos
             </a>
-            <a className="nav-link" href="#por-dentro">
-              Por dentro
+            <a className="nav-link" href="#instalacao">
+              Instalação
             </a>
             <a className="nav-link" href={REPO_URL}>
               GitHub
@@ -185,30 +186,76 @@ function App() {
         <div className="band">
           <section className="steps">
             <h2 data-reveal>Em três passos</h2>
-            <div className="steps-grid">
-              <div className="step" data-reveal="down">
-                <div className="card-inner">
+            <div className="feats">
+              <div className="feat" data-reveal>
+                <div className="feat-text">
                   <span className="num">01</span>
+                  <h3>Adiciona o Ace</h3>
                   <p>
-                    <strong>Adiciona o Ace</strong> ao servidor pelo convite
+                    Pelo convite, o Ace entra no seu servidor pronto pra usar,
+                    com o prefixo <code>a.</code> de fábrica.
                   </p>
                 </div>
+                <div className="feat-media">
+                  <div className="mock">
+                    <div className="mock-embed">
+                      <div className="mock-head">
+                        <img
+                          src="assets/ace-face-white.png"
+                          alt=""
+                          width="34"
+                          height="34"
+                        />
+                        <div className="mock-headtext">
+                          <strong>Ace</strong>
+                          <span>quer entrar no seu servidor</span>
+                        </div>
+                      </div>
+                      <div className="mock-btn">Autorizar</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="step" data-reveal="down">
-                <div className="card-inner">
+              <div className="feat" data-reveal>
+                <div className="feat-text">
                   <span className="num">02</span>
+                  <h3>Troca o prefixo</h3>
                   <p>
-                    Troca o prefixo com <code>a.setprefix</code>, ou mantém o{" "}
-                    <code>a.</code>
+                    Cada servidor define o seu com <code>a.setprefix</code>, ou
+                    mantém o <code>a.</code> padrão.
                   </p>
                 </div>
+                <div className="feat-media">
+                  <div className="mock">
+                    <div className="mock-line">
+                      <span className="mock-user">horizzon3507</span>
+                      <span className="mock-text">a.setprefix !</span>
+                    </div>
+                    <div className="mock-embed">
+                      <strong>Ace</strong>
+                      <p>
+                        Prefixo trocado para <code>!</code> neste servidor.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="step" data-reveal="down">
-                <div className="card-inner">
+              <div className="feat" data-reveal>
+                <div className="feat-text">
                   <span className="num">03</span>
+                  <h3>Roda o a.ajuda</h3>
                   <p>
-                    <code>a.ajuda</code> mostra os vinte e um comandos
+                    O <code>a.ajuda</code> lista os vinte e um comandos, direto
+                    no chat, paginado.
                   </p>
+                </div>
+                <div className="feat-media">
+                  <div className="shot-frame feat-shot">
+                    <img
+                      src="assets/ace-ajuda.png"
+                      alt="O embed do a.ajuda no Fluxer, listando os comandos do Ace"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -239,27 +286,24 @@ function App() {
             </div>
           </section>
 
-          <section className="specs" id="por-dentro" data-reveal>
-            <h2>Por dentro</h2>
+          <section className="install" id="instalacao" data-reveal>
+            <h2>Instalação</h2>
+            <p className="section-lede">
+              Node 22.21 ou mais novo; feito no Yuzuha, em TypeScript,
+              AGPL-3.0.
+            </p>
             <div className="frame">
-              <dl>
-              <div>
-                <dt>framework</dt>
-                <dd>yuzuha</dd>
-              </div>
-              <div>
-                <dt>runtime</dt>
-                <dd>node 22.21+</dd>
-              </div>
-              <div>
-                <dt>linguagem</dt>
-                <dd>typescript</dd>
-              </div>
-              <div>
-                <dt>licença</dt>
-                <dd>AGPL-3.0</dd>
-              </div>
-              </dl>
+              <pre className="term">
+                <code>
+                  <span className="cmd-line">npm install</span>{"\n"}
+                  <span className="cmd-line">cp .env.example .env</span>{"  "}
+                  <span className="c"># preencha FLUXER_BOT_TOKEN</span>{"\n"}
+                  <span className="cmd-line">npm run dev</span>{"            "}
+                  <span className="c"># CLI com recarga ao salvar</span>{"\n"}
+                  <span className="cmd-line">npm start</span>{"              "}
+                  <span className="c"># produção</span>{"\n"}
+                </code>
+              </pre>
             </div>
           </section>
 
@@ -321,7 +365,7 @@ function App() {
                 <span className="foot-h">Produto</span>
                 <a href={INVITE_URL}>Convite</a>
                 <a href="#comandos">Comandos</a>
-                <a href="#por-dentro">Por dentro</a>
+                <a href="#instalacao">Instalação</a>
               </div>
               <div className="foot-col">
                 <span className="foot-h">Projeto</span>
