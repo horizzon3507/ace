@@ -7,7 +7,7 @@ import { formatAge as initialAge, formatDayStamp as initialDay, formatStamp as i
 import { replyGuildInfo as initialGuildInfo, replyUserInfo as initialUserInfo } from './info.js';
 import { grantJoinRole as initialGrant, type JoinMember } from './join-role.js';
 import { isBareMention as initialBare, mentionMessage as initialMention, unknownCommandMessage as initialUnknown } from './mention.js';
-import { startPaginator as initialPaginator } from './paginator.js';
+import { startPaginator as initialPaginator, type PaginatorOptions } from './paginator.js';
 import { prefix as initialPrefix } from './prefix.js';
 import { runPurge as initialPurge, type PurgeMode } from './purge.js';
 import { runModeration as initialModeration, type Punishment } from './punish.js';
@@ -31,7 +31,7 @@ type UserAssetFn = (ctx: AceContext, kind: UserAsset) => Promise<void>;
 type GuildAssetFn = (ctx: AceContext, kind: GuildAsset) => Promise<void>;
 type PurgeFn = (ctx: AceContext, mode: PurgeMode) => Promise<void>;
 type DumpFn = (ctx: AceContext) => Promise<void>;
-type PaginatorFn = (ctx: AceContext, pages: readonly import('yuzuha').Embed[], timeoutMs?: number) => Promise<void>;
+type PaginatorFn = (ctx: AceContext, pages: readonly import('yuzuha').Embed[], options?: PaginatorOptions) => Promise<void>;
 
 export type RuntimeBrand = { primary: number; eyes: number; background: number };
 
@@ -187,8 +187,8 @@ export function replyEmojiIdDrop(ctx: AceContext): Promise<void> {
   return slots.replyEmojiIdDrop(ctx);
 }
 
-export function startPaginator(ctx: AceContext, pages: readonly import('yuzuha').Embed[], timeoutMs?: number): Promise<void> {
-  return slots.startPaginator(ctx, pages, timeoutMs);
+export function startPaginator(ctx: AceContext, pages: readonly import('yuzuha').Embed[], options?: PaginatorOptions): Promise<void> {
+  return slots.startPaginator(ctx, pages, options);
 }
 
 export function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {

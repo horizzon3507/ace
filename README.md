@@ -37,7 +37,7 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 
 | Comando | Argumentos | Faz |
 |---|---|---|
-| `a.ajuda` | | Lista os comandos do Ace. |
+| `a.ajuda` | `[página]` | Lista os comandos do Ace, já na página pedida. |
 | `a.ping` | | Latência do Ace. |
 | `a.uptime` | | Há quanto tempo o Ace está acordado. |
 | `a.avatar` | `[usuário]` | Avatar seu ou de outro usuário. |

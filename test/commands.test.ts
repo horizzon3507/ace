@@ -147,6 +147,53 @@ test('ajuda pagina as categorias com uma página cada', async (t) => {
   assert.deepEqual(fixture.errors, []);
 });
 
+const idlePaginator = {
+  collectors: { awaitReaction: async () => null },
+  messages: { removeReaction: async () => undefined, clearReactions: async () => undefined },
+};
+
+test('ajuda abre direto na página pedida', async (t) => {
+  const fixture = bot(idlePaginator);
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.ajuda 3'), 'success');
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(embed?.title, '<:information2fill:1566640356991184896> Informações');
+  assert.equal(embed?.footer?.text, 'Página 3 de 4 — Confira meus comandos');
+  assert.deepEqual(fixture.transport.reactions.map((reaction) => reaction.emoji), [
+    '<:arrowleftfill:1566639260100997120>',
+    '<:arrowrightfill:1566639126151700482>',
+    '<:home4fill:1570905409848344576>',
+  ]);
+  assert.deepEqual(fixture.errors, []);
+});
+
+test('ajuda na última página não arma a seta de avançar', async (t) => {
+  const fixture = bot(idlePaginator);
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.ajuda 4'), 'success');
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.equal(embed?.title, '<:globefill:1566571242956263426> Utilidades');
+  assert.equal(embed?.footer?.text, 'Página 4 de 4 — Confira meus comandos');
+  assert.deepEqual(fixture.transport.reactions.map((reaction) => reaction.emoji), [
+    '<:arrowleftfill:1566639260100997120>',
+    '<:home4fill:1570905409848344576>',
+  ]);
+});
+
+test('ajuda recusa página fora do intervalo', async (t) => {
+  const fixture = bot();
+  t.after(() => fixture.destroy());
+
+  for (const arg of ['0', '5', 'abc']) {
+    fixture.clock.advance(3_000); // o ajuda tem cooldown de 3s
+    assert.equal(await fixture.send(`a.ajuda ${arg}`), 'success');
+    const content = fixture.messages.at(-1)?.payload.content ?? '';
+    assert.match(content, /Essa página não existe! O ajuda vai de 1 a 4/, `a.ajuda ${arg}`);
+  }
+});
+
 test('guildicon exibe o ícone do servidor', async (t) => {
   const fixture = bot({
     users: {

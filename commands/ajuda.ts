@@ -33,6 +33,7 @@ export default defineCommand({
     'assist', 'socorro', 'aj', 'helper', 'commandhelp', 'comandoslista',
   ],
   cooldown: '3s',
+  examples: ['a.ajuda 2'],
   async run(ctx) {
     const p = await guildPrefix(ctx.guildID) ?? prefix();
     const descriptions = new Map(
@@ -68,6 +69,16 @@ export default defineCommand({
     if (rest.length) pages.push({ label: 'Outros', icon: 'happy', fields: rest });
 
     const total = pages.length + 1;
+    const requested = ctx.tokens[0];
+    let startPage = 0;
+    if (requested !== undefined) {
+      const n = /^\d+$/.test(requested) ? Number.parseInt(requested, 10) : 0;
+      if (n < 1 || n > total) {
+        await ctx.reply(`${ctx.emoji.unhappy} Essa página não existe! O ajuda vai de 1 a ${total}...\n-# ╰ Ex: \`a.ajuda 2\``);
+        return;
+      }
+      startPage = n - 1;
+    }
     const home = embed({
       color: brand.primary,
       title: `${ctx.emoji.home} Ace`,
@@ -91,6 +102,6 @@ export default defineCommand({
         footer: { text: `Página ${i + 2} de ${total} — Confira meus comandos` },
       })),
     ];
-    await startPaginator(ctx, embeds);
+    await startPaginator(ctx, embeds, { startPage });
   },
 });

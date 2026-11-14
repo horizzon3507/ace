@@ -33,6 +33,8 @@ Só chamamos algo de **stable** quando é pra valer.
 
 Terceiro corte em desenvolvimento do bot do Fluxer — ainda em construção, ainda não é release. Esta versão foi feita para CLI com canal de release alpha em 13/11/2026 (v0.1.2-alpha).
 
+- `a.ajuda` aceita o número da página (`a.ajuda 3`) e já abre nela com a barra de reações certa; página fora do intervalo avisa quantas existem.
+
 ## v0.1.1-stable · 13/11/2026
 
 Primeira versão estável do bot do Fluxer — dez comandos novos, listas paginadas por reação e deploy automático. Esta versão foi feita para CLI com canal de release stable em 13/11/2026 (v0.1.1-stable).

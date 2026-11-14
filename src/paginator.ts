@@ -9,6 +9,8 @@ const HOME = 'home4fill';
 const NAMES = [LEFT, RIGHT, HOME];
 const DEFAULT_TIMEOUT_MS = 60_000;
 
+export type PaginatorOptions = { timeoutMs?: number; startPage?: number };
+
 const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
 
 type Button = { name: string; tag: string };
@@ -163,16 +165,17 @@ async function place(ops: Ops, bar: Button[]): Promise<void> {
 }
 
 /**
- * Paginador por reação: responde com a primeira página, arma a barra e devolve
- * o controle — os votos correm em background (se o run esperasse o coletor
- * morrer, o comando só logaria 'ok' depois de 60s). Quando a barra muda
- * (entrada/saída de ponta) ela é refeita do zero; no miolo só o voto do
- * usuário sai, e só sobram as reações do bot.
+ * Paginador por reação: responde com a página inicial (primeira por padrão),
+ * arma a barra e devolve o controle — os votos correm em background (se o run
+ * esperasse o coletor morrer, o comando só logaria 'ok' depois de 60s).
+ * Quando a barra muda (entrada/saída de ponta) ela é refeita do zero; no miolo
+ * só o voto do usuário sai, e só sobram as reações do bot.
  */
-export async function startPaginator(ctx: AceContext, pages: readonly Embed[], timeoutMs = DEFAULT_TIMEOUT_MS): Promise<void> {
+export async function startPaginator(ctx: AceContext, pages: readonly Embed[], { timeoutMs = DEFAULT_TIMEOUT_MS, startPage = 0 }: PaginatorOptions = {}): Promise<void> {
   if (pages.length === 0) return;
+  const start = Number.isInteger(startPage) ? Math.min(Math.max(startPage, 0), pages.length - 1) : 0;
   const all = buttons(ctx);
-  const bar = barFor(0, pages.length, all);
+  const bar = barFor(start, pages.length, all);
 
   // Caminho quente: o raw da mensagem do comando já é a Message nativa — o
   // reply devolve a Message do paginador na MESMA request, sem resolve de
@@ -180,21 +183,21 @@ export async function startPaginator(ctx: AceContext, pages: readonly Embed[], t
   // da fila: nenhum flip corre na frente da montagem.
   const raw = ctx.message?.raw;
   const sent = raw instanceof Message
-    ? await safe(() => raw.reply({ embeds: [toBuilder(pages[0])] }, { ping: false }))
+    ? await safe(() => raw.reply({ embeds: [toBuilder(pages[start])] }, { ping: false }))
     : null;
 
   if (sent) {
     if (pages.length < 2) return;
     const ops = nativeOps(sent);
-    void watch(pages, all, ops, bar, nativeVotes(sent, ctx.authorID, timeoutMs), place(ops, bar));
+    void watch(pages, all, ops, bar, nativeVotes(sent, ctx.authorID, timeoutMs), place(ops, bar), start);
     return;
   }
 
-  const id = await ctx.reply({ embeds: [pages[0]] });
+  const id = await ctx.reply({ embeds: [pages[start]] });
   if (pages.length < 2) return;
   const ops = await makeOps(ctx, id);
   await place(ops, bar);
-  void watch(pages, all, ops, bar, portVotes(ctx, id, Date.now() + timeoutMs), Promise.resolve());
+  void watch(pages, all, ops, bar, portVotes(ctx, id, Date.now() + timeoutMs), Promise.resolve(), start);
 }
 
 async function watch(
@@ -204,9 +207,10 @@ async function watch(
   bar: Button[],
   source: VoteSource,
   initialTail: Promise<unknown>,
+  startPage: number,
 ): Promise<void> {
   let tail = initialTail;
-  let page = 0;
+  let page = startPage;
   let currentBar = bar;
   const warn = (error: unknown) => console.warn('[paginador] flip falhou:', error);
   try {
