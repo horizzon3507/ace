@@ -2,7 +2,7 @@ import { Button } from "@ui-sdk/react/button";
 import { useEffect } from "react";
 
 const INVITE_URL =
-  "https://web.fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120";
+  "https://fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120";
 const REPO_URL = "https://github.com/horizzon3507/ace";
 
 type Cmd = { name: string; desc: string };
@@ -455,11 +455,6 @@ function App() {
               <Button className="btn btn-ghost" render={<a href={REPO_URL} />}>
                 GitHub
               </Button>
-            </div>
-            <div className="end-links">
-              <a href={INVITE_URL}>Convite</a>
-              <a href={REPO_URL}>Código fonte</a>
-              <a href="https://www.npmjs.com/package/yuzuha">Yuzuha</a>
             </div>
           </section>
 
