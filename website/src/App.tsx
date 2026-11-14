@@ -122,7 +122,7 @@ function App() {
             Introduzindo:{" "}
             <img
               className="avatar"
-              src="assets/ace-avatar-crop.png"
+              src="assets/ace-avatar-white.png"
               alt=""
             />{" "}
             Ace
@@ -281,7 +281,7 @@ function App() {
             <div className="foot-brand">
               <div className="foot-lockup">
                 <img
-                  src="assets/ace-face.png"
+                  src="assets/ace-face-white.png"
                   alt=""
                   width="30"
                   height="30"
