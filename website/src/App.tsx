@@ -197,21 +197,33 @@ function App() {
                   </p>
                 </div>
                 <div className="feat-media">
-                  <div className="mock">
-                    <div className="mock-embed">
-                      <div className="mock-head">
-                        <img
-                          src="assets/ace-face-white.png"
-                          alt=""
-                          width="34"
-                          height="34"
-                        />
-                        <div className="mock-headtext">
-                          <strong>Ace</strong>
-                          <span>quer entrar no seu servidor</span>
-                        </div>
+                  <div className="oauth" aria-label="Prévia da tela de autorização do Ace">
+                    <div className="o-head">
+                      <img
+                        src="assets/ace-face.png"
+                        alt=""
+                        width="46"
+                        height="46"
+                      />
+                      <div className="o-headtext">
+                        <b>Ace</b>
+                        <span>quer entrar no seu servidor</span>
                       </div>
-                      <div className="mock-btn">Autorizar</div>
+                    </div>
+                    <div className="o-select">
+                      <span>Escolha um servidor</span>
+                      <svg viewBox="0 0 10 6" aria-hidden="true">
+                        <path d="M1 1l4 4 4-4" />
+                      </svg>
+                    </div>
+                    <ul className="o-perms">
+                      <li>Gerenciar mensagens e canais</li>
+                      <li>Expulsar, banir e silenciar membros</li>
+                      <li>Ver informações do servidor</li>
+                    </ul>
+                    <div className="o-btns">
+                      <span className="o-cancel">Cancelar</span>
+                      <span className="o-ok">Autorizar</span>
                     </div>
                   </div>
                 </div>
@@ -226,16 +238,34 @@ function App() {
                   </p>
                 </div>
                 <div className="feat-media">
-                  <div className="mock">
-                    <div className="mock-line">
-                      <span className="mock-user">horizzon3507</span>
-                      <span className="mock-text">a.setprefix !</span>
-                    </div>
-                    <div className="mock-embed">
-                      <strong>Ace</strong>
-                      <p>
-                        Prefixo trocado para <code>!</code> neste servidor.
+                  <div className="chat" aria-label="Prévia do a.setprefix no chat">
+                    <div className="msg">
+                      <span className="m-av m-av-user" aria-hidden="true" />
+                      <p className="m-text">
+                        <b className="m-user">horizzon3507</b>
+                        <span className="m-cmd">a.setprefix !</span>
                       </p>
+                    </div>
+                    <div className="msg">
+                      <img
+                        className="m-av"
+                        src="assets/ace-face.png"
+                        alt=""
+                        width="36"
+                        height="36"
+                      />
+                      <div className="m-col">
+                        <div className="m-head">
+                          <b>Ace</b>
+                          <span className="m-tag">Bot</span>
+                          <span className="m-time">Hoje às 19:08</span>
+                        </div>
+                        <div className="embx">
+                          <p className="e-desc">
+                            Prefixo trocado para <code>!</code> neste servidor.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -245,12 +275,17 @@ function App() {
                   <span className="num">03</span>
                   <h3>Roda o a.ajuda</h3>
                   <p>
-                    O <code>a.ajuda</code> lista os vinte e um comandos, direto
-                    no chat, paginado.
+                    Perdido? O <code>a.ajuda</code> abre o painel completo no
+                    chat: a descrição do Ace, o prefixo do servidor, a versão,
+                    o tempo acordado e os vinte e um comandos, tudo paginado e
+                    navegável por reações.
                   </p>
                 </div>
                 <div className="feat-media">
-                  <div className="chat" aria-label="Prévia do embed do a.ajuda no Fluxer">
+                  <div
+                    className="chat compact"
+                    aria-label="Prévia do embed do a.ajuda no Fluxer"
+                  >
                     <div className="msg">
                       <span className="m-av m-av-user" aria-hidden="true" />
                       <p className="m-text">

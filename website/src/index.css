@@ -475,60 +475,77 @@ h3 {
   padding: 0 5px;
 }
 
-.feat-shot { margin-top: 0; margin-bottom: 0; }
+/* mock da tela de autorização */
 
-/* mock de mensagem estilo Fluxer */
-
-.mock {
-  background: rgba(10, 14, 40, .6);
-  border: 1px solid rgba(255, 255, 255, .14);
-  border-radius: 16px;
+.oauth {
+  background: #101116;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 14px;
   padding: 22px;
+  font-size: 13.5px;
   box-shadow: 0 20px 50px rgba(10, 14, 50, .35);
 }
+.o-head { display: flex; align-items: center; gap: 13px; }
+.o-head img { border-radius: 50%; display: block; }
+.o-headtext { display: flex; flex-direction: column; gap: 2px; }
+.o-headtext b { color: #f4f6ff; font-size: 15px; }
+.o-headtext span { color: rgba(214, 216, 224, .6); font-size: 12.5px; }
 
-.mock-line {
+.o-select {
+  margin-top: 16px;
   display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 12px;
-  font-size: 13px;
-}
-.mock-user { color: #8f9aff; font-weight: 600; }
-.mock-text { color: rgba(228, 234, 255, .85); font-family: var(--font-mono); font-size: 12.5px; }
-
-.mock-embed {
-  background: rgba(255, 255, 255, .07);
-  border-left: 3px solid #8f9aff;
+  align-items: center;
+  justify-content: space-between;
+  background: #17181e;
+  border: 1px solid rgba(255, 255, 255, .12);
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 9px 12px;
+  color: rgba(214, 216, 224, .65);
+  font-size: 12.5px;
 }
-.mock-embed strong { color: #f4f6ff; font-size: 13.5px; }
-.mock-embed p { margin-top: 4px; color: rgba(228, 234, 255, .78); font-size: 13px; }
-.mock-embed code {
-  font-family: var(--font-mono);
-  font-size: .9em;
-  background: rgba(255, 255, 255, .12);
-  border-radius: 4px;
-  padding: 0 4px;
+.o-select svg {
+  width: 9px;
+  height: 5px;
+  stroke: rgba(214, 216, 224, .65);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
 }
 
-.mock-head { display: flex; align-items: center; gap: 12px; }
-.mock-head img { border-radius: 8px; display: block; }
-.mock-headtext { display: flex; flex-direction: column; }
-.mock-headtext strong { color: #f4f6ff; font-size: 14px; }
-.mock-headtext span { color: rgba(228, 234, 255, .65); font-size: 12.5px; }
-
-.mock-btn {
-  margin-top: 14px;
-  display: inline-block;
+.o-perms { margin-top: 14px; }
+.o-perms li {
+  position: relative;
+  padding-left: 16px;
+  color: #d6d8e0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.o-perms li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: .62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
   background: #5565ea;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 7px 18px;
+}
+
+.o-btns { display: flex; gap: 10px; margin-top: 18px; }
+.o-btns span {
+  flex: 1;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 650;
+  padding: 9px 0;
   border-radius: 8px;
 }
+.o-cancel {
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .12);
+  color: #d6d8e0;
+}
+.o-ok { background: #5565ea; color: #fff; }
 
 /* prévia fiel do embed do a.ajuda */
 
@@ -643,6 +660,22 @@ h3 {
   padding: 1px 7px;
   border-radius: 999px;
 }
+
+.chat.compact { font-size: 10.5px; padding: 10px 12px; }
+.chat.compact .m-av { width: 24px; height: 24px; }
+.chat.compact .m-text { padding-top: 3px; }
+.chat.compact .m-cmd { font-size: 10px; }
+.chat.compact .m-head b { font-size: 11.5px; }
+.chat.compact .m-tag { font-size: 8.5px; padding: 1px 4px; }
+.chat.compact .m-time { font-size: 9.5px; }
+.chat.compact .embx { padding: 8px 10px; }
+.chat.compact .e-title { font-size: 11.5px; }
+.chat.compact .e-title svg { width: 11px; height: 11px; }
+.chat.compact .e-desc { font-size: 10.5px; line-height: 1.4; }
+.chat.compact .e-list li { font-size: 10.5px; line-height: 1.6; padding-left: 12px; }
+.chat.compact .e-list li::before { width: 5px; height: 5px; }
+.chat.compact .e-foot { font-size: 10px; }
+.chat.compact .rct { font-size: 9.5px; padding: 1px 6px; }
 
 /* ————— instalação ————— */
 
