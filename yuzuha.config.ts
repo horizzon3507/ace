@@ -1,4 +1,5 @@
 import { defineConfig, SDK } from 'yuzuha';
+import { bindGuildAutoroles } from './src/guild-autorole.js';
 import { bindGuildPrefixes, guildPrefix } from './src/guild-prefix.js';
 import { grantJoinRole, isBareMention, mentionMessage, prefix, unknownCommandMessage } from './src/live.js';
 
@@ -24,6 +25,7 @@ export default defineConfig({
   },
   setup(bot) {
     bindGuildPrefixes(bot.store);
+    bindGuildAutoroles(bot.store);
     bot.on(SDK.Events.MessageCreate, async (message) => {
       const me = bot.client.user;
       if (!me || message.author.bot) return;

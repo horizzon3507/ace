@@ -20,8 +20,9 @@ import clear from '../commands/clear.js';
 import purge from '../commands/purge.js';
 import timeout from '../commands/timeout.js';
 import unban from '../commands/unban.js';
+import autorole from '../commands/autorole.js';
 
-const commands = [ping, uptime, setprefix, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban, userinfo, guildinfo, clear, purge, timeout, unban];
+const commands = [ping, uptime, setprefix, ajuda, guildicon, avatar, userbanner, guildbanner, kick, ban, userinfo, guildinfo, clear, purge, timeout, unban, autorole];
 
 function bot(resources?: MockResourceOverrides) {
   return createTestBot({ prefix: 'a.', commands, emoji, resources });

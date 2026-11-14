@@ -58,10 +58,11 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 | `a.clear` | `<n>` | Apaga as últimas mensagens do canal. |
 | `a.purge` | `<usuário> [n]` | Apaga mensagens recentes de um membro no canal. |
 | `a.setprefix` | `<prefixo>` ou `reset` | Troca o prefixo do Ace no servidor. |
+| `a.autorole` | `[cargo]` ou `off` | Cargo automático pra quem entra no servidor. |
 
 `usuário` aceita menção, ID ou nome (nome resolve por busca no servidor; no `a.unban`, na lista de bans). Sem argumento, `a.avatar`, `a.userbanner` e `a.userinfo` mostram o seu.
 
-`a.guildicon`, `a.guildbanner`, `a.userinfo`, `a.guildinfo`, `a.emojilist`, `a.emojidump`, `a.kick`, `a.ban`, `a.softban`, `a.unban`, `a.timeout`, `a.lock`, `a.unlock`, `a.clear`, `a.purge` e `a.setprefix` só rodam dentro de um servidor. `a.kick`, `a.ban`, `a.softban` e `a.unban` pedem a permissão equivalente; `a.timeout` pede Moderar Membros; `a.lock` e `a.unlock` pedem Gerenciar Cargos; `a.clear` e `a.purge` pedem Gerenciar Mensagens; `a.setprefix` pede Gerenciar Servidor.
+`a.guildicon`, `a.guildbanner`, `a.userinfo`, `a.guildinfo`, `a.emojilist`, `a.emojidump`, `a.kick`, `a.ban`, `a.softban`, `a.unban`, `a.timeout`, `a.lock`, `a.unlock`, `a.clear`, `a.purge`, `a.setprefix` e `a.autorole` só rodam dentro de um servidor. `a.kick`, `a.ban`, `a.softban` e `a.unban` pedem a permissão equivalente; `a.timeout` pede Moderar Membros; `a.lock`, `a.unlock` e `a.autorole` pedem Gerenciar Cargos; `a.clear` e `a.purge` pedem Gerenciar Mensagens; `a.setprefix` pede Gerenciar Servidor.
 
 ## Dados
 
