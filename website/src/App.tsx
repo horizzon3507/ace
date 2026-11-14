@@ -77,7 +77,7 @@ function App() {
     <>
       <nav>
         <div className="nav-bar">
-          <a className="brand" href="/">
+          <a className="brand" href="./">
             <img
               src="assets/ace-face-white.png"
               alt="Ace"
