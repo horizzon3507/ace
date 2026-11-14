@@ -240,9 +240,15 @@ function App() {
                 <div className="feat-media">
                   <div className="chat" aria-label="Prévia do a.setprefix no chat">
                     <div className="msg">
-                      <span className="m-av m-av-user" aria-hidden="true" />
+                      <img
+                        className="m-av"
+                        src="assets/horizzon.png"
+                        alt=""
+                        width="36"
+                        height="36"
+                      />
                       <p className="m-text">
-                        <b className="m-user">horizzon3507</b>
+                        <b className="m-user">Horizzon</b>
                         <span className="m-cmd">a.setprefix !</span>
                       </p>
                     </div>
@@ -262,6 +268,14 @@ function App() {
                         </div>
                         <div className="embx">
                           <p className="e-desc">
+                            <svg
+                              className="e-check"
+                              viewBox="0 0 14 14"
+                              aria-hidden="true"
+                            >
+                              <circle cx="7" cy="7" r="6" />
+                              <path d="M4.4 7.2l1.8 1.8 3.4-3.6" />
+                            </svg>
                             Prefixo trocado para <code>!</code> neste servidor.
                           </p>
                         </div>
@@ -287,9 +301,15 @@ function App() {
                     aria-label="Prévia do embed do a.ajuda no Fluxer"
                   >
                     <div className="msg">
-                      <span className="m-av m-av-user" aria-hidden="true" />
+                      <img
+                        className="m-av"
+                        src="assets/horizzon.png"
+                        alt=""
+                        width="36"
+                        height="36"
+                      />
                       <p className="m-text">
-                        <b className="m-user">horizzon3507</b>
+                        <b className="m-user">Horizzon</b>
                         <span className="m-cmd">a.ajuda</span>
                       </p>
                     </div>
@@ -343,9 +363,26 @@ function App() {
                           <p className="e-foot">Página 1 de 4 — Sobre mim</p>
                         </div>
                         <div className="reacts" aria-hidden="true">
-                          <span className="rct">→ 1</span>
-                          <span className="rct">⌂ 1</span>
-                          <span className="rct">☺</span>
+                          <span className="rct">
+                            <svg viewBox="0 0 16 16">
+                              <path d="M2.5 8h10M9.5 4.5l4 3.5-4 3.5" />
+                            </svg>
+                            1
+                          </span>
+                          <span className="rct">
+                            <svg viewBox="0 0 16 16">
+                              <path d="M8 2.2 2.6 6.6v7h3.8v-3.4h3.2v3.4h3.8v-7z" />
+                            </svg>
+                            1
+                          </span>
+                          <span className="rct">
+                            <svg viewBox="0 0 16 16">
+                              <circle cx="8" cy="8" r="6" />
+                              <circle cx="5.9" cy="6.4" r=".9" className="fill" />
+                              <circle cx="10.1" cy="6.4" r=".9" className="fill" />
+                              <path d="M5.3 9.6c.7 1 1.6 1.5 2.7 1.5s2-.5 2.7-1.5" />
+                            </svg>
+                          </span>
                         </div>
                       </div>
                     </div>
