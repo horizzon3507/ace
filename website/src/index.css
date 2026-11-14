@@ -20,10 +20,10 @@
   --primary-hover: #7ba0ec;
   --primary-pressed: #5374c9;
   --primary-light: #9eb7e5;
-  --hero-blue: #5565ea;
-  --hero-blue-deep: #3a49d6;
-  --hero-ink: #f4f6ff;
-  --hero-muted: rgba(228, 234, 255, .78);
+  --hero-blue: #f4f6fb;
+  --hero-blue-deep: #e2e7f2;
+  --hero-ink: #161d42;
+  --hero-muted: rgba(22, 29, 66, .68);
   --bg: #0a0c12;
   --surface: #12141c;
   --surface-hover: #171a23;
@@ -79,7 +79,7 @@ nav {
 .brand {
   display: inline-flex;
   align-items: center;
-  color: #fff;
+  color: var(--hero-ink);
   font-size: 15px;
   font-weight: 650;
   letter-spacing: -.02em;
@@ -94,7 +94,7 @@ nav {
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, .82);
+  color: rgba(22, 29, 66, .72);
   font-size: 13px;
   text-decoration: none;
   padding: 5px 10px;
@@ -106,8 +106,8 @@ nav {
   margin-left: 6px;
   padding: 5px 12px;
   border-radius: 9px;
-  background: #fff;
-  color: #2f3cbd;
+  background: #2f3cbd;
+  color: #fff;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -288,16 +288,16 @@ h1 {
 .btn-primary:active { background: var(--primary-pressed); }
 
 .hero .btn-primary {
-  background: #fff;
-  color: #2f3cbd;
+  background: #2f3cbd;
+  color: #fff;
   font-weight: 600;
-  box-shadow: 0 6px 20px rgba(20, 26, 80, .35), inset 0 1px 0 rgba(255, 255, 255, .6);
+  box-shadow: 0 6px 20px rgba(47, 60, 189, .3), inset 0 1px 0 rgba(255, 255, 255, .18);
 }
 
 .hero .btn-ghost {
-  background: rgba(255, 255, 255, .14);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, .3);
+  background: rgba(22, 29, 66, .06);
+  color: var(--hero-ink);
+  border: 1px solid rgba(22, 29, 66, .16);
 }
 
 .btn-ghost {
@@ -309,10 +309,10 @@ h1 {
 @media (hover: hover) and (pointer: fine) {
   .btn-primary:hover { background: var(--primary-hover); }
   .btn-ghost:hover { border-color: var(--border-hover); background: var(--surface-hover); }
-  .hero .btn-primary:hover { background: #e9edff; }
-  .hero .btn-ghost:hover { background: rgba(255, 255, 255, .22); border-color: rgba(255, 255, 255, .4); }
-  .nav-link:hover { color: #fff; background: rgba(255, 255, 255, .14); }
-  .nav-cta:hover { background: #e9edff; }
+  .hero .btn-primary:hover { background: #26329e; }
+  .hero .btn-ghost:hover { background: rgba(22, 29, 66, .1); border-color: rgba(22, 29, 66, .26); }
+  .nav-link:hover { color: var(--hero-ink); background: rgba(22, 29, 66, .07); }
+  .nav-cta:hover { background: #26329e; }
   footer a:hover { color: var(--text); }
 }
 
