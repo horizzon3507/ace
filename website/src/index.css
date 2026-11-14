@@ -60,7 +60,7 @@ a { -webkit-tap-highlight-color: transparent; }
 /* ————— nav flutuante: barra centralizada na largura do conteúdo ————— */
 
 nav {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
