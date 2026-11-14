@@ -48,9 +48,7 @@ function App() {
     <>
       <nav>
         <div className="nav-bar">
-          <a className="brand" href="/" aria-label="ace">
-            <img src="assets/ace-face.png" alt="" width="28" height="28" />
-          </a>
+          <a className="brand" href="/">Ace</a>
           <div className="nav-links">
             <a className="nav-link" href="#comandos">
               comandos
@@ -71,18 +69,19 @@ function App() {
       <main>
         <header className="hero">
           <h1>
-            conheça o{" "}
+            Introduzindo:{" "}
             <img
               className="avatar"
               src="assets/ace-avatar-crop.png"
               alt=""
             />{" "}
-            ace
+            Ace
           </h1>
           <p className="lede">
-            heey! eu seguro a moderação com kicks, bans, timeouts e limpeza de
-            mensagens, te conto tudo sobre usuários e o servidor, busco
-            avatares e banners e ainda listo e empaco os emojis daqui.
+            o bot que segura seu servidor inteiro. moderação firme com kicks,
+            bans e timeouts, respostas completas sobre usuários e o servidor,
+            e utilidades que vão de avatares a emojis. 21 comandos, direto ao
+            ponto.
           </p>
           <div className="cta">
             <Button className="btn btn-primary" render={<a href={INVITE_URL} />}>
@@ -199,11 +198,12 @@ function App() {
       </main>
 
       <footer>
+        <div className="foot-bar">
         <div className="foot-top">
           <div className="foot-brand">
             <img src="assets/ace-face.png" alt="" width="24" height="24" />
             <div>
-              <span className="foot-name">ace</span>
+              <span className="foot-name">Ace</span>
               <span className="foot-tag">bot do fluxer, em pt-BR</span>
             </div>
           </div>
@@ -225,6 +225,7 @@ function App() {
         <div className="foot-bottom">
           <span>AGPL-3.0</span>
           <span>v0.1.1-alpha</span>
+        </div>
         </div>
       </footer>
     </>
