@@ -50,7 +50,7 @@ export default defineCommand({
       await ctx.reply([
         `${ctx.emoji.team} Autorole deste servidor:`,
         ...lines,
-        `-# ╰ Configure com \`${p}autorole <all|user|app> <cargos>\` — limpe com \`${p}autorole reset <categoria>\``,
+        `-# ╰ Configure com \`${p}autorole <all|user|app> <cargos>\` | Limpe com \`${p}autorole reset <categoria>\``,
       ].join('\n'));
       return;
     }
@@ -78,7 +78,7 @@ export default defineCommand({
       return;
     }
     if (rest.length > MAX_ROLES) {
-      await ctx.reply(`${ctx.emoji.unhappy} São até ${MAX_ROLES} cargos por categoria — você mandou ${rest.length}...`);
+      await ctx.reply(`${ctx.emoji.unhappy} São até ${MAX_ROLES} cargos por categoria! Você mandou ${rest.length}...`);
       return;
     }
 
@@ -93,7 +93,7 @@ export default defineCommand({
     }
     for (const role of resolved) {
       if (role.managed || role.id === guildID) {
-        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** eu não consigo entregar — ele é do @everyone ou gerenciado por uma integração...`);
+        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** eu não consigo entregar! Ele é do @everyone ou é gerenciado por uma integração...`);
         return;
       }
     }
@@ -108,11 +108,11 @@ export default defineCommand({
     const authorTop = topOf(roles, author, guild.ownerID, ctx.authorID);
     for (const role of resolved) {
       if (role.position >= botTop) {
-        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** está acima do meu maior cargo — eu não conseguiria entregá-lo...`);
+        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** está acima do meu maior cargo! Eu não conseguiria entregá-lo...`);
         return;
       }
       if (role.position >= authorTop) {
-        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** está acima do seu maior cargo — você não pode delegá-lo...`);
+        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** está acima do seu maior cargo! Você não pode delegá-lo...`);
         return;
       }
     }
