@@ -20,8 +20,8 @@
   --primary-hover: #7ba0ec;
   --primary-pressed: #5374c9;
   --primary-light: #9eb7e5;
-  --hero-blue: #5565ea;
-  --hero-blue-deep: #3a49d6;
+  --hero-blue: #4c5ae0;
+  --hero-blue-deep: #333dbb;
   --hero-ink: #f4f6ff;
   --hero-muted: rgba(228, 234, 255, .78);
   --bg: #0a0c12;
@@ -39,7 +39,7 @@
   --site-w: 720px;
   --band: #eef1fa;
   --band-deep: #e0e6f5;
-  --paper: #4d55cb;
+  --paper: #444cc0;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -423,19 +423,19 @@ h3 {
   gap: 8px;
 }
 
-.step .card-inner { padding: 24px 22px; min-height: 168px; }
+.step .card-inner { padding: 30px 26px; min-height: 200px; }
 
 .step .num {
   font-family: var(--font-mono);
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 650;
   letter-spacing: -.04em;
   color: #2f3cbd;
 }
 
 .step p {
-  margin-top: 14px;
-  font-size: 15.5px;
+  margin-top: 16px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--muted);
 }
@@ -549,26 +549,26 @@ h3 {
   letter-spacing: -.01em;
 }
 
-/* ————— reveal on scroll (scroll-driven animation, degradado p/ visível) ————— */
+/* ————— reveal ao descer: IntersectionObserver liga .revealed ————— */
 
-@supports (animation-timeline: view()) {
-  [data-reveal] {
-    animation: reveal .6s var(--ease-out) both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 55%;
-  }
-  [data-reveal="down"] { animation-name: drop; }
-  .steps-grid .step:nth-child(2) { animation-range: entry 6% entry 61%; }
-  .steps-grid .step:nth-child(3) { animation-range: entry 12% entry 67%; }
+.io [data-reveal] { opacity: 0; }
+
+.io [data-reveal].revealed {
+  animation: reveal .65s var(--ease-out) both;
 }
+.io [data-reveal="down"].revealed { animation-name: drop; animation-duration: .8s; }
+
+.steps-grid .step:nth-child(1) { animation-delay: 0ms; }
+.steps-grid .step:nth-child(2) { animation-delay: 140ms; }
+.steps-grid .step:nth-child(3) { animation-delay: 280ms; }
 
 @keyframes reveal {
   from { opacity: 0; transform: translateY(16px); }
 }
 
 @keyframes drop {
-  0% { opacity: 0; transform: translateY(-52px) scale(.96); }
-  55% { opacity: 1; transform: translateY(7px) scale(1.005); }
+  0% { opacity: 0; transform: translateY(-64px) scale(.94); }
+  55% { opacity: 1; transform: translateY(8px) scale(1.008); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
@@ -719,7 +719,7 @@ footer {
   .hero h1, .hero .lede, .hero .cta, .hero .shot-frame { animation: none; }
   .d { animation: none; }
   .strip-track { animation: none; }
-  [data-reveal] { animation: none !important; }
+  [data-reveal] { animation: none !important; opacity: 1; }
   .btn { transition: background .15s ease, border-color .15s ease; }
 }
 

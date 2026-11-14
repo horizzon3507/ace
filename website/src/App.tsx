@@ -1,4 +1,5 @@
 import { Button } from "@ui-sdk/react/button";
+import { useEffect } from "react";
 
 const INVITE_URL =
   "https://web.fluxer.app/oauth2/authorize?client_id=1565400101596172288&scope=bot&permissions=18014398509829120";
@@ -50,11 +51,40 @@ const STRIPS: Cmd[][] = [[], [], []];
 ALL_COMMANDS.forEach((c, i) => STRIPS[i % 3].push(c));
 
 function App() {
+  useEffect(() => {
+    const els = document.querySelectorAll("[data-reveal]");
+    document.documentElement.classList.add("io");
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("revealed");
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.15 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => {
+      io.disconnect();
+      document.documentElement.classList.remove("io");
+    };
+  }, []);
+
   return (
     <>
       <nav>
         <div className="nav-bar">
-          <a className="brand" href="/">Ace</a>
+          <a className="brand" href="/">
+            <img
+              src="assets/ace-face-white.png"
+              alt="Ace"
+              width="24"
+              height="24"
+            />
+            Ace
+          </a>
           <div className="nav-links">
             <a className="nav-link" href="#comandos">
               Comandos
@@ -118,15 +148,7 @@ function App() {
               <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
             </svg>
           </div>
-          <h1>
-            Introduzindo:{" "}
-            <img
-              className="avatar"
-              src="assets/ace-avatar-white.png"
-              alt=""
-            />{" "}
-            Ace
-          </h1>
+          <h1>Introduzindo: Ace</h1>
           <p className="lede">
             A aplicação perfeita para gerenciar o seu servidor! Moderação
             rápida e intuitiva, utilidades prontas para uso, manipulação de
