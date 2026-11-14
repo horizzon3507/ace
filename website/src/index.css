@@ -74,14 +74,23 @@ nav {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: min(var(--site-w), calc(100% - 32px));
-  padding: 7px 8px 7px 14px;
+  gap: 10px;
+  max-width: calc(100% - 32px);
+  padding: 6px 7px;
   background: rgba(19, 19, 21, .72);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 999px;
+}
+
+.nav-bar .brand {
+  padding-left: 4px;
+  border-radius: 999px;
+}
+
+.nav-bar .nav-links {
+  padding-right: 2px;
 }
 
 .brand {
