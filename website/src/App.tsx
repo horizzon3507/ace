@@ -177,7 +177,7 @@ function App() {
           >
             <path
               d="M0 72 C240 128 480 132 720 92 C960 52 1200 40 1440 84 L1440 140 L0 140 Z"
-              fill="var(--band)"
+              fill="#3944a8"
             />
           </svg>
         </header>
