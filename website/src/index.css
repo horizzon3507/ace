@@ -20,6 +20,10 @@
   --primary-hover: #7ba0ec;
   --primary-pressed: #5374c9;
   --primary-light: #9eb7e5;
+  --hero-blue: #a3bdf4;
+  --hero-blue-deep: #7da2ef;
+  --hero-ink: #10131c;
+  --hero-muted: rgba(16, 19, 28, .66);
   --bg: #0a0a0b;
   --surface: #131315;
   --surface-hover: #17171a;
@@ -138,25 +142,38 @@ main {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 96px 24px 64px;
+  padding: 96px 24px 0;
+  background: linear-gradient(180deg, var(--hero-blue) 0%, var(--hero-blue-deep) 100%);
+  color: var(--hero-ink);
+}
+
+.wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: clamp(70px, 10vw, 140px);
+  display: block;
 }
 
 .avatar {
   display: inline-block;
-  width: 1.08em;
-  height: 1.08em;
+  width: 1.85em;
+  height: 1.85em;
+  margin: 0 -.1em;
   object-fit: contain;
-  vertical-align: -.14em;
+  vertical-align: -.6em;
 }
 
 .shot-frame {
   margin-top: 52px;
+  margin-bottom: clamp(80px, 11vw, 160px);
   padding: 4px;
   width: min(640px, 100%);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+  box-shadow: 0 20px 60px rgba(16, 19, 28, .35);
 }
 
 .hero-shot {
@@ -166,7 +183,7 @@ main {
   border-radius: 12px;
 }
 
-h1 { color: #fff; }
+h1 { color: var(--hero-ink); }
 
 h1 {
   font-size: clamp(56px, 8vw, 76px);
@@ -178,7 +195,7 @@ h1 {
 
 .lede {
   margin-top: 16px;
-  color: var(--muted);
+  color: var(--hero-muted);
   font-size: clamp(15px, 2.4vw, 18px);
   line-height: 1.5;
   letter-spacing: -.005em;
@@ -222,6 +239,18 @@ h1 {
 }
 .btn-primary:active { background: var(--primary-pressed); }
 
+.hero .btn-primary {
+  background: #3d63c9;
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16);
+}
+
+.hero .btn-ghost {
+  background: rgba(255, 255, 255, .3);
+  color: var(--hero-ink);
+  border: 1px solid rgba(16, 19, 28, .14);
+}
+
 .btn-ghost {
   background: var(--surface);
   color: var(--text);
@@ -230,7 +259,9 @@ h1 {
 
 @media (hover: hover) and (pointer: fine) {
   .btn-primary:hover { background: var(--primary-hover); }
+  .hero .btn-primary:hover { background: #4a72d6; }
   .btn-ghost:hover { border-color: var(--border-hover); background: var(--surface-hover); }
+  .hero .btn-ghost:hover { background: rgba(255, 255, 255, .45); border-color: rgba(16, 19, 28, .22); }
   .nav-link:hover { color: var(--text); background: var(--surface-hover); }
   .nav-cta:hover { background: var(--primary-hover); }
   footer a:hover { color: var(--text); }

@@ -48,9 +48,8 @@ function App() {
     <>
       <nav>
         <div className="nav-bar">
-          <a className="brand" href="/">
-            <img src="assets/ace-face.png" alt="" width="22" height="22" />
-            ace
+          <a className="brand" href="/" aria-label="ace">
+            <img src="assets/ace-face.png" alt="" width="28" height="28" />
           </a>
           <div className="nav-links">
             <a className="nav-link" href="#comandos">
@@ -100,6 +99,17 @@ function App() {
               alt="O embed do a.ajuda no Fluxer, listando os comandos do Ace"
             />
           </div>
+          <svg
+            className="wave"
+            viewBox="0 0 1440 140"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M0 72 C240 128 480 132 720 92 C960 52 1200 40 1440 84 L1440 140 L0 140 Z"
+              fill="var(--bg)"
+            />
+          </svg>
         </header>
 
         <section className="steps" data-reveal>
