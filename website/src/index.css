@@ -167,11 +167,11 @@ main {
 
 .avatar {
   display: inline-block;
-  width: 1.85em;
-  height: 1.85em;
-  margin: 0 -.1em;
+  width: 1.02em;
+  height: 1.02em;
+  margin: 0 .06em;
   object-fit: contain;
-  vertical-align: -.6em;
+  vertical-align: -.14em;
 }
 
 .shot-frame {

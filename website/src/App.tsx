@@ -74,7 +74,7 @@ function App() {
             conheça o{" "}
             <img
               className="avatar"
-              src="assets/ace-avatar-animado.png"
+              src="assets/ace-avatar-crop.png"
               alt=""
             />{" "}
             ace
