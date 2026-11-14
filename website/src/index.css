@@ -908,7 +908,10 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .hero h1, .hero .lede, .hero .cta, .hero .shot-frame { animation: none; }
   .d { animation: none; }
+  .strips { height: auto; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+  .strip { overflow: visible; }
   .strip-track { animation: none; }
+  .chip.dup { display: none; }
   [data-reveal] { animation: none !important; opacity: 1; }
   .btn { transition: background .15s ease, border-color .15s ease; }
 }

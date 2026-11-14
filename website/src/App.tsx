@@ -334,7 +334,11 @@ function App() {
                     style={{ animationDelay: `${-i * 6}s` }}
                   >
                     {[...strip, ...strip].map((command, j) => (
-                      <div className="chip" key={`${command.name}-${j}`}>
+                      <div
+                        className={`chip${j >= strip.length ? " dup" : ""}`}
+                        aria-hidden={j >= strip.length}
+                        key={`${command.name}-${j}`}
+                      >
                         <code>{command.name}</code>
                         <span>{command.desc}</span>
                       </div>
