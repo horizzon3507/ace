@@ -9,6 +9,6 @@ export default defineCommand({
   permissions: ['ManageMessages'],
   botPermissions: ['ManageMessages'],
   cooldown: '3s',
-  examples: ['a.clear 20'],
+  examples: ['clear 20'],
   run: (ctx) => runPurge(ctx, 'channel'),
 });

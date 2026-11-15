@@ -9,6 +9,6 @@ export default defineCommand({
   permissions: ['BanMembers'],
   botPermissions: ['BanMembers'],
   cooldown: '3s',
-  examples: ['a.ban @usuario spam'],
+  examples: ['ban @usuario spam'],
   run: (ctx) => runModeration(ctx, 'ban'),
 });

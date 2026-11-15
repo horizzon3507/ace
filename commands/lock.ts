@@ -9,6 +9,6 @@ export default defineCommand({
   permissions: ['ManageRoles'],
   botPermissions: ['ManageRoles'],
   cooldown: '3s',
-  examples: ['a.lock', 'a.lock #geral flood'],
+  examples: ['lock', 'lock #geral flood'],
   run: (ctx) => runChannelLock(ctx, 'lock'),
 });

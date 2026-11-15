@@ -9,7 +9,7 @@ export default defineCommand({
   guildOnly: true,
   permissions: ['ManageGuild'],
   cooldown: '3s',
-  examples: ['a.setprefix !', 'a.setprefix reset'],
+  examples: ['setprefix !', 'setprefix reset'],
   async run(ctx) {
     const guildID = ctx.requireGuild();
     const next = ctx.tokens[0];

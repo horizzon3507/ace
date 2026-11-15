@@ -35,7 +35,7 @@ export default defineCommand({
   permissions: ['ManageRoles'],
   botPermissions: ['ManageRoles'],
   cooldown: '3s',
-  examples: ['a.autorole user @Membro @Vip', 'a.autorole reset all'],
+  examples: ['autorole user @Membro @Vip', 'autorole reset all'],
   async run(ctx) {
     const guildID = ctx.requireGuild();
     const p = await guildPrefix(ctx.guildID) ?? prefix();

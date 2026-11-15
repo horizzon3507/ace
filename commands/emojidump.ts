@@ -7,6 +7,6 @@ export default defineCommand({
   aliases: ['dumpemojis', 'exportaremojis', 'emojisdump', 'emojizip', 'zipemojis'],
   guildOnly: true,
   cooldown: '10s',
-  examples: ['a.emojidump'],
+  examples: ['emojidump'],
   run: (ctx) => replyEmojiDump(ctx),
 });

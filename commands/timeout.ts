@@ -9,6 +9,6 @@ export default defineCommand({
   permissions: ['ModerateMembers'],
   botPermissions: ['ModerateMembers'],
   cooldown: '3s',
-  examples: ['a.timeout @usuario 10m spam'],
+  examples: ['timeout @usuario 10m spam'],
   run: (ctx) => runModeration(ctx, 'timeout'),
 });

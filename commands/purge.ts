@@ -9,6 +9,6 @@ export default defineCommand({
   permissions: ['ManageMessages'],
   botPermissions: ['ManageMessages'],
   cooldown: '3s',
-  examples: ['a.purge @usuario', 'a.purge @usuario 25'],
+  examples: ['purge @usuario', 'purge @usuario 25'],
   run: (ctx) => runPurge(ctx, 'user'),
 });

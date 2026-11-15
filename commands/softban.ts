@@ -9,6 +9,6 @@ export default defineCommand({
   permissions: ['BanMembers'],
   botPermissions: ['BanMembers'],
   cooldown: '3s',
-  examples: ['a.softban @usuario spam'],
+  examples: ['softban @usuario spam'],
   run: (ctx) => runModeration(ctx, 'softban'),
 });

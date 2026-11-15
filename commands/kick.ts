@@ -9,6 +9,6 @@ export default defineCommand({
   permissions: ['KickMembers'],
   botPermissions: ['KickMembers'],
   cooldown: '3s',
-  examples: ['a.kick @usuario spam'],
+  examples: ['kick @usuario spam'],
   run: (ctx) => runModeration(ctx, 'kick'),
 });

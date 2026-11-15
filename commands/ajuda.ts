@@ -24,6 +24,25 @@ const commandIcons: Record<string, EmojiKey> = {
   clear: 'purge', purge: 'purge', timeout: 'time', unban: 'unban', autorole: 'team',
 };
 
+// Exemplos mostrados no ajuda, sem prefixo — renderizados com o do servidor.
+// Espelho do metadata `examples` dos comandos (o ctx não expõe os demais);
+// o teste de consistência cobre drift entre os dois.
+export const commandExamples: Record<string, readonly string[]> = {
+  ajuda: ['ajuda 2'],
+  setprefix: ['setprefix !', 'setprefix reset'],
+  autorole: ['autorole user @Membro @Vip', 'autorole reset all'],
+  kick: ['kick @usuario spam'],
+  ban: ['ban @usuario spam'],
+  softban: ['softban @usuario spam'],
+  lock: ['lock', 'lock #geral flood'],
+  unlock: ['unlock', 'unlock #geral'],
+  clear: ['clear 20'],
+  purge: ['purge @usuario', 'purge @usuario 25'],
+  timeout: ['timeout @usuario 10m spam'],
+  unban: ['unban @usuario', 'unban 1234567890123 se arrependeu'],
+  emojidump: ['emojidump'],
+};
+
 export default defineCommand({
   name: 'ajuda',
   description: 'Lista os comandos do Ace.',
@@ -33,7 +52,7 @@ export default defineCommand({
     'assist', 'socorro', 'aj', 'helper', 'commandhelp', 'comandoslista',
   ],
   cooldown: '3s',
-  examples: ['a.ajuda 2'],
+  examples: ['ajuda 2'],
   async run(ctx) {
     const p = await guildPrefix(ctx.guildID) ?? prefix();
     const descriptions = new Map(
@@ -48,6 +67,12 @@ export default defineCommand({
 
     const listed = new Set<string>();
     const pages: { label: string; icon: EmojiKey; fields: { name: string; value: string; inline?: boolean }[] }[] = [];
+    // Descrição + exemplo(s) na mesma field: `Ex: a.foo bar` com o prefixo do servidor.
+    const fieldValue = (command: string, description: string): string => {
+      const examples = commandExamples[command];
+      const usage = examples?.length ? `\n╰ Ex: ${examples.map((ex) => `\`${p}${ex}\``).join(' · ')}` : '';
+      return `${description || '​'}${usage}`;
+    };
     for (const { icon, label, commands } of categories) {
       const fields: { name: string; value: string; inline?: boolean }[] = [];
       for (const command of commands) {
@@ -55,7 +80,7 @@ export default defineCommand({
         if (description === undefined) continue;
         listed.add(command);
         const key = commandIcons[command] ?? icon;
-        fields.push({ name: `${ctx.emoji[key]} \`${p}${command}\``, value: description || '​', inline: true });
+        fields.push({ name: `${ctx.emoji[key]} \`${p}${command}\``, value: fieldValue(command, description), inline: true });
       }
       if (fields.length) pages.push({ label, icon, fields });
     }
@@ -64,7 +89,7 @@ export default defineCommand({
     for (const [command, description] of descriptions) {
       if (listed.has(command)) continue;
       const key = commandIcons[command] ?? 'happy';
-      rest.push({ name: `${ctx.emoji[key]} \`${p}${command}\``, value: description || '​', inline: true });
+      rest.push({ name: `${ctx.emoji[key]} \`${p}${command}\``, value: fieldValue(command, description), inline: true });
     }
     if (rest.length) pages.push({ label: 'Outros', icon: 'happy', fields: rest });
 
