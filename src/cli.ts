@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -10,15 +10,7 @@ import { emoji } from './emoji.js';
 import { fillMissingEnv } from './env-file.js';
 import { prefix } from './live.js';
 import { formatBanner, formatConnecting, type Panel } from './term.js';
-
-function packageVersion(file: string): string {
-  try {
-    const parsed = JSON.parse(readFileSync(join(process.cwd(), file), 'utf8')) as { version?: string };
-    return parsed.version ?? 'unknown';
-  } catch {
-    return 'unknown';
-  }
-}
+import { readPackageVersion } from './version.js';
 
 type Mode = 'dev' | 'start';
 
@@ -66,8 +58,8 @@ function banner(bot: Yuzuha, mode: Mode, cwd: string): string {
       description: command.description,
       aliases: command.aliases,
     })),
-    version: packageVersion('package.json'),
-    yuzuha: packageVersion('node_modules/yuzuha/package.json'),
+    version: readPackageVersion('package.json', 'unknown'),
+    yuzuha: readPackageVersion('node_modules/yuzuha/package.json', 'unknown'),
     node: process.version,
     cwd,
   };
@@ -91,7 +83,7 @@ async function main(): Promise<void> {
     return;
   }
   if (args.length === 1 && (mode === '--version' || mode === '-v')) {
-    console.log(`ace ${packageVersion('package.json')}`);
+    console.log(`ace ${readPackageVersion('package.json', 'unknown')}`);
     return;
   }
   if (args.length !== 1 || (mode !== 'dev' && mode !== 'start')) {
@@ -182,6 +174,9 @@ async function main(): Promise<void> {
       closing = true;
       process.off('SIGINT', onSignal);
       process.off('SIGTERM', onSignal);
+      bot.off(SDK.Events.Ready, show);
+      bot.off(SDK.Events.ShardDisconnect, onDisconnect);
+      bot.off(SDK.Events.ShardResumed, onResume);
       emit('saindo', 'encerrando');
       await watcher?.close();
       try {
