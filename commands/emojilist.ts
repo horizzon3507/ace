@@ -6,6 +6,7 @@ export default defineCommand({
   description: 'Lista os emojis do servidor com nome e menção.',
   aliases: ['emojis', 'listaremojis', 'elist', 'emojislist'],
   guildOnly: true,
-  cooldown: '5s',
+  cooldown: 5_000,
+  examples: ['emojilist'],
   run: (ctx) => replyEmojiList(ctx),
 });
