@@ -35,6 +35,8 @@ Autorole por tipo de conta e ajuda mais direta — ainda em construção, ainda 
 
 - `a.ajuda` aceita o número da página (`a.ajuda 3`) e já abre nela com a barra de reações certa; página fora do intervalo avisa quantas existem.
 - Autorole por servidor em três categorias — `a.autorole all|user|app <cargos>` define até 15 cargos (menção, ID ou nome) pra quem entra (`all` cobre usuários e apps, `user` só usuários, `app` só bots); `a.autorole` mostra as três listas, `a.autorole reset <categoria>` desliga uma e `a.autorole off` desliga as três. Recusa cargo gerenciado, `@everyone` ou acima da hierarquia do bot ou do autor.
+- Atualização da biblioteca `yuzuha` de `^0.3.2` para `^0.7.0`, ativando `memberCache`, `cacheSweepers`, `concurrency`, `owners`, drenagem limitada (`destroy({ timeoutMs })`) e suporte a `ErrorReportInfo` e `ctx.isOwner()`.
+- Otimizações de performance em runtime e comandos: caches LRU com coalescência concorrente para prefixos e autoroles, ordenação de snowflakes sem `BigInt`, `buildZip` com alocação única de buffer, regexes pré-compiladas, metadados congelados nos 23 comandos e short-circuit de mensagens no `MessageCreate`.
 - Correção: os exemplos nas mensagens de erro respeitam o prefixo do servidor em vez de assumir `a.`.
 
 ## v0.1.1-stable · 13/11/2026
