@@ -23,6 +23,13 @@ export const TYPE_ONLY_FILES = [
   'src/context.ts',
 ] as const;
 
+const RUNTIME_SET = new Set<string>(RUNTIME_FILES);
+const TYPE_ONLY_SET = new Set<string>(TYPE_ONLY_FILES);
+const IGNORED_DIRS = new Set(['node_modules', '.git', 'dist', 'data', 'assets', 'coverage']);
+const CODE_RE = /\.(?:[cm]?js|ts|mts)$/;
+const TEST_RE = /\.(?:test|spec)\.[cm]?[jt]s$/;
+const CONFIG_RE = /^yuzuha\.config\.(?:ts|mts|js|mjs|cjs)$/;
+
 function normalize(input: string): string {
   const parts: string[] = [];
   for (const part of input.replaceAll('\\', '/').replace(/^\.\//, '').split('/')) {
@@ -34,25 +41,25 @@ function normalize(input: string): string {
 }
 
 function isCode(path: string): boolean {
-  return /\.(?:[cm]?js|ts|mts)$/.test(path) && !path.endsWith('.d.ts');
+  return CODE_RE.test(path) && !path.endsWith('.d.ts');
 }
 
 export function classifyChange(input: string, commandsDir = 'commands'): ReloadKind {
   const path = normalize(input);
   if (!path) return 'ignore';
   const parts = path.split('/');
-  if (parts.some((part) => part === 'node_modules' || part === '.git' || part === 'dist' || part === 'data' || part === 'assets' || part === 'coverage')) {
-    return 'ignore';
+  for (let i = 0; i < parts.length; i += 1) {
+    if (IGNORED_DIRS.has(parts[i]!)) return 'ignore';
   }
   if (path.endsWith('.map') || path.endsWith('~') || path.endsWith('.swp')) return 'ignore';
   if (path === '.env') return 'env';
-  if (/^yuzuha\.config\.(?:ts|mts|js|mjs|cjs)$/.test(path)) return 'restart';
-  if (parts[0] === 'test' || /\.(?:test|spec)\.[cm]?[jt]s$/.test(path)) return 'ignore';
+  if (CONFIG_RE.test(path)) return 'restart';
+  if (parts[0] === 'test' || TEST_RE.test(path)) return 'ignore';
   const commands = normalize(commandsDir);
   if (commands && (path === commands || path.startsWith(`${commands}/`)) && isCode(path)) return 'commands';
   if (parts[0] === 'src' && isCode(path)) {
-    if ((TYPE_ONLY_FILES as readonly string[]).includes(path)) return 'ignore';
-    return (RUNTIME_FILES as readonly string[]).includes(path) ? 'runtime' : 'restart';
+    if (TYPE_ONLY_SET.has(path)) return 'ignore';
+    return RUNTIME_SET.has(path) ? 'runtime' : 'restart';
   }
   return 'ignore';
 }
