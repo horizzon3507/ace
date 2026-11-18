@@ -113,9 +113,14 @@ async function main(): Promise<void> {
     level: 'warn',
     sink(level, message, fields) {
       if (message === 'gateway error') return;
-      const extra = fields
-        ? `  ${Object.entries(fields).map(([key, value]) => `${key}=${typeof value === 'string' ? value : JSON.stringify(value)}`).join(' ')}`
-        : '';
+      let extra = '';
+      if (fields) {
+        for (const key in fields) {
+          if (!Object.hasOwn(fields, key)) continue;
+          const value = fields[key];
+          extra += `${extra ? ' ' : '  '}${key}=${typeof value === 'string' ? value : JSON.stringify(value)}`;
+        }
+      }
       emit(level === 'error' ? 'erro' : 'sdk', `${message}${extra}`);
     },
   });
