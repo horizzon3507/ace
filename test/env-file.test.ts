@@ -54,3 +54,16 @@ test('linha solta sem = não vira lixo no ambiente', () => {
   assert.equal(env.SOLITARIA, undefined);
   assert.equal(env.PREFIX, 'z.');
 });
+
+
+test('env vazio ou apenas com comentarios usa curto-circuito seguro', () => {
+  const env: NodeJS.ProcessEnv = { FLUXER_BOT_TOKEN: 'abc' };
+  fillMissingEnv('', env);
+  assert.equal(env.FLUXER_BOT_TOKEN, 'abc');
+  const emptyPlan = planEnv('', env);
+  assert.equal(emptyPlan.tokenRemoved, true);
+  assert.deepEqual(emptyPlan.assignments, []);
+  const commentPlan = planEnv('# comentario\n', {});
+  assert.equal(commentPlan.tokenRemoved, false);
+  assert.deepEqual(commentPlan.assignments, []);
+});
