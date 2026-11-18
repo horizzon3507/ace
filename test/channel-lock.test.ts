@@ -132,3 +132,15 @@ test('unlock com menção destranca outro canal', async (t) => {
   assert.equal(calls.at(-1)?.channelID, '9');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Canal <#9> \*\*destrancado\*\*!/);
 });
+
+
+test('unlock em canal de voz libera Connect e remove mencoes do motivo', async (t) => {
+  const fixture = bot({ '7': 2 });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.unlock <#7> liberado por <@1> agora'), 'success');
+  assert.equal(calls.at(-1)?.action, 'unlock');
+  assert.equal(calls.at(-1)?.channelID, '7');
+  assert.equal(calls.at(-1)?.options?.reason, 'Hory: liberado por agora');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /entrada está liberada novamente/);
+});
