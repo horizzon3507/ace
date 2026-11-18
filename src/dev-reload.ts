@@ -145,14 +145,21 @@ export function watchProject(root: string, commandsPath: string, onFiles: (files
 }
 
 export async function applyChanges(root: string, bot: Yuzuha, commandsPath: string, shellEnv: ReadonlySet<string>, filenames: string[]): Promise<void> {
-  const files = [...new Set(filenames.map((name) => relativeChange(root, name)).filter((name): name is string => Boolean(name)))];
+  const files = new Set<string>();
+  for (let i = 0; i < filenames.length; i += 1) {
+    const rel = relativeChange(root, filenames[i]!);
+    if (rel) files.add(rel);
+  }
   const commandsDir = relative(root, commandsPath);
   const kinds = new Map<ReloadKind, string[]>();
   for (const file of files) {
     const kind = classifyChange(file, commandsDir);
-    const list = kinds.get(kind) ?? [];
+    let list = kinds.get(kind);
+    if (!list) {
+      list = [];
+      kinds.set(kind, list);
+    }
     list.push(file);
-    kinds.set(kind, list);
   }
   const envFiles = kinds.get('env') ?? [];
   if (envFiles.length) {
