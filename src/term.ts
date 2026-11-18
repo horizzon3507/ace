@@ -108,10 +108,11 @@ export function formatBanner(panel: Panel, color: boolean): string {
 }
 
 const LABEL_WIDTH = 10;
+const DEFAULT_TIME_PAD = ' '.repeat(8 + 2 + LABEL_WIDTH);
 const LABEL_SGR: Record<string, string> = { erro: '31', gateway: '33', saindo: '33' };
 
 export function formatLine(time: string, label: string, detail: string, color: boolean): string {
-  const pad = ' '.repeat(time.length + 2 + LABEL_WIDTH);
+  const pad = time.length === 8 ? DEFAULT_TIME_PAD : ' '.repeat(time.length + 2 + LABEL_WIDTH);
   const body = detail.split('\n').map((line, index) => (index === 0 ? line : `${pad}${line}`)).join('\n');
   const tag = label.slice(0, LABEL_WIDTH).padEnd(LABEL_WIDTH);
   const sgr = LABEL_SGR[label];
