@@ -133,14 +133,14 @@ async function main(): Promise<void> {
     ...config,
     emoji,
     clientOptions: { ...config.clientOptions, logger },
-    onError(error, ctx) {
-      if (closing) return config.onError?.(error, ctx);
+    onError(error, ctx, info) {
+      if (closing) return config.onError?.(error, ctx, info);
       const gateway = gatewayDetail(error);
       const detail = gateway ?? `${ctx?.command?.name ? `${prefix()}${ctx.command.name}  ` : ''}${explain(error)}`;
       reported = error;
       reportedDetail = detail;
       emit(gateway ? 'gateway' : 'erro', detail);
-      return config.onError?.(error, ctx);
+      return config.onError?.(error, ctx, info);
     },
     onCommand(ctx, outcome) {
       if (outcome === 'success' || outcome === 'guarded') {
