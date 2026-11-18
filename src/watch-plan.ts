@@ -31,6 +31,17 @@ const TEST_RE = /\.(?:test|spec)\.[cm]?[jt]s$/;
 const CONFIG_RE = /^yuzuha\.config\.(?:ts|mts|js|mjs|cjs)$/;
 
 function normalize(input: string): string {
+  if (
+    input &&
+    !input.includes('\\') &&
+    !input.includes('//') &&
+    !input.startsWith('/') &&
+    !input.endsWith('/') &&
+    !input.startsWith('./') &&
+    !input.includes('/.')
+  ) {
+    return input;
+  }
   const parts: string[] = [];
   for (const part of input.replaceAll('\\', '/').replace(/^\.\//, '').split('/')) {
     if (!part || part === '.') continue;
