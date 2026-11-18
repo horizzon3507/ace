@@ -8,35 +8,35 @@ import { formatUptime } from './uptime.js';
 type EmojiKey = keyof typeof catalog;
 type Category = { icon: EmojiKey; label: string; commands: readonly string[] };
 
-const categories: Category[] = [
-  { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'softban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
-  { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo', 'autorole'] },
-  { icon: 'globe', label: 'Utilidades', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
-];
+const categories: readonly Category[] = Object.freeze([
+  Object.freeze({ icon: 'ban', label: 'Moderação', commands: Object.freeze(['kick', 'ban', 'softban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban']) }),
+  Object.freeze({ icon: 'information', label: 'Informações', commands: Object.freeze(['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo', 'autorole']) }),
+  Object.freeze({ icon: 'globe', label: 'Utilidades', commands: Object.freeze(['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump']) }),
+]);
 
 // Ícone por comando quando um encaixa melhor que o da categoria.
 const PAGE_NUMBER_RE = /^\d+$/;
 
-const commandIcons: Record<string, EmojiKey> = {
+const commandIcons: Readonly<Record<string, EmojiKey>> = Object.freeze({
   ajuda: 'information', ping: 'globe', uptime: 'time', setprefix: 'settings',
   userinfo: 'accountCircle', guildinfo: 'idCard',
   avatar: 'accountBox', userbanner: 'stickyNote', guildicon: 'medal', guildbanner: 'shining',
   emojilist: 'sparkling', emojidump: 'sparkling',
   kick: 'kick', ban: 'ban', softban: 'ban', lock: 'lock', unlock: 'unlock',
   clear: 'purge', purge: 'purge', timeout: 'time', unban: 'unban', autorole: 'team',
-};
+});
 
 
 export default defineCommand({
   name: 'ajuda',
   description: 'Lista os comandos do Ace.',
-  aliases: [
+  aliases: Object.freeze([
     'help', 'commands', 'cmds', 'ajd', 'h', 'menu', 'ajudar',
     'commandslist', 'cmdlist', 'listcommands', 'comandos', 'ajdlist',
     'assist', 'socorro', 'aj', 'helper', 'commandhelp', 'comandoslista',
-  ],
+  ]) as string[],
   cooldown: 3_000,
-  examples: ['ajuda 2'],
+  examples: Object.freeze(['ajuda 2']) as string[],
   async run(ctx) {
     const p = await guildPrefix(ctx.guildID) ?? prefix();
     const descriptions = new Map<string, string>();
