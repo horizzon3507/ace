@@ -7,14 +7,14 @@ import { prefix } from '../src/live.js';
 const ADMIN = 0x8n;
 const MAX_ROLES = 15;
 const RESET = /^(reset|off|limpar|remover|desligar)$/i;
-const CATEGORIES: AutoroleCategory[] = ['all', 'user', 'app'];
+const CATEGORIES: readonly AutoroleCategory[] = Object.freeze(['all', 'user', 'app']);
 
-const categories: Record<string, AutoroleCategory> = {
+const categories: Readonly<Record<string, AutoroleCategory>> = Object.freeze({
   all: 'all', todos: 'all', tudo: 'all',
   user: 'user', usuario: 'user', usuarios: 'user', membro: 'user', membros: 'user',
   app: 'app', apps: 'app', bot: 'app', bots: 'app',
-};
-const labels: Record<AutoroleCategory, string> = { all: 'Todos', user: 'Usuários', app: 'Apps' };
+});
+const labels: Readonly<Record<AutoroleCategory, string>> = Object.freeze({ all: 'Todos', user: 'Usuários', app: 'Apps' });
 
 type MemberRef = { roles: string[]; permissions: string };
 
@@ -38,12 +38,12 @@ const mention = (ids: readonly string[]): string =>
 export default defineCommand({
   name: 'autorole',
   description: 'Cargos automáticos pra quem entra no servidor.',
-  aliases: ['joinrole', 'autocargo', 'autojoinrole'],
+  aliases: Object.freeze(['joinrole', 'autocargo', 'autojoinrole']) as string[],
   guildOnly: true,
-  permissions: ['ManageRoles'],
-  botPermissions: ['ManageRoles'],
+  permissions: Object.freeze(['ManageRoles']) as string[],
+  botPermissions: Object.freeze(['ManageRoles']) as string[],
   cooldown: 3_000,
-  examples: ['autorole user @Membro @Vip', 'autorole reset all'],
+  examples: Object.freeze(['autorole user @Membro @Vip', 'autorole reset all']) as string[],
   async run(ctx) {
     const guildID = ctx.requireGuild();
     const p = await guildPrefix(ctx.guildID) ?? prefix();
