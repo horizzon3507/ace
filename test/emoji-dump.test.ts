@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
 import { emoji } from '../src/emoji.js';
-import { buildZip } from '../src/emoji-dump.js';
+import { buildZip, compareSnowflakeDesc } from '../src/emoji-dump.js';
 import emojilist from '../commands/emojilist.js';
 import emojidump from '../commands/emojidump.js';
 import iddrop from '../commands/iddrop.js';
@@ -180,4 +180,11 @@ test('buildZip monta arquivo PK válido com entradas', () => {
   assert.equal(tail.getUint16(10, true), 2);
   const text = new TextDecoder().decode(zip);
   assert.ok(text.includes('a.png') && text.includes('b.gif'));
+});
+
+
+test('compareSnowflakeDesc ordena snowflakes de tamanhos diferentes sem BigInt', () => {
+  const ids = ['999', '1000000000000000000', '1000', '200000000000000000', '1000000000000000000'];
+  ids.sort(compareSnowflakeDesc);
+  assert.deepEqual(ids, ['1000000000000000000', '1000000000000000000', '200000000000000000', '1000', '999']);
 });
