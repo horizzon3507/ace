@@ -19,10 +19,18 @@ const labels: Record<AutoroleCategory, string> = { all: 'Todos', user: 'Usuário
 type MemberRef = { roles: string[]; permissions: string };
 
 /** Maior posição do membro; Administrator e dono do servidor passam por cima de tudo. */
-const topOf = (roles: readonly { id: string; position: number }[], member: MemberRef, ownerID: string, userID: string): number =>
-  userID === ownerID || (BigInt(member.permissions) & ADMIN) !== 0n
-    ? Number.MAX_SAFE_INTEGER
-    : Math.max(0, ...roles.filter((role) => member.roles.includes(role.id)).map((role) => role.position));
+function topOf(roles: readonly { id: string; position: number }[], member: MemberRef, ownerID: string, userID: string): number {
+  if (userID === ownerID || (BigInt(member.permissions) & ADMIN) !== 0n) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+  const owned = new Set(member.roles);
+  let highest = 0;
+  for (let i = 0; i < roles.length; i += 1) {
+    const role = roles[i]!;
+    if (owned.has(role.id) && role.position > highest) highest = role.position;
+  }
+  return highest;
+}
 
 const mention = (ids: readonly string[]): string =>
   ids.length ? ids.map((id) => `<@&${id}>`).join(' ') : 'desligado';
@@ -34,7 +42,7 @@ export default defineCommand({
   guildOnly: true,
   permissions: ['ManageRoles'],
   botPermissions: ['ManageRoles'],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['autorole user @Membro @Vip', 'autorole reset all'],
   async run(ctx) {
     const guildID = ctx.requireGuild();
@@ -93,7 +101,11 @@ export default defineCommand({
     }
 
     const resolved: RoleInfo[] = [];
-    for (const token of rest) {
+    const seenTokens = new Set<string>();
+    for (let i = 0; i < rest.length; i += 1) {
+      const token = rest[i]!;
+      if (seenTokens.has(token)) continue;
+      seenTokens.add(token);
       try {
         resolved.push(await ctx.resources.roles.resolve(guildID, token));
       } catch {
