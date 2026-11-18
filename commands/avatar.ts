@@ -10,5 +10,6 @@ export default defineCommand({
     'ui', 'ua', 'upfp', 'usericon', 'userav',
     'pic', 'avt', 'picture', 'perfil', 'avpic', 'pfpic',
   ],
+  examples: ['avatar', 'avatar @usuario'],
   run: (ctx) => replyUserAsset(ctx, 'avatar'),
 });
