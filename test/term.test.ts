@@ -74,3 +74,17 @@ test('label maior que a coluna é truncada sem desalinhar', () => {
 test('latência aparece arredondada no painel', () => {
   assert.match(formatBanner({ ...panel, ping: 42.7 }, false), /latência\s+43 ms/);
 });
+
+
+test('painel sem comandos exibe nenhum e trunca cwd longo quando terminal e estreito', (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(process.stdout, 'columns');
+  Object.defineProperty(process.stdout, 'columns', { value: 10, configurable: true });
+  t.after(() => {
+    if (descriptor) Object.defineProperty(process.stdout, 'columns', descriptor);
+    else delete (process.stdout as { columns?: number }).columns;
+  });
+
+  const text = formatBanner({ ...panel, commands: [], cwd: '/caminho/muito/comprido/para/caber' }, false);
+  assert.match(text, /Comandos \(0\)\n  nenhum/);
+  assert.match(text, /\/caminho\/…$/);
+});
