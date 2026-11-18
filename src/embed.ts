@@ -46,6 +46,8 @@ const userCopy = {
   banner: { label: 'Banner', command: 'userbanner', fail: 'o banner', asset: 'um banner' },
 } as const;
 
+const MARKDOWN_STRIP_RE = /[*_~`]/g;
+
 /** Resolve o alvo, busca membro→usuário e responde o asset em embed. */
 export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<void> {
   const { emoji } = ctx;
@@ -86,7 +88,7 @@ export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<
     await ctx.reply(`${emoji.unhappy} Eu não consegui carregar ${spec.fail} deste usuário...`);
     return;
   }
-  const label = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
+  const label = (user.displayName || user.username).replace(MARKDOWN_STRIP_RE, '') || 'usuário';
   if (!url) {
     await ctx.reply(`${emoji.unhappy} ${label} não possui ${spec.asset} configurado...`);
     return;
