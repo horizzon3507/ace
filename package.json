@@ -12,6 +12,7 @@
     "start": "tsx src/cli.ts start",
     "dev": "tsx src/cli.ts dev",
     "check": "yuzuha check",
+    "doctor": "yuzuha doctor",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test test/*.test.ts"
   },
