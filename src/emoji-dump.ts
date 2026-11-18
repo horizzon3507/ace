@@ -179,7 +179,11 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
     await ctx.edit(waiting, `${emoji.unhappy} Este servidor não tem emojis para eu empacotar...`);
     return;
   }
-  const downloadable = emojis.filter((item) => item.url);
+  const downloadable: EmojiInfo[] = [];
+  for (let i = 0; i < emojis.length; i += 1) {
+    const item = emojis[i]!;
+    if (item.url) downloadable.push(item);
+  }
   const taken = new Map<string, number>();
   const nameOf = (item: EmojiInfo): string => {
     const base = item.name.replace(SAFE_NAME_RE, '_').slice(0, 60) || 'emoji';
@@ -192,11 +196,19 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
   const entries: ZipEntry[] = [];
   if (http) {
     for (let i = 0; i < downloadable.length; i += DOWNLOAD_BATCH) {
-      const batch = await Promise.all(downloadable.slice(i, i + DOWNLOAD_BATCH).map(async (item) => {
-        const response = await safe(() => http.requestBytes({ method: 'GET', url: item.url! }));
-        return response?.ok ? { name: nameOf(item), data: response.body } : null;
-      }));
-      for (const entry of batch) if (entry) entries.push(entry);
+      const end = Math.min(i + DOWNLOAD_BATCH, downloadable.length);
+      const pending: Promise<ZipEntry | null>[] = [];
+      for (let j = i; j < end; j += 1) {
+        const item = downloadable[j]!;
+        pending.push(
+          safe(() => http.requestBytes({ method: 'GET', url: item.url! }))
+            .then((response) => (response?.ok ? { name: nameOf(item), data: response.body } : null)),
+        );
+      }
+      const batch = await Promise.all(pending);
+      for (let k = 0; k < batch.length; k += 1) {
+        if (batch[k]) entries.push(batch[k]!);
+      }
     }
   }
   if (entries.length === 0) {
