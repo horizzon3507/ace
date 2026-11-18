@@ -196,7 +196,7 @@ export function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
 }
 
 function color(value: number, name: string): void {
-  if (!Number.isInteger(value) || value < 0 || value > 0xffffff) {
+  if (typeof value !== 'number' || (value & 0xffffff) !== value) {
     throw new Error(`cor ${name} inválida.`);
   }
 }
