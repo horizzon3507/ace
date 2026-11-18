@@ -18,10 +18,13 @@ export function autoroleCategory(config: AutoroleConfig | undefined, guildID: st
 /** Cargos de entrada efetivos: all+user pra humano, all+app pra bot. */
 export async function joinRolesFor(guildID: string, bot: boolean): Promise<string[]> {
   const config = await guildAutorole(guildID);
-  return [...new Set([
-    ...autoroleCategory(config, guildID, 'all'),
-    ...autoroleCategory(config, guildID, bot ? 'app' : 'user'),
-  ])];
+  if (!config && guildID !== joinRole.guildId) return [];
+  const all = autoroleCategory(config, guildID, 'all');
+  const specific = autoroleCategory(config, guildID, bot ? 'app' : 'user');
+  if (all.length === 0 && specific.length === 0) return [];
+  if (specific.length === 0) return [...all];
+  if (all.length === 0) return [...specific];
+  return [...new Set([...all, ...specific])];
 }
 
 export type JoinMember = {
