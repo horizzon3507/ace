@@ -462,3 +462,17 @@ test('userbanner avisa quando falta banner', async (t) => {
   assert.equal(await fixture.send('a.userbanner'), 'success');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /não possui um banner configurado/);
 });
+
+
+test('todos os metadados de comandos estao congelados', () => {
+  const all = [ajuda, ping, uptime, setprefix, guildicon, avatar, userbanner, guildbanner,
+    kick, ban, userinfo, guildinfo, clear, purge, timeout, unban, autorole,
+    lock, unlock, softban, emojidump, emojilist, iddrop];
+  for (const command of all) {
+    if (command.aliases) assert.equal(Object.isFrozen(command.aliases), true, `${command.name}.aliases`);
+    if (command.examples) assert.equal(Object.isFrozen(command.examples), true, `${command.name}.examples`);
+    if (command.permissions) assert.equal(Object.isFrozen(command.permissions), true, `${command.name}.permissions`);
+    if (command.botPermissions) assert.equal(Object.isFrozen(command.botPermissions), true, `${command.name}.botPermissions`);
+    if (command.checks) assert.equal(Object.isFrozen(command.checks), true, `${command.name}.checks`);
+  }
+});
