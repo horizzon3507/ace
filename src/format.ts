@@ -13,7 +13,7 @@ export function formatDayStamp(date: Date): string {
 
 /** Idade aproximada pt-BR: "há **8 meses**". */
 export function formatAge(date: Date, now = Date.now()): string {
-  const days = Math.floor((now - date.getTime()) / DAY_MS);
+  const days = Math.max(0, Math.floor((now - date.getTime()) / DAY_MS));
   if (days >= 365) {
     const years = Math.floor(days / 365);
     return `há **${years} ${years === 1 ? 'ano' : 'anos'}**`;
