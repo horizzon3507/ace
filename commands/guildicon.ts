@@ -13,5 +13,6 @@ export default defineCommand({
     'svicon', 'gico', 'serverico', 'svic', 'iconedoservidor',
   ],
   guildOnly: true,
+  examples: ['guildicon'],
   run: (ctx) => replyGuildAsset(ctx, 'icon'),
 });
