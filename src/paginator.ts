@@ -6,6 +6,9 @@ import type { AceContext } from './context.js';
 const LEFT = 'arrowleftfill';
 const RIGHT = 'arrowrightfill';
 const HOME = 'home4fill';
+const DEFAULT_LEFT_TAG = '<:arrowleftfill:1566639260100997120>';
+const DEFAULT_RIGHT_TAG = '<:arrowrightfill:1566639126151700482>';
+const DEFAULT_HOME_TAG = '<:home4fill:1570905409848344576>';
 const NAMES = [LEFT, RIGHT, HOME];
 const WANTED_NAMES = new Set(NAMES);
 const DEFAULT_TIMEOUT_MS = 60_000;
@@ -16,11 +19,23 @@ const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().t
 
 type Button = { name: string; tag: string };
 
+const DEFAULT_BUTTONS: Record<string, Button> = Object.freeze({
+  [LEFT]: Object.freeze({ name: LEFT, tag: DEFAULT_LEFT_TAG }),
+  [RIGHT]: Object.freeze({ name: RIGHT, tag: DEFAULT_RIGHT_TAG }),
+  [HOME]: Object.freeze({ name: HOME, tag: DEFAULT_HOME_TAG }),
+});
+
 function buttons(ctx: AceContext): Record<string, Button> {
+  const leftTag = ctx.emoji.arrowLeft ?? DEFAULT_LEFT_TAG;
+  const rightTag = ctx.emoji.arrowRight ?? DEFAULT_RIGHT_TAG;
+  const homeTag = ctx.emoji.home ?? DEFAULT_HOME_TAG;
+  if (leftTag === DEFAULT_LEFT_TAG && rightTag === DEFAULT_RIGHT_TAG && homeTag === DEFAULT_HOME_TAG) {
+    return DEFAULT_BUTTONS;
+  }
   return {
-    [LEFT]: { name: LEFT, tag: ctx.emoji.arrowLeft ?? '<:arrowleftfill:1566639260100997120>' },
-    [RIGHT]: { name: RIGHT, tag: ctx.emoji.arrowRight ?? '<:arrowrightfill:1566639126151700482>' },
-    [HOME]: { name: HOME, tag: ctx.emoji.home ?? '<:home4fill:1570905409848344576>' },
+    [LEFT]: { name: LEFT, tag: leftTag },
+    [RIGHT]: { name: RIGHT, tag: rightTag },
+    [HOME]: { name: HOME, tag: homeTag },
   };
 }
 
