@@ -6,6 +6,7 @@ export default defineCommand({
   description: 'Mostra informações de um usuário.',
   aliases: ['whois', 'user', 'memberinfo', 'uinfo', 'infouser', 'usermembro', 'membroinfo'],
   guildOnly: true,
-  cooldown: '3s',
+  cooldown: 3_000,
+  examples: ['userinfo', 'userinfo @usuario'],
   run: (ctx) => replyUserInfo(ctx),
 });
