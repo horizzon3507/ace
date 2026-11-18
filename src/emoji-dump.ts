@@ -84,14 +84,21 @@ export function buildZip(entries: readonly ZipEntry[]): Uint8Array {
   return out;
 }
 
+const EXT_RE = /\.(png|gif|webp|apng|jpe?g)(?:[?#]|$)/i;
+const ANIMATED_PNG_RE = /\/(a_[^/.]+)\.png(\?|$)/;
+const SAFE_NAME_RE = /[^\w.-]+/g;
+const DIACRITICS_RE = /[\u0300-\u036f]/g;
+const NON_ALNUM_RE = /[^a-z0-9]+/g;
+const TRIM_DASH_RE = /^-+|-+$/g;
+
 const tag = (item: EmojiInfo) => `<${item.animated ? 'a' : ''}:${item.name}:${item.id}>`;
 const extOf = (item: EmojiInfo): string =>
-  item.url?.match(/\.(png|gif|webp|apng|jpe?g)(?:[?#]|$)/i)?.[1]?.toLowerCase() ?? (item.animated ? 'gif' : 'png');
+  item.url?.match(EXT_RE)?.[1]?.toLowerCase() ?? (item.animated ? 'gif' : 'png');
 
 // Mesma regra do fixAnimatedAssetUrl da yuzuha: hash a_* em .png aponta pro .gif.
-const fixGif = (url?: string | null) => url?.replace(/\/(a_[^/.]+)\.png(\?|$)/, '/$1.gif$2') ?? null;
+const fixGif = (url?: string | null) => url?.replace(ANIMATED_PNG_RE, '/$1.gif$2') ?? null;
 
-const compareSnowflakeDesc = (a: string, b: string): number =>
+export const compareSnowflakeDesc = (a: string, b: string): number =>
   a.length !== b.length ? b.length - a.length : b > a ? 1 : b < a ? -1 : 0;
 
 const fetchEmojis = async (ctx: AceContext, guildID: string) => {
@@ -175,7 +182,7 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
   const downloadable = emojis.filter((item) => item.url);
   const taken = new Map<string, number>();
   const nameOf = (item: EmojiInfo): string => {
-    const base = item.name.replace(/[^\w.-]+/g, '_').slice(0, 60) || 'emoji';
+    const base = item.name.replace(SAFE_NAME_RE, '_').slice(0, 60) || 'emoji';
     const seen = (taken.get(base) ?? 0) + 1;
     taken.set(base, seen);
     return seen === 1 ? `${base}.${extOf(item)}` : `${base}-${seen}.${extOf(item)}`;
@@ -199,9 +206,9 @@ export async function replyEmojiDump(ctx: AceContext): Promise<void> {
   const slug = (guild?.name ?? 'servidor')
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'servidor';
+    .replace(DIACRITICS_RE, '')
+    .replace(NON_ALNUM_RE, '-')
+    .replace(TRIM_DASH_RE, '') || 'servidor';
   const filename = `emojis-${slug}.zip`;
   const zip = buildZip(entries);
   const missing = downloadable.length - entries.length;
