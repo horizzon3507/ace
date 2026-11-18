@@ -6,6 +6,7 @@ export default defineCommand({
   description: 'Mostra informações do servidor.',
   aliases: ['serverinfo', 'server', 'guild', 'infoserver', 'infoguild', 'si'],
   guildOnly: true,
-  cooldown: '3s',
+  cooldown: 3_000,
+  examples: ['guildinfo'],
   run: (ctx) => replyGuildInfo(ctx),
 });
