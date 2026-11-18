@@ -3,6 +3,7 @@ import type { AceContext } from './context.js';
 
 const SNOWFLAKE = /^\d{5,}$/;
 const MENTION = /^<@!?(\d+)>$/;
+const DISCRIM_SUFFIX_RE = /#\d{1,6}$/;
 
 export type TargetResult =
   | { status: 'found'; id: string; /** Apelido já resolvido — sem fetch extra antes da ação. */ label?: string }
@@ -15,7 +16,8 @@ export async function resolveTarget(ctx: AceContext, _guildID: string, tokens: r
   const token = tokens[0];
   if (!token) return { status: 'none' };
   // Tag legada user#0001: o resolver nativo não conhece discrim — busca pelo nome.
-  const resolved = await ctx.members.resolve(token.replace(/#\d{1,6}$/, '') || token);
+  const query = token.includes('#') ? token.replace(DISCRIM_SUFFIX_RE, '') || token : token;
+  const resolved = await ctx.members.resolve(query);
   switch (resolved.status) {
     case 'found': return { status: 'found', id: resolved.id, label: resolved.label };
     case 'ambiguous': return { status: 'ambiguous', query: token };
