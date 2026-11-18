@@ -10,5 +10,6 @@ export default defineCommand({
     'sbg', 'svbanner', 'gbr', 'serverbnr', 'bannerdoservidor', 'gb',
   ],
   guildOnly: true,
+  examples: ['guildbanner'],
   run: (ctx) => replyGuildAsset(ctx, 'banner'),
 });
