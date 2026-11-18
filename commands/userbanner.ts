@@ -9,5 +9,6 @@ export default defineCommand({
     'usercover', 'cover', 'ubg', 'bann', 'userbanners',
     'usbanner', 'ubanner', 'banneruser', 'ubn', 'userbg', 'profilebg',
   ],
+  examples: ['userbanner', 'userbanner @usuario'],
   run: (ctx) => replyUserAsset(ctx, 'banner'),
 });
