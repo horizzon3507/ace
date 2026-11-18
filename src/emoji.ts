@@ -48,3 +48,6 @@ export const emoji = {
   home: '<:home4fill:1570905409848344576>',
   dot: '<:dot:1566664882068131840>',
 } as const;
+
+export type EmojiKey = keyof typeof emoji;
+export type EmojiCatalog = typeof emoji;
