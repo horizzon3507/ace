@@ -352,3 +352,20 @@ test('guildinfo avisa quando a guild falha', async (t) => {
   const content = fixture.messages.at(-1)?.payload.content ?? '';
   assert.match(content, /não consegui carregar as informações deste servidor/);
 });
+
+
+test('guildinfo conta canais de anuncio, palco e forum em passagem unica', async (t) => {
+  const fixture = bot({
+    users: { guild: async () => comunidade },
+    channels: {
+      async list() {
+        return [chan('n1', 5), chan('s1', 13), chan('f1', 15), chan('f2', 15)];
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.guildinfo'), 'success');
+  const embed = fixture.messages.at(-1)?.payload.embeds?.[0];
+  assert.match(fieldValue(embed, 'Canais'), /\*\*4\*\* canais, sendo deles \*\*1\*\* canal de texto, \*\*1\*\* canal de voz e \*\*2\*\* fóruns!/);
+});
