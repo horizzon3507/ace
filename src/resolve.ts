@@ -72,6 +72,13 @@ export function moderationReason(ctx: AceContext, skip = 1): string {
 }
 
 export function targetUserID(ctx: AceContext): string {
-  const first = ctx.tokens[0] ? MENTION.exec(ctx.tokens[0])?.[1] : undefined;
-  return first ?? ctx.message.mentions[0] ?? ctx.tokens.find((token) => SNOWFLAKE.test(token)) ?? ctx.authorID;
+  const firstToken = ctx.tokens[0];
+  const first = firstToken ? MENTION.exec(firstToken)?.[1] : undefined;
+  if (first) return first;
+  if (ctx.message.mentions[0]) return ctx.message.mentions[0];
+  for (let i = 0; i < ctx.tokens.length; i += 1) {
+    const token = ctx.tokens[i]!;
+    if (SNOWFLAKE.test(token)) return token;
+  }
+  return ctx.authorID;
 }
