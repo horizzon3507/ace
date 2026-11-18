@@ -165,7 +165,12 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   }
 
   if (accounts.length > 0) {
-    const list = accounts.map((account) => `\`${account.name ?? account.type ?? '?'}\``).join(', ');
+    let list = '';
+    for (let i = 0; i < accounts.length; i += 1) {
+      const account = accounts[i]!;
+      const label = `\`${account.name ?? account.type ?? '?'}\``;
+      list = i === 0 ? label : `${list}, ${label}`;
+    }
     fields.push({ name: `${emoji.links} Conexões`, value: `Este usuário conectou ${list}!`, inline: true });
   }
   if (bio) {
@@ -242,7 +247,12 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     client ? safe(() => client.guilds.resolve(guildID)) : null,
   ]);
 
-  const joinAnd = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}`;
+  const joinAnd = (parts: readonly string[]): string => {
+    if (parts.length === 0) return '';
+    if (parts.length === 1) return parts[0]!;
+    if (parts.length === 2) return `${parts[0]} e ${parts[1]}`;
+    return `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
+  };
 
   const ownerTag = ownerNative
     ? ownerNative.discriminator && ownerNative.discriminator !== '0'
