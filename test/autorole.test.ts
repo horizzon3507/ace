@@ -104,8 +104,20 @@ test('sem categoria ou categoria inválida pede all, user ou app', async (t) => 
   assert.equal(await fixture.send('a.autorole 42'), 'success');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /`all` \(todos\), `user` \(usuários\) ou `app` \(bots\)/);
   await fixture.tick(3_100);
-  assert.equal(await fixture.send('a.autorole reset'), 'success');
+  assert.equal(await fixture.send('a.autorole reset nada'), 'success');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /categoria a limpar/);
+});
+
+test('a.autorole off puro desliga as três categorias', async (t) => {
+  const fixture = bot(hierarchy);
+  t.after(clean(fixture));
+
+  assert.equal(await fixture.send('a.autorole app <@&42>'), 'success');
+  await fixture.tick(3_100);
+  assert.equal(await fixture.send('a.autorole off'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /desligado por completo/);
+  assert.deepEqual(await fixture.store.read((state) => state.variables[VAR]), { all: 'off', user: 'off', app: 'off' });
+  assert.deepEqual(await guildAutorole('100'), { all: 'off', user: 'off', app: 'off' });
 });
 
 test('mais de 15 cargos, gerenciado e desconhecido são recusados', async (t) => {

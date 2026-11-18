@@ -58,6 +58,15 @@ export default defineCommand({
     if (RESET.test(action)) {
       const target = categories[(rest[0] ?? '').toLowerCase()];
       if (!target) {
+        // `a.autorole off` puro desliga tudo de uma vez — herança da versão de
+        // um cargo só, onde 'off' bastava.
+        if (!rest.length) {
+          const config: AutoroleConfig = { all: 'off', user: 'off', app: 'off' };
+          await ctx.data.guild.set('autorole', config);
+          setGuildAutoroleCache(guildID, config);
+          await ctx.reply(`${ctx.emoji.happy} Autorole desligado por completo!`);
+          return;
+        }
         await ctx.reply(`${ctx.emoji.unhappy} Me informe a categoria a limpar: \`all\`, \`user\` ou \`app\`...\n-# ╰ Ex: \`${p}autorole reset user\``);
         return;
       }

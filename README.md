@@ -58,7 +58,7 @@ O prefixo padrão é `a.`; cada servidor troca o seu com `a.setprefix`. Argument
 | `a.clear` | `<n>` | Apaga as últimas mensagens do canal. |
 | `a.purge` | `<usuário> [n]` | Apaga mensagens recentes de um membro no canal. |
 | `a.setprefix` | `<prefixo>` ou `reset` | Troca o prefixo do Ace no servidor. |
-| `a.autorole` | `<all|user|app> [cargos]` ou `reset <categoria>` | Cargos automáticos pra quem entra, por tipo de conta. |
+| `a.autorole` | `<all|user|app> [cargos]`, `reset <categoria>` ou `off` | Cargos automáticos pra quem entra, por tipo de conta. |
 
 `usuário` aceita menção, ID ou nome (nome resolve por busca no servidor; no `a.unban`, na lista de bans). Sem argumento, `a.avatar`, `a.userbanner` e `a.userinfo` mostram o seu.
 
