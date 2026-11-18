@@ -8,7 +8,7 @@ export default defineCommand({
   guildOnly: true,
   permissions: ['BanMembers'],
   botPermissions: ['BanMembers'],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['ban @usuario spam'],
   run: (ctx) => runModeration(ctx, 'ban'),
 });
