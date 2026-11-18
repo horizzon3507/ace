@@ -13,4 +13,6 @@ test('yuzuha.config.ts instancia Yuzuha 0.7.0 com caches, owners e concorrencia 
   await config.setup?.(bot);
   assert.equal(bot.isOwner('1473035660161241245'), true);
   assert.equal(bot.isOwner('123'), false);
+  assert.equal(typeof config.prefix, 'function');
+  assert.ok(config.cacheSweepers && config.cacheSweepers.messages);
 });
