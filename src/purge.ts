@@ -6,6 +6,7 @@ export type PurgeMode = 'channel' | 'user';
 
 const REPLY_TTL_MS = 7_000;
 const MENTION = /^<@!?\d+>$/;
+const DIGITS_RE = /^\d+$/;
 
 export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
   const { emoji } = ctx;
@@ -63,7 +64,7 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
 
 /** Inteiro decimal de 1 a 99; ausente, não numérico ou fora da faixa viram undefined. */
 function amount(raw: string | undefined): number | undefined {
-  if (raw === undefined || !/^\d+$/.test(raw)) return undefined;
+  if (raw === undefined || !DIGITS_RE.test(raw)) return undefined;
   const n = Number.parseInt(raw, 10);
   return n >= 1 && n <= 99 ? n : undefined;
 }
