@@ -28,19 +28,23 @@ export function colorEnabled(): boolean {
 }
 
 export function redact(text: string): string {
+  if (!text) return text;
   const token = process.env.FLUXER_BOT_TOKEN;
   if (!token || !text.includes(token)) return text;
   return text.split(token).join('[token]');
 }
 
 export function explain(error: unknown): string {
-  const raw = error instanceof ScriptError
-    ? error.format()
-    : error instanceof YuzuhaError
-      ? `${error.code}  ${error.message}`
-      : error instanceof Error
-        ? error.message || error.name
-        : String(error);
+  let raw: string;
+  if (error instanceof ScriptError) {
+    raw = error.format();
+  } else if (error instanceof YuzuhaError) {
+    raw = `${error.code}  ${error.message}`;
+  } else if (error instanceof Error) {
+    raw = error.message || error.name;
+  } else {
+    raw = String(error);
+  }
   if (TOKEN_ERROR_RE.test(raw)) return 'token recusado. Confira FLUXER_BOT_TOKEN.';
   return raw;
 }
