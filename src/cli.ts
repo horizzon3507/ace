@@ -185,7 +185,7 @@ async function main(): Promise<void> {
       emit('saindo', 'encerrando');
       await watcher?.close();
       try {
-        await bot.destroy();
+        await bot.destroy({ timeoutMs: 5_000 });
       } finally {
         await bot.options.store?.close?.();
       }
