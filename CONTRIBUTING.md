@@ -11,7 +11,9 @@ npm run typecheck
 npm test
 ```
 
-Os dois precisam passar. Os testes rodam com `tsx --test` sobre `test/`.
+Os dois precisam passar (além de `npm run check`). Os testes rodam com `tsx --test` sobre `test/` (incluindo `test/performance.test.ts`).
+
+Metadados estáticos de comandos (`aliases`, `permissions`, `botPermissions`, `examples`, `checks`) devem usar arrays congelados (`Object.freeze`) e `cooldown` numérico em ms sempre que possível.
 
 ## Commits
 
