@@ -9,6 +9,8 @@ const copy = {
 
 /** GuildText (0), GuildVoice (2) e GuildAnnouncement (5) — o nativo escolhe o bit certo por tipo. */
 const LOCKABLE_TYPES = new Set([0, 2, 5]);
+const CHANNEL_MENTION_RE = /^<#(\d+)>$/;
+const CHANNEL_ID_RE = /^\d{15,}$/;
 
 export async function runChannelLock(ctx: AceContext, action: LockAction): Promise<void> {
   const { emoji } = ctx;
@@ -17,7 +19,7 @@ export async function runChannelLock(ctx: AceContext, action: LockAction): Promi
   const first = ctx.tokens[0];
   const ref = first === undefined
     ? undefined
-    : (first.match(/^<#(\d+)>$/)?.[1] ?? (/^\d{15,}$/.test(first) ? first : undefined));
+    : (first.match(CHANNEL_MENTION_RE)?.[1] ?? (CHANNEL_ID_RE.test(first) ? first : undefined));
   const channelID = ref ?? ctx.channelID;
   const reason = (ref ? ctx.tokens.slice(1) : ctx.tokens)
     .filter((token) => !token.startsWith('<@'))
