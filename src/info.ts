@@ -117,10 +117,14 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
       inline: true,
     });
 
+    const roleSet = new Set(member.roles);
     const mine = (roleList ?? [])
-      .filter((role) => role.id !== guildID && member.roles.includes(role.id))
+      .filter((role) => role.id !== guildID && roleSet.has(role.id))
       .sort((a, b) => b.position - a.position);
-    const total = member.roles.filter((roleID) => roleID !== guildID).length;
+    let total = 0;
+    for (let i = 0; i < member.roles.length; i += 1) {
+      if (member.roles[i] !== guildID) total += 1;
+    }
     const hierarquia = [
       total === 0
         ? 'Este membro não possui cargos!'
@@ -257,7 +261,13 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   const total = counts?.memberCount ?? guild.memberCount ?? members?.length ?? null;
   const full = members?.length && total !== null && members.length >= total;
   if (total !== null) {
-    const bots = full ? members!.filter((member) => member.bot).length : null;
+    let bots: number | null = null;
+    if (full) {
+      bots = 0;
+      for (let i = 0; i < members!.length; i += 1) {
+        if (members![i]!.bot) bots += 1;
+      }
+    }
     const humans = bots !== null ? members!.length - bots : 0;
     const split = bots !== null ? `, sendo **${humans}** ${noun(humans, 'humano')} e **${bots}** ${noun(bots, 'aplicativo')}` : '';
     const online = counts?.onlineCount !== undefined ? `Temos **${counts.onlineCount}** usuários online!` : '';
@@ -269,9 +279,14 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   if (roles?.length) {
-    const real = roles.filter((role) => role.id !== guildID);
-    const top = real.length ? real.reduce((a, b) => (b.position > a.position ? b : a)) : null;
-    const base = real.length ? real.reduce((a, b) => (b.position < a.position ? b : a)) : null;
+    let top: (typeof roles)[number] | null = null;
+    let base: (typeof roles)[number] | null = null;
+    for (let i = 0; i < roles.length; i += 1) {
+      const role = roles[i]!;
+      if (role.id === guildID) continue;
+      if (!top || role.position > top.position) top = role;
+      if (!base || role.position < base.position) base = role;
+    }
     const tail = top && base && top.id !== base.id
       ? `, sendo o que está no topo **<@&${top.id}>** e o que está na base **<@&${base.id}>**`
       : top ? `, sendo o que está no topo **<@&${top.id}>**` : '';
@@ -279,15 +294,22 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   if (channels?.length) {
+    let textCount = 0;
+    let voiceCount = 0;
+    let forumCount = 0;
+    let categoryCount = 0;
+    for (let i = 0; i < channels.length; i += 1) {
+      const type = channels[i]!.type;
+      if (type === 0 || type === 5) textCount += 1;
+      else if (type === 2 || type === 13) voiceCount += 1;
+      else if (type === 15) forumCount += 1;
+      else if (type === 4) categoryCount += 1;
+    }
     const items: string[] = [];
-    const push = (type: number | number[], singular: string, plural: string) => {
-      const count = channels.filter((channel) => (Array.isArray(type) ? type : [type]).includes(channel.type)).length;
-      if (count) items.push(`**${count}** ${noun(count, singular, plural)}`);
-    };
-    push([0, 5], 'canal de texto', 'canais de texto');
-    push([2, 13], 'canal de voz', 'canais de voz');
-    push(15, 'fórum', 'fóruns');
-    push(4, 'categoria', 'categorias');
+    if (textCount) items.push(`**${textCount}** ${noun(textCount, 'canal de texto', 'canais de texto')}`);
+    if (voiceCount) items.push(`**${voiceCount}** ${noun(voiceCount, 'canal de voz', 'canais de voz')}`);
+    if (forumCount) items.push(`**${forumCount}** ${noun(forumCount, 'fórum', 'fóruns')}`);
+    if (categoryCount) items.push(`**${categoryCount}** ${noun(categoryCount, 'categoria', 'categorias')}`);
     fields.push({
       name: `${emoji.chatThread} Canais`,
       value: `Há **${channels.length}** ${noun(channels.length, 'canal', 'canais')}${items.length ? `, sendo deles ${joinAnd(items)}` : ''}!`,
