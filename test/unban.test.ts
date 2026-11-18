@@ -73,3 +73,24 @@ test('sem argumento pede o membro', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Por favor, me informe o membro a ser desbanido\.\.\./);
   assert.equal(fixture.transport.actions.length, 0);
 });
+
+
+test('unban avisa quando o nome bate com mais de um banido (ambiguo)', async (t) => {
+  const fixture = createTestBot({
+    prefix: 'a.',
+    commands: [unban],
+    emoji,
+    resources: {
+      users: {
+        async resolveBan() {
+          return { status: 'ambiguous' as const, candidates: [{ id: '7', label: 'fulano1' }, { id: '8', label: 'fulano2' }] };
+        },
+      },
+    },
+  });
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.unban fulano'), 'success');
+  assert.match(fixture.messages.at(-1)?.payload.content ?? '', /vários membros como fulano/);
+  assert.equal(fixture.transport.actions.length, 0);
+});
