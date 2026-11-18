@@ -51,3 +51,4 @@ export const emoji = {
 
 export type EmojiKey = keyof typeof emoji;
 export type EmojiCatalog = typeof emoji;
+export const DEFAULT_EMOJI_KEYS: readonly EmojiKey[] = Object.freeze(Object.keys(emoji) as EmojiKey[]);
