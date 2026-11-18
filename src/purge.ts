@@ -18,7 +18,14 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
 
   if (mode === 'user') {
     // A menção vale em qualquer posição (`a.purge 2 @user` ≡ `a.purge @user 2`).
-    const mention = ctx.tokens.find((token) => MENTION.test(token));
+    let mention: string | undefined;
+    for (let i = 0; i < ctx.tokens.length; i += 1) {
+      const token = ctx.tokens[i]!;
+      if (MENTION.test(token)) {
+        mention = token;
+        break;
+      }
+    }
     const target = await resolveTarget(ctx, guildID, mention ? [mention] : ctx.tokens);
     if (target.status === 'none') {
       await ctx.reply(`${emoji.unhappy} Por favor, me informe o membro cujas mensagens apagar...\n-# ╰ Ex: \`${p}purge @usuario 10\``);
@@ -33,8 +40,15 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
       return;
     }
     const targetToken = mention ?? ctx.tokens[0];
-    const countRaw = ctx.tokens.find((token) => token !== targetToken);
-    const parsed = countRaw === undefined ? 10 : amount(countRaw);
+    let countRaw: string | undefined;
+    for (let i = 0; i < ctx.tokens.length; i += 1) {
+      const token = ctx.tokens[i]!;
+      if (token !== targetToken) {
+        countRaw = token;
+        break;
+      }
+    }
+    const parsed = countRaw === undefined ? 10 : parsePurgeAmount(countRaw);
     if (parsed === undefined) {
       await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)...\n-# ╰ Ex: \`${p}purge @usuario 10\``);
       return;
@@ -43,7 +57,7 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
     of = target.id;
     label = target.label ?? target.id;
   } else {
-    const parsed = amount(ctx.tokens[0]);
+    const parsed = parsePurgeAmount(ctx.tokens[0]);
     if (parsed === undefined) {
       await ctx.reply(`${emoji.unhappy} Por favor, me informe quantas mensagens apagar (de 1 a 99)...\n-# ╰ Ex: \`${p}clear 20\``);
       return;
@@ -63,7 +77,7 @@ export async function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> 
 }
 
 /** Inteiro decimal de 1 a 99; ausente, não numérico ou fora da faixa viram undefined. */
-function amount(raw: string | undefined): number | undefined {
+export function parsePurgeAmount(raw: string | undefined): number | undefined {
   if (raw === undefined || !DIGITS_RE.test(raw)) return undefined;
   const n = Number.parseInt(raw, 10);
   return n >= 1 && n <= 99 ? n : undefined;
