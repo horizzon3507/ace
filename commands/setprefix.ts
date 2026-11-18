@@ -7,11 +7,11 @@ const RESET_PREFIX_RE = /^(reset|padr[aã]o|default)$/i;
 export default defineCommand({
   name: 'setprefix',
   description: 'Muda o prefixo do Ace neste servidor.',
-  aliases: ['prefixo', 'setarprefixo', 'mudarprefixo', 'prefix', 'mudaprefixo', 'trocarprefixo', 'novoprefixo', 'sp', 'prefixset'],
+  aliases: Object.freeze(['prefixo', 'setarprefixo', 'mudarprefixo', 'prefix', 'mudaprefixo', 'trocarprefixo', 'novoprefixo', 'sp', 'prefixset']) as string[],
   guildOnly: true,
-  permissions: ['ManageGuild'],
+  permissions: Object.freeze(['ManageGuild']) as string[],
   cooldown: 3_000,
-  examples: ['setprefix !', 'setprefix reset'],
+  examples: Object.freeze(['setprefix !', 'setprefix reset']) as string[],
   async run(ctx) {
     const guildID = ctx.requireGuild();
     const next = ctx.tokens[0];
