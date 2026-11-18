@@ -10,9 +10,9 @@ const RESET = /^(reset|off|limpar|remover|desligar)$/i;
 const CATEGORIES: AutoroleCategory[] = ['all', 'user', 'app'];
 
 const categories: Record<string, AutoroleCategory> = {
-  all: 'all', todos: 'all', tudo: 'all', ambos: 'all',
-  user: 'user', usuario: 'user', usuarios: 'user', membro: 'user', membros: 'user', humano: 'user', humanos: 'user',
-  app: 'app', apps: 'app', bot: 'app', bots: 'app', aplicativo: 'app', aplicativos: 'app',
+  all: 'all', todos: 'all', tudo: 'all',
+  user: 'user', usuario: 'user', usuarios: 'user', membro: 'user', membros: 'user',
+  app: 'app', apps: 'app', bot: 'app', bots: 'app',
 };
 const labels: Record<AutoroleCategory, string> = { all: 'Todos', user: 'Usuários', app: 'Apps' };
 
@@ -30,7 +30,7 @@ const mention = (ids: readonly string[]): string =>
 export default defineCommand({
   name: 'autorole',
   description: 'Cargos automáticos pra quem entra no servidor.',
-  aliases: ['joinrole', 'autocargo', 'cargoautomatico', 'cargodeentrada', 'cargauto', 'autojoinrole'],
+  aliases: ['joinrole', 'autocargo', 'autojoinrole'],
   guildOnly: true,
   permissions: ['ManageRoles'],
   botPermissions: ['ManageRoles'],
