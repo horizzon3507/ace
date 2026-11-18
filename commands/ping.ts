@@ -15,7 +15,8 @@ export default defineCommand({
     'lat', 'response', 'resposta', 'speed', 'velocidade', 'delay',
     'p', 'lag', 'conexao', 'conexão', 'latencytest', 'roundtrip',
   ],
-  cooldown: '3s',
+  cooldown: 3_000,
+  examples: ['ping'],
   async run(ctx) {
     const ping = ctx.transport.ping;
     if (!Number.isFinite(ping) || ping < 0) {
