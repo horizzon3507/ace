@@ -28,3 +28,10 @@ test('uptime responde há quanto tempo está acordado', async (t) => {
   const content = fixture.messages.at(-1)?.payload.content ?? '';
   assert.match(content, /^<:timefill:1567289278214438912> Eu estou acordado e na escuta há \*\*.+\*\* \(desde \*\*\d{2}\/\d{2} \*\*às \*\*\d{2}:\d{2}\*\*\)!$/);
 });
+
+
+test('formatUptime trata valores negativos e fracionarios com seguranca', () => {
+  assert.equal(formatUptime(-42), '**alguns segundos**');
+  assert.equal(formatUptime(59.9), '**59 segundos**');
+  assert.equal(formatUptime(0.4), '**alguns segundos**');
+});
