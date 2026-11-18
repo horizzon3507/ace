@@ -42,14 +42,19 @@ export default defineCommand({
     const [action, ...rest] = ctx.tokens;
     const usage = `${ctx.emoji.unhappy} Me informe a categoria: \`all\` (todos), \`user\` (usuários) ou \`app\` (bots)...\n-# ╰ Ex: \`${p}autorole user @Membros\``;
 
-    const line = async (category: AutoroleCategory): Promise<string> =>
-      `${ctx.emoji.dot} **${labels[category]}**: ${mention(autoroleCategory(await guildAutorole(guildID), guildID, category))}`;
+    // Config lida uma vez: listagem, reset e gravação partem da mesma base.
+    const current = (await guildAutorole(guildID)) ?? {};
+    const save = async (config: AutoroleConfig): Promise<void> => {
+      await ctx.data.guild.set('autorole', config);
+      setGuildAutoroleCache(guildID, config);
+    };
+    const line = (category: AutoroleCategory): string =>
+      `${ctx.emoji.dot} **${labels[category]}**: ${mention(autoroleCategory(current, guildID, category))}`;
 
     if (!action) {
-      const lines = await Promise.all(CATEGORIES.map(line));
       await ctx.reply([
         `${ctx.emoji.team} O Autorole deste servidor está configurado para...`,
-        ...lines,
+        ...CATEGORIES.map(line),
         `-# ╰ Configure com \`${p}autorole <all|user|app> <cargos>\` | Limpe com \`${p}autorole reset <categoria>\``,
       ].join('\n'));
       return;
@@ -61,18 +66,14 @@ export default defineCommand({
         // `a.autorole off` puro desliga tudo de uma vez — herança da versão de
         // um cargo só, onde 'off' bastava.
         if (!rest.length) {
-          const config: AutoroleConfig = { all: 'off', user: 'off', app: 'off' };
-          await ctx.data.guild.set('autorole', config);
-          setGuildAutoroleCache(guildID, config);
+          await save({ all: 'off', user: 'off', app: 'off' });
           await ctx.reply(`${ctx.emoji.happy} Autorole desligado por completo!`);
           return;
         }
         await ctx.reply(`${ctx.emoji.unhappy} Me informe a categoria a limpar: \`all\`, \`user\` ou \`app\`...\n-# ╰ Ex: \`${p}autorole reset user\``);
         return;
       }
-      const config: AutoroleConfig = { ...(await guildAutorole(guildID) ?? {}), [target]: 'off' };
-      await ctx.data.guild.set('autorole', config);
-      setGuildAutoroleCache(guildID, config);
+      await save({ ...current, [target]: 'off' });
       await ctx.reply(`${ctx.emoji.happy} Autorole de **${labels[target]}** desligado!`);
       return;
     }
@@ -83,7 +84,7 @@ export default defineCommand({
       return;
     }
     if (!rest.length) {
-      await ctx.reply(await line(category));
+      await ctx.reply(line(category));
       return;
     }
     if (rest.length > MAX_ROLES) {
@@ -100,12 +101,6 @@ export default defineCommand({
         return;
       }
     }
-    for (const role of resolved) {
-      if (role.managed || role.id === guildID) {
-        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** eu não consigo entregar! Ele é do @everyone ou é gerenciado por uma integração...`);
-        return;
-      }
-    }
 
     const [guild, author, me, roles] = await Promise.all([
       ctx.resources.users.guild(guildID),
@@ -116,6 +111,10 @@ export default defineCommand({
     const botTop = topOf(roles, me, guild.ownerID, ctx.transport.botID);
     const authorTop = topOf(roles, author, guild.ownerID, ctx.authorID);
     for (const role of resolved) {
+      if (role.managed || role.id === guildID) {
+        await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** eu não consigo entregar! Ele é do @everyone ou é gerenciado por uma integração...`);
+        return;
+      }
       if (role.position >= botTop) {
         await ctx.reply(`${ctx.emoji.unhappy} O cargo **${role.name}** está acima do meu maior cargo! Eu não conseguiria entregá-lo...`);
         return;
@@ -127,9 +126,7 @@ export default defineCommand({
     }
 
     const ids = [...new Set(resolved.map((role) => role.id))];
-    const config: AutoroleConfig = { ...(await guildAutorole(guildID) ?? {}), [category]: ids };
-    await ctx.data.guild.set('autorole', config);
-    setGuildAutoroleCache(guildID, config);
+    await save({ ...current, [category]: ids });
     await ctx.reply(`${ctx.emoji.happy} Autorole de **${labels[category]}** configurado: ${ids.map((id) => `<@&${id}>`).join(' ')}!`);
   },
 });
