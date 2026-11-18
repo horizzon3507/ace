@@ -8,7 +8,7 @@ export default defineCommand({
   guildOnly: true,
   permissions: ['KickMembers'],
   botPermissions: ['KickMembers'],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['kick @usuario spam'],
   run: (ctx) => runModeration(ctx, 'kick'),
 });
