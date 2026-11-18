@@ -12,4 +12,5 @@ export type AceContext = Omit<CommandContextLike, 'args'> & Pick<CommandContext,
   client?: CommandContext['client'];
   http?: CommandContext['http'];
   sendStream?: CommandContext['sendStream'];
+  isOwner?: CommandContext['isOwner'];
 };
