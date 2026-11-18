@@ -41,11 +41,11 @@ function buttons(ctx: AceContext): Record<string, Button> {
 
 // Barra por página: ◀ volta, ▶ avança, home volta à primeira — sempre por último.
 function barFor(page: number, total: number, all: Record<string, Button>): Button[] {
-  return [
-    ...(page > 0 ? [all[LEFT]] : []),
-    ...(page < total - 1 ? [all[RIGHT]] : []),
-    all[HOME],
-  ];
+  const bar: Button[] = [];
+  if (page > 0) bar.push(all[LEFT]!);
+  if (page < total - 1) bar.push(all[RIGHT]!);
+  bar.push(all[HOME]!);
+  return bar;
 }
 
 const sameBar = (a: readonly Button[], b: readonly Button[]) =>
