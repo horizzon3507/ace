@@ -9,7 +9,8 @@ export default defineCommand({
   aliases: ['emojidrop', 'dropids', 'drop'],
   guildOnly: true,
   hidden: true,
-  cooldown: '5s',
-  checks: [(ctx) => ctx.authorID === OWNER_ID || `${ctx.emoji.unhappy} Este comando é só para o meu detentor...`],
+  cooldown: 5_000,
+  examples: ['iddrop'],
+  checks: [(ctx) => (typeof ctx.isOwner === 'function' && ctx.isOwner()) || ctx.authorID === OWNER_ID || `${ctx.emoji.unhappy} Este comando é só para o meu detentor...`],
   run: (ctx) => replyEmojiIdDrop(ctx),
 });
