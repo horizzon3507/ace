@@ -8,7 +8,7 @@ export default defineCommand({
   guildOnly: true,
   permissions: ['ManageRoles'],
   botPermissions: ['ManageRoles'],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['lock', 'lock #geral flood'],
   run: (ctx) => runChannelLock(ctx, 'lock'),
 });
