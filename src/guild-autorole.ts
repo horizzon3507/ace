@@ -12,7 +12,9 @@ export type AutoroleConfig = Partial<Record<AutoroleCategory, string[] | 'off'>>
 // Mesmo esquema do guild-prefix: store e cache ficam fora de RUNTIME_FILES pra
 // sobreviver ao hot-reload.
 let store: Store | undefined;
+let epoch = 0;
 const cache = new Map<string, AutoroleConfig | null>();
+const inFlight = new Map<string, Promise<AutoroleConfig | undefined>>();
 
 function writeCache(guildID: string, config: AutoroleConfig | null): void {
   if (cache.has(guildID)) {
@@ -62,15 +64,32 @@ export async function guildAutorole(guildID: string | null | undefined): Promise
     cache.set(guildID, hit);
     return hit ?? undefined;
   }
-  if (!store) return undefined;
-  const stored = store.readVariable
-    ? await store.readVariable(variableKey(guildID), Date.now)
-    : await store.read((state) => state.variables[variableKey(guildID)]);
-  const resolved = normalize(stored);
-  writeCache(guildID, resolved ?? null);
-  return resolved;
+  const active = store;
+  if (!active) return undefined;
+  const pending = inFlight.get(guildID);
+  if (pending) return pending;
+
+  const lookupEpoch = epoch;
+  const task = (async () => {
+    const stored = active.readVariable
+      ? await active.readVariable(variableKey(guildID), Date.now)
+      : await active.read((state) => state.variables[variableKey(guildID)]);
+    const resolved = normalize(stored);
+    if (epoch === lookupEpoch) writeCache(guildID, resolved ?? null);
+    return resolved;
+  })().finally(() => {
+    if (inFlight.get(guildID) === task) inFlight.delete(guildID);
+  });
+  inFlight.set(guildID, task);
+  return task;
 }
 
 export function setGuildAutoroleCache(guildID: string, config: AutoroleConfig | undefined): void {
+  epoch += 1;
   writeCache(guildID, config ?? null);
+}
+
+export function clearGuildAutoroleCache(): void {
+  epoch += 1;
+  cache.clear();
 }
