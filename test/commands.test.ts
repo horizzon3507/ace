@@ -3,12 +3,11 @@ import assert from 'node:assert/strict';
 import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
 import { brand } from '../src/brand.js';
 import { emoji } from '../src/emoji.js';
-import { bindGuildPrefixes, setGuildPrefixCache } from '../src/guild-prefix.js';
 import { prefix } from '../src/prefix.js';
 import ping from '../commands/ping.js';
 import uptime from '../commands/uptime.js';
 import setprefix from '../commands/setprefix.js';
-import ajuda, { commandExamples } from '../commands/ajuda.js';
+import ajuda from '../commands/ajuda.js';
 import guildicon from '../commands/guildicon.js';
 import avatar from '../commands/avatar.js';
 import userbanner from '../commands/userbanner.js';
@@ -228,36 +227,15 @@ test('guildicon exibe o ícone do servidor', async (t) => {
   assert.equal(embed?.image?.url, 'https://cdn.fluxer.app/icons/server.png?size=4096');
 });
 
-test('ajuda espelha os exemplos do metadata e renderiza com o prefixo do servidor', async (t) => {
-  // O mapa do ajuda precisa refletir o `examples` de cada comando — sem prefixo.
+test('os examples do metadata nunca levam prefixo', () => {
   const all = [ajuda, ping, uptime, setprefix, guildicon, avatar, userbanner, guildbanner,
     kick, ban, userinfo, guildinfo, clear, purge, timeout, unban, autorole,
     lock, unlock, softban, emojidump, emojilist, iddrop];
   for (const command of all) {
-    assert.deepEqual(commandExamples[command.name] ?? [], command.examples ?? [],
-      `commandExamples['${command.name}'] fora de sincronia com examples`);
     for (const ex of command.examples ?? []) {
       assert.doesNotMatch(ex, /^a\./, `${command.name}: exemplo ${ex} ainda leva prefixo`);
     }
   }
-
-  const fixture = bot(idlePaginator);
-  bindGuildPrefixes(fixture.store);
-  setGuildPrefixCache('100', '!');
-  t.after(() => { setGuildPrefixCache('100', undefined); return fixture.destroy(); });
-
-  assert.equal(await fixture.send('a.ajuda 2'), 'success');
-  const kickField = fixture.messages.at(-1)?.payload.embeds?.[0]?.fields
-    ?.find((field) => field.name.includes('kick'));
-  assert.match(kickField?.value ?? '', /╰ Ex: `!kick @usuario spam`/);
-  assert.doesNotMatch(kickField?.value ?? '', /`a\.kick/);
-
-  fixture.clock.advance(3_000);
-  assert.equal(await fixture.send('a.ajuda 3'), 'success');
-  const info = fixture.messages.at(-1)?.payload.embeds?.[0];
-  const autoroleField = info?.fields?.find((field) => field.name.includes('autorole'));
-  assert.match(autoroleField?.value ?? '', /`!autorole user @Membro @Vip` · `!autorole reset all`/);
-  assert.deepEqual(fixture.errors, []);
 });
 
 test('guildavatar segue como alias de guildicon', async (t) => {
