@@ -7,6 +7,7 @@ const LEFT = 'arrowleftfill';
 const RIGHT = 'arrowrightfill';
 const HOME = 'home4fill';
 const NAMES = [LEFT, RIGHT, HOME];
+const WANTED_NAMES = new Set(NAMES);
 const DEFAULT_TIMEOUT_MS = 60_000;
 
 export type PaginatorOptions = { timeoutMs?: number; startPage?: number };
@@ -113,13 +114,12 @@ type VoteSource = { next(): Promise<Vote | null>; close(): void };
  * de novo. Sem collector novo nem listeners rearmados a cada voto.
  */
 function nativeVotes(msg: Message, authorID: string, timeoutMs: number): VoteSource {
-  const wanted = new Set(NAMES);
   const queue: (Vote | null)[] = [];
   let wake: (() => void) | undefined;
   const collector = new ReactionCollector(msg.client, msg.id, msg.channelId, {
     time: timeoutMs,
     filter: (reaction, user) =>
-      user.id === authorID && wanted.has(reaction.emoji.name.toLowerCase()),
+      user.id === authorID && WANTED_NAMES.has(reaction.emoji.name.toLowerCase()),
   });
   const push = (vote: Vote | null) => {
     queue.push(vote);
