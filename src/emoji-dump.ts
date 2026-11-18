@@ -29,55 +29,58 @@ export interface ZipEntry {
   data: Uint8Array;
 }
 
+const TEXT_ENCODER = new TextEncoder();
+
 /** Zip STORE, sem compressão — emoji já vem comprimido (PNG, GIF, WebP). */
 export function buildZip(entries: readonly ZipEntry[]): Uint8Array {
-  const encoder = new TextEncoder();
-  const body: Uint8Array[] = [];
-  const central: Uint8Array[] = [];
-  let offset = 0;
-  for (const entry of entries) {
-    const nameBytes = encoder.encode(entry.name);
+  const prepared: { nameBytes: Uint8Array; data: Uint8Array; crc: number; offset: number }[] = new Array(entries.length);
+  let bodySize = 0;
+  let centralSize = 0;
+  for (let i = 0; i < entries.length; i += 1) {
+    const entry = entries[i]!;
+    const nameBytes = TEXT_ENCODER.encode(entry.name);
     const crc = crc32(entry.data);
-    const local = new DataView(new ArrayBuffer(30));
-    local.setUint32(0, 0x04034b50, true);
-    local.setUint16(4, 20, true);
-    local.setUint16(6, 0x0800, true); // nomes em UTF-8
-    local.setUint16(8, 0, true); // STORE
-    local.setUint16(12, 33, true); // 1980-01-01
-    local.setUint32(14, crc, true);
-    local.setUint32(18, entry.data.length, true);
-    local.setUint32(22, entry.data.length, true);
-    local.setUint16(26, nameBytes.length, true);
-    body.push(new Uint8Array(local.buffer), nameBytes, entry.data);
+    prepared[i] = { nameBytes, data: entry.data, crc, offset: bodySize };
+    bodySize += 30 + nameBytes.length + entry.data.length;
+    centralSize += 46 + nameBytes.length;
+  }
 
-    const dir = new DataView(new ArrayBuffer(46));
-    dir.setUint32(0, 0x02014b50, true);
-    dir.setUint16(4, 20, true);
-    dir.setUint16(6, 20, true);
-    dir.setUint16(8, 0x0800, true);
-    dir.setUint16(14, 33, true);
-    dir.setUint32(16, crc, true);
-    dir.setUint32(20, entry.data.length, true);
-    dir.setUint32(24, entry.data.length, true);
-    dir.setUint16(28, nameBytes.length, true);
-    dir.setUint32(42, offset, true);
-    central.push(new Uint8Array(dir.buffer), nameBytes);
-    offset += 30 + nameBytes.length + entry.data.length;
+  const out = new Uint8Array(bodySize + centralSize + 22);
+  const view = new DataView(out.buffer);
+  let centralCursor = bodySize;
+  for (let i = 0; i < prepared.length; i += 1) {
+    const { nameBytes, data, crc, offset } = prepared[i]!;
+    view.setUint32(offset, 0x04034b50, true);
+    view.setUint16(offset + 4, 20, true);
+    view.setUint16(offset + 6, 0x0800, true); // nomes em UTF-8
+    view.setUint16(offset + 8, 0, true); // STORE
+    view.setUint16(offset + 12, 33, true); // 1980-01-01
+    view.setUint32(offset + 14, crc, true);
+    view.setUint32(offset + 18, data.length, true);
+    view.setUint32(offset + 22, data.length, true);
+    view.setUint16(offset + 26, nameBytes.length, true);
+    out.set(nameBytes, offset + 30);
+    out.set(data, offset + 30 + nameBytes.length);
+
+    view.setUint32(centralCursor, 0x02014b50, true);
+    view.setUint16(centralCursor + 4, 20, true);
+    view.setUint16(centralCursor + 6, 20, true);
+    view.setUint16(centralCursor + 8, 0x0800, true);
+    view.setUint16(centralCursor + 14, 33, true);
+    view.setUint32(centralCursor + 16, crc, true);
+    view.setUint32(centralCursor + 20, data.length, true);
+    view.setUint32(centralCursor + 24, data.length, true);
+    view.setUint16(centralCursor + 28, nameBytes.length, true);
+    view.setUint32(centralCursor + 42, offset, true);
+    out.set(nameBytes, centralCursor + 46);
+    centralCursor += 46 + nameBytes.length;
   }
-  const centralOffset = offset;
-  const centralSize = central.reduce((sum, part) => sum + part.length, 0);
-  const end = new DataView(new ArrayBuffer(22));
-  end.setUint32(0, 0x06054b50, true);
-  end.setUint16(8, entries.length, true);
-  end.setUint16(10, entries.length, true);
-  end.setUint32(12, centralSize, true);
-  end.setUint32(16, centralOffset, true);
-  const out = new Uint8Array(offset + centralSize + 22);
-  let cursor = 0;
-  for (const part of [...body, ...central, new Uint8Array(end.buffer)]) {
-    out.set(part, cursor);
-    cursor += part.length;
-  }
+
+  view.setUint32(centralCursor, 0x06054b50, true);
+  view.setUint16(centralCursor + 8, entries.length, true);
+  view.setUint16(centralCursor + 10, entries.length, true);
+  view.setUint32(centralCursor + 12, centralSize, true);
+  view.setUint32(centralCursor + 16, bodySize, true);
   return out;
 }
 
@@ -87,6 +90,9 @@ const extOf = (item: EmojiInfo): string =>
 
 // Mesma regra do fixAnimatedAssetUrl da yuzuha: hash a_* em .png aponta pro .gif.
 const fixGif = (url?: string | null) => url?.replace(/\/(a_[^/.]+)\.png(\?|$)/, '/$1.gif$2') ?? null;
+
+const compareSnowflakeDesc = (a: string, b: string): number =>
+  a.length !== b.length ? b.length - a.length : b > a ? 1 : b < a ? -1 : 0;
 
 const fetchEmojis = async (ctx: AceContext, guildID: string) => {
   const [guild, emojis] = await Promise.all([
@@ -104,7 +110,7 @@ const fetchEmojis = async (ctx: AceContext, guildID: string) => {
     safe(() => ctx.resources.expressions.emojis(guildID)),
   ]);
   // Recentes primeiro — snowflake cresce com o tempo, ordem desc por id.
-  emojis?.sort((a, b) => (BigInt(b.id) > BigInt(a.id) ? 1 : BigInt(b.id) < BigInt(a.id) ? -1 : 0));
+  emojis?.sort((a, b) => compareSnowflakeDesc(a.id, b.id));
   return { guild, emojis };
 };
 
