@@ -2,6 +2,11 @@ import { execSync } from 'node:child_process';
 
 const INTERVAL_MS = (Number(process.env.DEPLOY_POLL_SECONDS) || 60) * 1000;
 const REQUEST_TIMEOUT_MS = 10_000;
+const GITHUB_SLUG_RE = /github\.com[/:]([\w.-]+\/[\w.-]+?)(?:\.git)?$/;
+
+export function parseGitHubSlug(url: string): string | undefined {
+  return GITHUB_SLUG_RE.exec(url)?.[1];
+}
 
 function git(args: string): string | undefined {
   try {
@@ -13,7 +18,7 @@ function git(args: string): string | undefined {
 
 function remoteSlug(): string | undefined {
   const url = git('remote get-url origin');
-  return url?.match(/github\.com[/:]([\w.-]+\/[\w.-]+?)(?:\.git)?$/)?.[1];
+  return url ? parseGitHubSlug(url) : undefined;
 }
 
 async function remoteSha(slug: string, branch: string, etag?: string): Promise<{ sha?: string; etag?: string }> {
