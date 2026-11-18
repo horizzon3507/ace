@@ -2,13 +2,15 @@ import { defineCommand } from 'yuzuha';
 import { setGuildPrefixCache } from '../src/guild-prefix.js';
 import { prefix } from '../src/live.js';
 
+const RESET_PREFIX_RE = /^(reset|padr[aã]o|default)$/i;
+
 export default defineCommand({
   name: 'setprefix',
   description: 'Muda o prefixo do Ace neste servidor.',
   aliases: ['prefixo', 'setarprefixo', 'mudarprefixo', 'prefix', 'mudaprefixo', 'trocarprefixo', 'novoprefixo', 'sp', 'prefixset'],
   guildOnly: true,
   permissions: ['ManageGuild'],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['setprefix !', 'setprefix reset'],
   async run(ctx) {
     const guildID = ctx.requireGuild();
@@ -17,7 +19,7 @@ export default defineCommand({
       await ctx.reply(`${ctx.emoji.information} Você precisa me fornecer um prefixo novo para eu definir neste ambiente...`);
       return;
     }
-    if (/^(reset|padr[aã]o|default)$/i.test(next)) {
+    if (RESET_PREFIX_RE.test(next)) {
       await ctx.data.guild.delete('prefix');
       setGuildPrefixCache(guildID, undefined);
       await ctx.reply(`${ctx.emoji.happy} O prefixo do servidor voltou para **\`${prefix()}\`**!`);
