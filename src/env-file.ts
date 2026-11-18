@@ -1,4 +1,5 @@
 import { parseEnv } from 'node:util';
+import { DEFAULT_PREFIX } from './prefix.js';
 
 export type EnvPlan = {
   assignments: { key: string; value: string }[];
@@ -31,7 +32,10 @@ export function planEnv(text: string, env: Readonly<NodeJS.ProcessEnv>, preserve
     if (key === 'FLUXER_BOT_TOKEN' || typeof value !== 'string') continue;
     if (preserve?.has(key) || env[key] === value) continue;
     assignments.push({ key, value });
-    if (key === 'PREFIX') prefix = value.trim() ? value.trim() : 'a.';
+    if (key === 'PREFIX') {
+      const trimmed = value.trim();
+      prefix = trimmed || DEFAULT_PREFIX;
+    }
   }
   return { assignments, prefix, tokenChanged, tokenRemoved };
 }
