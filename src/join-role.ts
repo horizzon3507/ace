@@ -24,6 +24,10 @@ export async function joinRolesFor(guildID: string, bot: boolean): Promise<strin
   if (all.length === 0 && specific.length === 0) return [];
   if (specific.length === 0) return [...all];
   if (all.length === 0) return [...specific];
+  if (specific.length === 1) {
+    const only = specific[0]!;
+    return all.includes(only) ? [...all] : [...all, only];
+  }
   return [...new Set([...all, ...specific])];
 }
 
