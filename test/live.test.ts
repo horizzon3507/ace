@@ -129,3 +129,19 @@ test('bindModeration usa o resolve injetado, não o módulo em cache', async () 
   } as unknown as Parameters<typeof run>[0], 'kick');
   assert.deepEqual(seen, ['resolve', 'u Por favor, me informe o membro a ser expulso...\n-# ╰ Ex: `a.kick @usuario motivo`']);
 });
+
+
+test('install rejeita cores negativas ou fracionarias na validacao bitwise', () => {
+  for (const invalid of [-1, 1.5, Number.NaN]) {
+    assert.throws(() => installRuntime({
+      prefix: () => 'a.',
+      mentionMessage: () => 'x',
+      isBareMention: () => true,
+      unknownCommandMessage: sourceUnknown,
+      grantJoinRole: async () => false,
+      ...moderation,
+      ...rest,
+      brand: { primary: invalid, eyes: 1, background: 1 },
+    }), /primary/);
+  }
+});
