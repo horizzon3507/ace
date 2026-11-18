@@ -2,6 +2,7 @@ import { embed, SDK, type GuildInfo, type MemberInfo, type UserInfo, type UserPr
 import type { AceContext } from './context.js';
 import { brand, formatAge, formatDayStamp, resolveAssetTarget } from './live.js';
 
+const MARKDOWN_CHARS_RE = /[*_~`]/g;
 const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
 const noun = (n: number, singular: string, plural = `${singular}s`) => n === 1 ? singular : plural;
 
@@ -16,7 +17,7 @@ const nativeUser = async (ctx: AceContext, id: string) => {
   return client ? safe(() => client.users.resolve(id)) : null;
 };
 
-const PRIVILEGE_LADDER: { flag: keyof typeof SDK.PermissionFlags; label: string }[] = [
+const PRIVILEGE_LADDER: readonly { flag: keyof typeof SDK.PermissionFlags; label: string }[] = Object.freeze([
   { flag: 'Administrator', label: 'Administrador' },
   { flag: 'ManageGuild', label: 'Gerenciar servidor' },
   { flag: 'ManageRoles', label: 'Gerenciar cargos' },
@@ -25,7 +26,7 @@ const PRIVILEGE_LADDER: { flag: keyof typeof SDK.PermissionFlags; label: string 
   { flag: 'KickMembers', label: 'Expulsar membros' },
   { flag: 'ModerateMembers', label: 'Moderar membros' },
   { flag: 'ManageMessages', label: 'Gerenciar mensagens' },
-];
+]);
 
 const topPrivilege = (permissions: string): string | null => {
   const bits = BigInt(permissions || '0');
@@ -72,7 +73,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
   const roleList = member && guildID ? await safe(() => ctx.resources.roles.list(guildID)) : null;
 
-  const name = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
+  const name = (user.displayName || user.username).replace(MARKDOWN_CHARS_RE, '') || 'usuário';
   const avatar = user.avatarURL;
   const banner = (guildID ? profile?.serverProfile?.bannerURL : null)
     ?? profile?.globalProfile?.bannerURL
@@ -95,7 +96,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   const ficha = [
     `Este ${user.bot ? 'aplicativo' : 'usuário'} é <@${user.id}>, de nome de usuário \`${tag}\` e ID \`${user.id}\`!`,
   ];
-  const nickname = member?.nickname?.replace(/[*_~`]/g, '');
+  const nickname = member?.nickname?.replace(MARKDOWN_CHARS_RE, '');
   if (nickname) {
     ficha.push(`Seu apelido neste servidor é **${nickname}**!`);
   }
@@ -192,15 +193,15 @@ const NEEDED_PERMISSIONS: { flag: keyof typeof SDK.PermissionFlags; label: strin
   { flag: 'ModerateMembers', label: 'Moderar membros' },
 ];
 
-const VERIFICATION_LABELS: Record<number, string> = {
+const VERIFICATION_LABELS: Readonly<Record<number, string>> = Object.freeze({
   0: 'nenhum', 1: 'baixo', 2: 'médio', 3: 'alto', 4: 'máximo',
-};
+});
 
-const CONTENT_FILTER_LABELS: Record<number, string> = {
+const CONTENT_FILTER_LABELS: Readonly<Record<number, string>> = Object.freeze({
   0: 'desativado', 1: 'membros sem cargo', 2: 'todos os membros',
-};
+});
 
-const FEATURE_LABELS: Record<string, string> = {
+const FEATURE_LABELS: Readonly<Record<string, string>> = Object.freeze({
   ANIMATED_BANNER: 'banner animado',
   ANIMATED_ICON: 'ícone animado',
   BANNER: 'banner',
@@ -215,7 +216,7 @@ const FEATURE_LABELS: Record<string, string> = {
   MEMBER_VERIFICATION_GATE_ENABLED: 'verificação de entrada',
   NEWS: 'anúncios',
   THREADS_ENABLED: 'tópicos',
-};
+});
 
 /** Ficha do servidor em campos inline: guild obrigatória, contadores degradáveis. */
 export async function replyGuildInfo(ctx: AceContext): Promise<void> {
