@@ -8,7 +8,7 @@ export default defineCommand({
   guildOnly: true,
   permissions: ['ModerateMembers'],
   botPermissions: ['ModerateMembers'],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['timeout @usuario 10m spam'],
   run: (ctx) => runModeration(ctx, 'timeout'),
 });
