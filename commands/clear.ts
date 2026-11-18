@@ -8,7 +8,7 @@ export default defineCommand({
   guildOnly: true,
   permissions: ['ManageMessages'],
   botPermissions: ['ManageMessages'],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['clear 20'],
   run: (ctx) => runPurge(ctx, 'channel'),
 });
