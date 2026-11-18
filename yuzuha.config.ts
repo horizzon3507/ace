@@ -1,4 +1,4 @@
-import { defineConfig, SDK } from 'yuzuha';
+import { defineConfig, SDK, type Command } from 'yuzuha';
 import { bindGuildAutoroles } from './src/guild-autorole.js';
 import { bindGuildPrefixes, guildPrefix } from './src/guild-prefix.js';
 import { grantJoinRole, isBareMention, mentionMessage, prefix, unknownCommandMessage } from './src/live.js';
@@ -30,6 +30,28 @@ export default defineConfig({
   setup(bot) {
     bindGuildPrefixes(bot.store);
     bindGuildAutoroles(bot.store);
+    let cachedCommands: readonly Command[] = [];
+    let cachedNames: readonly string[] = Object.freeze([]);
+    const getCommandNames = (): readonly string[] => {
+      const current = bot.listCommands();
+      if (current.length === cachedCommands.length && current.every((command, index) => command === cachedCommands[index])) {
+        return cachedNames;
+      }
+      const next: string[] = [];
+      for (let i = 0; i < current.length; i += 1) {
+        const command = current[i]!;
+        next.push(command.name);
+        if (command.aliases) {
+          for (let j = 0; j < command.aliases.length; j += 1) {
+            next.push(command.aliases[j]!);
+          }
+        }
+      }
+      cachedCommands = current;
+      cachedNames = Object.freeze(next);
+      return cachedNames;
+    };
+
     bot.on(SDK.Events.MessageCreate, async (message) => {
       const me = bot.client.user;
       if (!me || message.author.bot || !message.content) return;
@@ -41,8 +63,7 @@ export default defineConfig({
       }
       const p = await guildPrefix(message.guildId) ?? prefix();
       if (!message.content.startsWith(p)) return;
-      const names = bot.listCommands().flatMap((command) => [command.name, ...(command.aliases ?? [])]);
-      const missing = unknownCommandMessage(message.content, p, names);
+      const missing = unknownCommandMessage(message.content, p, getCommandNames());
       if (missing) await message.reply(missing, { ping: false });
     });
 
