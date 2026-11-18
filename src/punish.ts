@@ -12,6 +12,8 @@ export type ModerationDeps = {
   moderationReason: typeof bundledReason;
 };
 
+const USER_REF_RE = /^<@!?\d+>$|^\d+$/;
+
 const copy = {
   kick: { past: 'expulso', fail: 'expulsar', mark: 'kick', perm: 'Expulsar membros' },
   ban: { past: 'banido', fail: 'banir', mark: 'ban', perm: 'Banir membros' },
@@ -69,7 +71,7 @@ export function bindModeration(deps: ModerationDeps) {
     if (target.status === 'missing') {
       // Unban por menção/ID: o alvo existe — missing significa "sem ban ativo".
       // Por nome, é o "não encontrei" de sempre.
-      const ref = /^<@!?\d+>$|^\d+$/.test(ctx.tokens[0] ?? '');
+      const ref = USER_REF_RE.test(ctx.tokens[0] ?? '');
       await ctx.reply(action === 'unban' && ref
         ? `${emoji.unhappy} Este usuário não está banido neste servidor...`
         : `${emoji.unhappy} Eu não encontrei ninguém como ${target.query}! Use menção ou ID de usuário...`);
