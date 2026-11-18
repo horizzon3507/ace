@@ -15,6 +15,8 @@ const categories: Category[] = [
 ];
 
 // Ícone por comando quando um encaixa melhor que o da categoria.
+const PAGE_NUMBER_RE = /^\d+$/;
+
 const commandIcons: Record<string, EmojiKey> = {
   ajuda: 'information', ping: 'globe', uptime: 'time', setprefix: 'settings',
   userinfo: 'accountCircle', guildinfo: 'idCard',
@@ -33,19 +35,19 @@ export default defineCommand({
     'commandslist', 'cmdlist', 'listcommands', 'comandos', 'ajdlist',
     'assist', 'socorro', 'aj', 'helper', 'commandhelp', 'comandoslista',
   ],
-  cooldown: '3s',
+  cooldown: 3_000,
   examples: ['ajuda 2'],
   async run(ctx) {
     const p = await guildPrefix(ctx.guildID) ?? prefix();
-    const descriptions = new Map(
-      ctx.help()
-        .split('\n')
-        .filter(Boolean)
-        .map((line) => {
-          const i = line.indexOf(':');
-          return i < 0 ? [line.trim(), ''] : [line.slice(0, i).trim(), line.slice(i + 1).trim()];
-        }),
-    );
+    const descriptions = new Map<string, string>();
+    const helpLines = ctx.help().split('\n');
+    for (let idx = 0; idx < helpLines.length; idx += 1) {
+      const line = helpLines[idx]!;
+      if (!line) continue;
+      const i = line.indexOf(':');
+      if (i < 0) descriptions.set(line.trim(), '');
+      else descriptions.set(line.slice(0, i).trim(), line.slice(i + 1).trim());
+    }
 
     const listed = new Set<string>();
     const pages: { label: string; icon: EmojiKey; fields: { name: string; value: string; inline?: boolean }[] }[] = [];
@@ -73,7 +75,7 @@ export default defineCommand({
     const requested = ctx.tokens[0];
     let startPage = 0;
     if (requested !== undefined) {
-      const n = /^\d+$/.test(requested) ? Number.parseInt(requested, 10) : 0;
+      const n = PAGE_NUMBER_RE.test(requested) ? Number.parseInt(requested, 10) : 0;
       if (n < 1 || n > total) {
         await ctx.reply(`${ctx.emoji.unhappy} Essa página não existe! O ajuda vai de 1 a ${total}...\n-# ╰ Ex: \`${p}ajuda 2\``);
         return;
