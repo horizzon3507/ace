@@ -10,13 +10,13 @@ function connectionStatus(ping: number): string {
 export default defineCommand({
   name: 'ping',
   description: 'Latência do Ace.',
-  aliases: [
+  aliases: Object.freeze([
     'latency', 'ms', 'pong', 'latencia', 'latência', 'pingpong', 'pings',
     'lat', 'response', 'resposta', 'speed', 'velocidade', 'delay',
     'p', 'lag', 'conexao', 'conexão', 'latencytest', 'roundtrip',
-  ],
+  ]) as string[],
   cooldown: 3_000,
-  examples: ['ping'],
+  examples: Object.freeze(['ping']) as string[],
   async run(ctx) {
     const ping = ctx.transport.ping;
     if (!Number.isFinite(ping) || ping < 0) {
