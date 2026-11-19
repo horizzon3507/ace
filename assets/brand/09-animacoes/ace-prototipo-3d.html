@@ -69,7 +69,7 @@ function frame(now){
   const dt=Math.min(.033,(now-last)/1000);last=now;
   step(dt);
   const T=(now-t0)/1000;
-  const breathe=1+Math.sin(T*1.6)*.012;
+  const breathe=reduce?1:1+Math.sin(T*1.6)*.012;
   const yaw=P.yaw.v,pit=P.pitch.v;
   head.style.transform=`rotateY(${yaw*24}deg) rotateX(${-pit*20}deg) rotateZ(${P.roll.v*6}deg) scale(${breathe*(1-P.squash.v*.04)},${breathe*(1+P.squash.v*.05)})`;
   const S=stage.clientWidth;
@@ -94,7 +94,7 @@ requestAnimationFrame(frame);
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const rnd=(a,b)=>a+Math.random()*(b-a);
-function look(x,y,eyeBoost=1){set('yaw',x);set('pitch',y);set('ex',x*eyeBoost);set('ey',y*eyeBoost);set('roll',x*.4)}
+function look(x,y,eyeBoost=1){if(performance.now()<manual)return;set('yaw',x);set('pitch',y);set('ex',x*eyeBoost);set('ey',y*eyeBoost);set('roll',x*.4)}
 async function blink(){set('blink',1);await sleep(90);set('blink',0);await sleep(120)}
 async function happy(ms=1300,which='both'){
   if(which!=='R')set('hL',1);if(which!=='L')set('hR',1);set('squash',1);
@@ -124,7 +124,7 @@ async function loop(){
   }
 }
 // piscadas automáticas, irregulares
-(async function autoBlink(){while(true){await sleep(rnd(2200,5200));if(performance.now()>=manual||true){await blink();if(Math.random()<.2){await sleep(60);await blink()}}}})();
+if(!reduce)(async function autoBlink(){while(true){await sleep(rnd(2200,5200));if(performance.now()>=manual){await blink();if(Math.random()<.2){await sleep(60);await blink()}}}})();
 if(!reduce)loop();
 
 // segue o ponteiro; ao parar por 2,5s volta ao roteiro
