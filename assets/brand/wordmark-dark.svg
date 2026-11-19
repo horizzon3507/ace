@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 64" role="img" aria-label="Ace">
+  <g transform="translate(32 32)">
+    <circle r="26" fill="#648DE5"/>
+    <g transform="translate(2.85 -8.31) rotate(22)">
+      <rect x="-3.36" y="-5.28" width="6.72" height="10.56" rx="3.36" fill="#F1F1F1"/>
+    </g>
+    <g transform="translate(15.13 -14.02) rotate(22)">
+      <rect x="-2.81" y="-5.13" width="5.62" height="10.26" rx="2.81" fill="#F1F1F1"/>
+    </g>
+  </g>
+  <text x="72" y="44" font-family="Geist, Inter, system-ui, sans-serif" font-size="36" font-weight="600" fill="#171717" letter-spacing="-1">ace</text>
+</svg>
