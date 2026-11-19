@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Olhos 3D</title>
+<style>
+  :root{
+    --bg:#fbeee2; --hint:#8f6a4a;
+    --c1:#fad7b4; --c2:#f7a85f; --c3:#ea8630; --c4:#b85a10;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bg:#2a1708; --hint:#d1a58f; }
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;touch-action:none}
+  .stage{--s:min(72vmin,520px);width:var(--s);height:var(--s);perspective:900px;position:relative}
+  .head{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+  .ball{position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle at var(--hx,35%) var(--hy,28%), var(--c1) 0%, var(--c2) 38%, var(--c3) 78%, var(--c4) 100%);
+    box-shadow:0 calc(var(--s)*.06) calc(var(--s)*.12) rgba(20,40,100,.35)}
+  .eyes{position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(calc(var(--s)*.14))}
+  .eye{position:absolute;left:50%;top:43%;width:calc(var(--s)*.16);height:calc(var(--s)*.36);
+    margin-left:calc(var(--s)*-.08);margin-top:calc(var(--s)*-.18);will-change:transform}
+  .eye.l{left:calc(50% - var(--s)*.143)} .eye.r{left:calc(50% + var(--s)*.143)}
+  .pill{position:absolute;inset:0;background:#fff;border-radius:999px;box-shadow:0 0 calc(var(--s)*.04) rgba(255,255,255,.55)}
+  .caret{position:absolute;left:-10%;right:-10%;top:30%;height:40%;opacity:0}
+  .caret svg{width:100%;height:100%;overflow:visible}
+  .shadow{width:calc(min(72vmin,520px)*.55);height:calc(min(72vmin,520px)*.06);margin-top:calc(min(72vmin,520px)*.06);
+    border-radius:50%;background:rgba(20,40,100,.22);filter:blur(10px)}
+  p{color:var(--hint);font-size:14px;margin:18px 0 0;opacity:.8}
+  @media (prefers-reduced-motion: reduce){ p::after{content:" (animação reduzida)"} }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="head" id="head">
+    <div class="ball" id="ball"></div>
+    <div class="eyes" id="eyes">
+      <div class="eye l" id="eL"><div class="pill"></div><div class="caret"><svg viewBox="0 0 100 60"><polyline points="8,52 50,10 92,52" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="eye r" id="eR"><div class="pill"></div><div class="caret"><svg viewBox="0 0 100 60"><polyline points="8,52 50,10 92,52" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+  </div>
+</div>
+<div class="shadow" id="shadow"></div>
+<p>mexa o mouse ou toque na tela para ele te seguir</p>
+
+<script>
+const $=id=>document.getElementById(id);
+const head=$('head'),eyes=$('eyes'),ball=$('ball'),shadow=$('shadow'),stage=$('stage');
+const E=[$('eL'),$('eR')];
+// estado: valor atual (v) e alvo (t) para cada parâmetro, com mola
+const P={};
+function def(n,v,k=60,d=10){P[n]={v,t:v,x:0,k,d}}
+def('yaw',0,50,9);def('pitch',0,50,9);        // rotação da cabeça
+def('ex',0,120,12);def('ey',0,120,12);        // deslocamento dos olhos
+def('blink',0,400,28);def('hL',0,260,22);def('hR',0,260,22); // piscar e ^ ^
+def('wide',0,200,14);def('squash',0,180,10);def('roll',0,60,8);
+const set=(n,t)=>P[n].t=t;
+function step(dt){for(const n in P){const p=P[n];const a=p.k*(p.t-p.v)-p.d*p.x;p.x+=a*dt;p.v+=p.x*dt}}
+
+let last=performance.now(),t0=last,manual=0;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function frame(now){
+  const dt=Math.min(.033,(now-last)/1000);last=now;
+  step(dt);
+  const T=(now-t0)/1000;
+  const breathe=1+Math.sin(T*1.6)*.012;
+  const yaw=P.yaw.v,pit=P.pitch.v;
+  head.style.transform=`rotateY(${yaw*24}deg) rotateX(${-pit*20}deg) rotateZ(${P.roll.v*6}deg) scale(${breathe*(1-P.squash.v*.04)},${breathe*(1+P.squash.v*.05)})`;
+  const S=stage.clientWidth;
+  // olhos "flutuam" na frente da esfera e deslizam mais que a cabeça: sensação de volume
+  eyes.style.transform=`translateZ(${S*.14}px) translate(${P.ex.v*S*.075}px,${P.ey.v*S*.06}px)`;
+  ball.style.setProperty('--hx',(35-yaw*14)+'%');
+  ball.style.setProperty('--hy',(28+pit*10)+'%');
+  shadow.style.transform=`translateX(${-yaw*S*.05}px) scaleX(${1-Math.abs(yaw)*.1})`;
+  const hs=[P.hL.v,P.hR.v];
+  E.forEach((el,i)=>{
+    const h=Math.min(1,Math.max(0,hs[i]));
+    const side=i?1:-1;                       // olho mais distante da direção do olhar encolhe (perspectiva)
+    const persp=1-Math.max(0,-side*yaw)*.18+Math.max(0,side*yaw)*.06;
+    const sy=(1-P.blink.v*.94)*(1+P.wide.v*.22);
+    el.children[0].style.opacity=1-h;
+    el.children[1].style.opacity=h;
+    el.style.transform=`scale(${persp},${h>0.5?1:sy})`;
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function look(x,y,eyeBoost=1){set('yaw',x);set('pitch',y);set('ex',x*eyeBoost);set('ey',y*eyeBoost);set('roll',x*.4)}
+async function blink(){set('blink',1);await sleep(90);set('blink',0);await sleep(120)}
+async function happy(ms=1300,which='both'){
+  if(which!=='R')set('hL',1);if(which!=='L')set('hR',1);set('squash',1);
+  await sleep(ms);set('hL',0);set('hR',0);set('squash',0);await sleep(250)}
+
+const moves=[
+  async()=>{look(.9,0);await sleep(900);look(-.9,0);await sleep(1100);look(0,0);await sleep(500)},
+  async()=>{look(0,-.9);await sleep(900);look(0,.8);await sleep(900);look(0,0);await sleep(400)},
+  async()=>{look(.8,-.7);await sleep(700);look(-.8,-.7);await sleep(800);look(-.8,.7);await sleep(800);look(.8,.7);await sleep(800);look(0,0);await sleep(400)},
+  async()=>{look(.3,-.2,1.6);await blink();await sleep(300);await blink();look(0,0);await sleep(300)},
+  async()=>{look(0,0);await happy(1500)},
+  async()=>{look(-.5,-.2);await sleep(500);await happy(1100,'L');look(0,0)},        // piscadinha
+  async()=>{set('wide',1);look(0,-.3);await sleep(900);set('wide',0);look(0,0);await sleep(400)},
+  async()=>{look(.6,.3);await sleep(500);look(-.6,.3);await sleep(500);look(.6,.3);await sleep(500);await happy(900);look(0,0)},
+  async()=>{ // círculo com o olhar
+    for(let a=0;a<=Math.PI*2+.1;a+=Math.PI/8){look(Math.cos(a)*.85,Math.sin(a)*.7);await sleep(110)}look(0,0);await sleep(300)},
+];
+let idx=-1,busy=false;
+async function loop(){
+  while(true){
+    if(performance.now()<manual){await sleep(200);continue}
+    busy=true;
+    let n;do{n=Math.floor(Math.random()*moves.length)}while(n===idx);idx=n;
+    await moves[n]();
+    await sleep(rnd(500,1400));
+    busy=false;
+  }
+}
+// piscadas automáticas, irregulares
+(async function autoBlink(){while(true){await sleep(rnd(2200,5200));if(performance.now()>=manual||true){await blink();if(Math.random()<.2){await sleep(60);await blink()}}}})();
+if(!reduce)loop();
+
+// segue o ponteiro; ao parar por 2,5s volta ao roteiro
+function follow(e){
+  const r=stage.getBoundingClientRect();
+  const x=((e.clientX-(r.left+r.width/2))/(innerWidth/2)),y=((e.clientY-(r.top+r.height/2))/(innerHeight/2));
+  look(Math.max(-1,Math.min(1,x*1.4)),Math.max(-1,Math.min(1,y*1.4)));
+  manual=performance.now()+2500;
+}
+addEventListener('pointermove',follow);
+addEventListener('pointerdown',e=>{follow(e);manual=performance.now()+3500;happy(1000)});
+</script>
+</body>
+</html>

@@ -1,70 +1,51 @@
 # Manual de marca — Ace
 
-Identidade visual do Ace, bot do Fluxer. Os valores canônicos de cor vivem em `src/brand.ts`; este documento explica como usá-los.
+O Ace é uma esfera chapada com dois olhos e sem boca. Toda a expressividade vem dos olhos. A função principal é a identidade visual do bot no Fluxer; o uso como mascote segue as mesmas regras.
 
-## Símbolo
+Este arquivo é o resumo rápido. O manual completo (identidade, logo, cores, expressões, estados, movimento, aplicações, tipografia e especificações) está em [`assets/brand/01-guia/ace-manual-de-marca.pdf`](assets/brand/01-guia/ace-manual-de-marca.pdf), com a variante laranja em [`assets/brand/canary/01-guia/ace-canary-manual-de-marca.pdf`](assets/brand/canary/01-guia/ace-canary-manual-de-marca.pdf).
 
-O símbolo do Ace é um círculo azul com dois olhos brancos inclinados a 22°, levemente deslocados para cima e para a direita — um rosto simples, sem boca.
+## Regras que não mudam
 
-| Arquivo | Uso |
-|---|---|
-| `assets/ace.svg` | Versão principal, fundo transparente |
-| `assets/ace-black.svg` / `assets/ace-black.png` | Símbolo colorido sobre fundo Ink |
-| `assets/ace-white.svg` / `assets/ace-white.png` / `assets/ace-white-small.*` | Símbolo colorido sobre fundo branco |
-| `assets/ace-mono-dark.svg` | Um só ink em Ink, olhos vazados — para fundos claros |
-| `assets/ace-mono-light.svg` | Um só ink em Eye White, olhos vazados — para fundos escuros |
-| `assets/ace.png` | Versão raster 1024×1024 |
-| `assets/ace-face.jpg` | Ilustração do mascote para avatar e divulgação |
-
-### Lockups
-
-Símbolo + wordmark `ace` em minúsculas, Geist/Inter, peso 600, tracking −1:
-
-- `assets/brand/wordmark-dark.svg` — texto Ink, para fundos claros
-- `assets/brand/wordmark-light.svg` — texto Eye White, para fundos escuros
-
-### Respiro e tamanho mínimo
-
-- Respiro: metade do diâmetro do círculo em todos os lados.
-- Tamanho mínimo do símbolo: 16 px. Abaixo disso os olhos viram borrão.
-- O símbolo funciona sozinho como avatar/ícone; o lockup é para contextos onde o nome precisa aparecer.
-
-### Usos incorretos
-
-- Não mudar a cor do círculo ou dos olhos.
-- Não girar, achatar ou deformar o símbolo.
-- Não adicionar boca, contorno ou sombra.
-- Não usar o símbolo colorido sobre fundo azul — use a versão monocromática.
-- Não escrever o nome em maiúsculas ("ACE"); é sempre `ace` ou `Ace` no início de frase.
+- Esfera inteira, sem boca, sem contorno, sombra, degradê ou brilho.
+- Olhos sempre em Eye White `#F1F1F1`, em qualquer expressão, cor ou estado.
+- A cor da esfera indica o estado: azul é o Ace padrão; verde, vermelho e cinza são online, erro e instável.
+- Ace Canary é a variante laranja: só a família azul vira laranja (`#F5841F`); as cores de estado continuam iguais.
+- Texto de manual e documento é formal, sem gírias, em português do Brasil.
 
 ## Cores
 
-![Paleta](assets/brand/palette.svg)
-
-| Nome | Hex | Papel |
+| Uso | Nome | Hex |
 |---|---|---|
-| Ace Blue | `#648DE5` | Primária: embeds, links, destaques, o círculo do símbolo |
-| Ink | `#171717` | Fundo escuro, cor dos embeds de informação (`guildinfo`, lista de emojis) |
-| Eye White | `#F1F1F1` | Texto sobre Ink, os olhos do símbolo |
+| Ace padrão | Ace Blue | `#648DE5` |
+| Ace Canary | Canary Orange | `#F5841F` |
+| Olhos (sempre) | Eye White | `#F1F1F1` |
+| Fundo escuro e texto | Ink | `#171717` |
+| Online | Online | `#34B878` (texto em fundo claro: `#1F9E60`) |
+| Erro / offline | Error | `#E53E3E` |
+| Instável | Unstable | `#8C919A` |
 
-No código, nunca escreva o hex à mão: importe `brand` de `src/brand.ts` (`primary`, `eyes`, `background`). A CLI pinta o selo do dev com texto Ink sobre fundo Ace Blue (`src/term.ts`).
+Paleta completa (variações, extras e gradientes): [`assets/brand/03-cores/`](assets/brand/03-cores/) em CSS, JSON, TXT e PNG. No código, nunca escreva o hex à mão: importe `brand` de `src/brand.ts`.
+
+## Assets
+
+`assets/brand/` segue a estrutura do kit oficial (`00-LEIA-ME.txt` descreve cada pasta):
+
+- `02-logo/` — logo em SVG e PNG (transparente, fundo escuro, fundo branco)
+- `03-cores/` — paleta e tokens
+- `04-expressoes/` — as 15 expressões
+- `05-avatar/` — avatar animado e variações
+- `06-banners/` — banners e gradientes
+- `07-status/` — estados online, erro e instável, com e sem texto
+- `08-emojis/` — emojis 512×512 para o Fluxer
+- `09-animacoes/` — GIFs, vídeo de motion e protótipo 3D
+- `canary/` — o mesmo kit na variante Ace Canary
 
 ## Tipografia
 
-- **Geist** — títulos, nomes e texto de interface (site, manuais). Fallback: Inter, system-ui.
-- **Geist Mono** — comandos, código e respostas do bot quando citadas em texto (`a.ping`, `pong!`).
+- **Geist** (400–700) — principal. Alternativa serifada: Geist Serif ou Lora.
+- **Geist Mono** — comandos e código.
+- As peças de status prontas usam Liberation Sans Bold e Lora SemiBold.
 
-Nos embeds do Fluxer vale a fonte do cliente; a regra acima é para superfícies nossas (site, imagens, documentos).
+## Voz
 
-## Voz e tom
-
-- Português brasileiro, informal e direto.
-- Respostas curtas: `pong!`, `trancado.`, `feito.` — verbo ou confirmação, sem burocracia.
-- O nome do bot aparece em minúsculas nas respostas (`ace`), em Ace Blue quando destacado.
-- Nada de caps lock, exclamações em série ou emojis decorativos fora do catálogo do bot (`src/emoji.ts`).
-
-## Social
-
-- `assets/brand/og.png` — card 1200×630 para `og:image` e links compartilhados.
-- `assets/brand/palette.svg` — chips da paleta usados neste manual.
-- `assets/readme/banner.gif` — banner do README.
+O bot responde curto e direto em pt-BR (`pong!`, `trancado.`, `feito.`). O nome aparece como `ace` nas respostas e `Ace` no início de frase.

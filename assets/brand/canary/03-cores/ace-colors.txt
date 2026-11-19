@@ -1,0 +1,12 @@
+Canary Orange    #F5841F  rgb(245, 132, 31)  Cor principal do Ace Canary
+Canary Deep      #A94A0C  rgb(169, 74, 12)  Laranja profundo, para detalhes e contraste
+Canary Light     #F9C697  rgb(249, 198, 151)  Laranja claro, para apoio e detalhes
+Ink              #171717  rgb(23, 23, 23)  Fundo escuro e texto
+Eye White        #F1F1F1  rgb(241, 241, 241)  Olhos e traços sobre o Ace
+White            #FFFFFF  rgb(255, 255, 255)  Fundo claro
+Online           #34B878  rgb(52, 184, 120)  Estado online (Ace verde)
+Online Text      #1F9E60  rgb(31, 158, 96)  Texto "online" sobre fundo claro
+Error            #E53E3E  rgb(229, 62, 62)  Estado de erro ou offline (Ace vermelho, olhos em x)
+Unstable         #8C919A  rgb(140, 145, 154)  Estado instável (Ace cinza, olhos em traço)
+
+Extras (formas/variações): Purple #8B66E0, Pink #F06FA8, Deep Orange #D95F0A, Teal #25AEB0, Amber #EE9B1B

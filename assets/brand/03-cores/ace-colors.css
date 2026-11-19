@@ -1,0 +1,20 @@
+:root{
+  --ace-ace-blue: #648DE5;
+  --ace-ace-blue-deep: #2D4780;
+  --ace-ace-blue-light: #9EB7E5;
+  --ace-ink: #171717;
+  --ace-eye-white: #F1F1F1;
+  --ace-white: #FFFFFF;
+  --ace-online: #34B878;
+  --ace-online-text: #1F9E60;
+  --ace-error: #E53E3E;
+  --ace-unstable: #8C919A;
+  --ace-purple: #8B66E0;
+  --ace-pink: #F06FA8;
+  --ace-orange: #F5822E;
+  --ace-teal: #25AEB0;
+  --ace-indigo: #4A5AD3;
+  --ace-amber: #EE9B1B;
+  --ace-grad-claro: linear-gradient(225deg,#FFFFFF,#CFDDF5);
+  --ace-grad-azul: linear-gradient(225deg,#ECF2FD,#648DE5);
+}
