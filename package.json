@@ -1,6 +1,6 @@
 {
   "name": "ace",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "type": "module",
   "description": "Bot do Fluxer com Yuzuha: prefixo a., comandos de utilidade e moderação.",
@@ -12,11 +12,12 @@
     "start": "tsx src/cli.ts start",
     "dev": "tsx src/cli.ts dev",
     "check": "yuzuha check",
+    "doctor": "yuzuha doctor",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
-    "yuzuha": "^0.3.2"
+    "yuzuha": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",

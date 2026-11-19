@@ -196,10 +196,17 @@ export function runPurge(ctx: AceContext, mode: PurgeMode): Promise<void> {
 }
 
 function color(value: number, name: string): void {
-  if (!Number.isInteger(value) || value < 0 || value > 0xffffff) {
+  if (typeof value !== 'number' || (value & 0xffffff) !== value) {
     throw new Error(`cor ${name} inválida.`);
   }
 }
+
+const REQUIRED_FUNCTIONS: readonly (keyof RuntimeInstall)[] = [
+  'grantJoinRole', 'runModeration', 'runChannelLock', 'targetUserID',
+  'resolveTarget', 'resolveBanTarget', 'resolveAssetTarget', 'moderationReason',
+  'formatStamp', 'formatDayStamp', 'formatAge',
+  'replyUserInfo', 'replyGuildInfo', 'replyUserAsset', 'replyGuildAsset', 'runPurge',
+] as const;
 
 export function installRuntime(next: RuntimeInstall): void {
   const commandPrefix = next.prefix();
@@ -216,19 +223,15 @@ export function installRuntime(next: RuntimeInstall): void {
   if (typeof next.unknownCommandMessage('a.nope', 'a.', []) !== 'string' || next.unknownCommandMessage('a.ajuda', 'a.', ['ajuda']) != null) {
     throw new Error('unknownCommandMessage() não separou comando faltando de comando conhecido.');
   }
-  const functions: (keyof RuntimeInstall)[] = [
-    'grantJoinRole', 'runModeration', 'runChannelLock', 'targetUserID',
-    'resolveTarget', 'resolveBanTarget', 'resolveAssetTarget', 'moderationReason',
-    'formatStamp', 'formatDayStamp', 'formatAge',
-    'replyUserInfo', 'replyGuildInfo', 'replyUserAsset', 'replyGuildAsset', 'runPurge',
-  ];
-  for (const name of functions) {
+  for (let i = 0; i < REQUIRED_FUNCTIONS.length; i += 1) {
+    const name = REQUIRED_FUNCTIONS[i]!;
     if (typeof next[name] !== 'function') throw new Error(`${name}() não é função.`);
   }
   color(next.brand.primary, 'primary');
   color(next.brand.eyes, 'eyes');
   color(next.brand.background, 'background');
-  for (const name of functions) {
+  for (let i = 0; i < REQUIRED_FUNCTIONS.length; i += 1) {
+    const name = REQUIRED_FUNCTIONS[i]!;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (slots as Record<keyof RuntimeInstall, unknown>)[name] = next[name] as any;
   }

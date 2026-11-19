@@ -8,44 +8,46 @@ import { formatUptime } from './uptime.js';
 type EmojiKey = keyof typeof catalog;
 type Category = { icon: EmojiKey; label: string; commands: readonly string[] };
 
-const categories: Category[] = [
-  { icon: 'ban', label: 'Moderação', commands: ['kick', 'ban', 'softban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban'] },
-  { icon: 'information', label: 'Informações', commands: ['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo', 'autorole'] },
-  { icon: 'globe', label: 'Utilidades', commands: ['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump'] },
-];
+const categories: readonly Category[] = Object.freeze([
+  Object.freeze({ icon: 'ban', label: 'Moderação', commands: Object.freeze(['kick', 'ban', 'softban', 'lock', 'unlock', 'clear', 'purge', 'timeout', 'unban']) }),
+  Object.freeze({ icon: 'information', label: 'Informações', commands: Object.freeze(['ajuda', 'ping', 'uptime', 'setprefix', 'userinfo', 'guildinfo', 'autorole']) }),
+  Object.freeze({ icon: 'globe', label: 'Utilidades', commands: Object.freeze(['avatar', 'userbanner', 'guildicon', 'guildbanner', 'emojilist', 'emojidump']) }),
+]);
 
 // Ícone por comando quando um encaixa melhor que o da categoria.
-const commandIcons: Record<string, EmojiKey> = {
+const PAGE_NUMBER_RE = /^\d+$/;
+
+const commandIcons: Readonly<Record<string, EmojiKey>> = Object.freeze({
   ajuda: 'information', ping: 'globe', uptime: 'time', setprefix: 'settings',
   userinfo: 'accountCircle', guildinfo: 'idCard',
   avatar: 'accountBox', userbanner: 'stickyNote', guildicon: 'medal', guildbanner: 'shining',
   emojilist: 'sparkling', emojidump: 'sparkling',
   kick: 'kick', ban: 'ban', softban: 'ban', lock: 'lock', unlock: 'unlock',
   clear: 'purge', purge: 'purge', timeout: 'time', unban: 'unban', autorole: 'team',
-};
+});
 
 
 export default defineCommand({
   name: 'ajuda',
   description: 'Lista os comandos do Ace.',
-  aliases: [
+  aliases: Object.freeze([
     'help', 'commands', 'cmds', 'ajd', 'h', 'menu', 'ajudar',
     'commandslist', 'cmdlist', 'listcommands', 'comandos', 'ajdlist',
     'assist', 'socorro', 'aj', 'helper', 'commandhelp', 'comandoslista',
-  ],
-  cooldown: '3s',
-  examples: ['ajuda 2'],
+  ]) as string[],
+  cooldown: 3_000,
+  examples: Object.freeze(['ajuda 2']) as string[],
   async run(ctx) {
     const p = await guildPrefix(ctx.guildID) ?? prefix();
-    const descriptions = new Map(
-      ctx.help()
-        .split('\n')
-        .filter(Boolean)
-        .map((line) => {
-          const i = line.indexOf(':');
-          return i < 0 ? [line.trim(), ''] : [line.slice(0, i).trim(), line.slice(i + 1).trim()];
-        }),
-    );
+    const descriptions = new Map<string, string>();
+    const helpLines = ctx.help().split('\n');
+    for (let idx = 0; idx < helpLines.length; idx += 1) {
+      const line = helpLines[idx]!;
+      if (!line) continue;
+      const i = line.indexOf(':');
+      if (i < 0) descriptions.set(line.trim(), '');
+      else descriptions.set(line.slice(0, i).trim(), line.slice(i + 1).trim());
+    }
 
     const listed = new Set<string>();
     const pages: { label: string; icon: EmojiKey; fields: { name: string; value: string; inline?: boolean }[] }[] = [];
@@ -73,7 +75,7 @@ export default defineCommand({
     const requested = ctx.tokens[0];
     let startPage = 0;
     if (requested !== undefined) {
-      const n = /^\d+$/.test(requested) ? Number.parseInt(requested, 10) : 0;
+      const n = PAGE_NUMBER_RE.test(requested) ? Number.parseInt(requested, 10) : 0;
       if (n < 1 || n > total) {
         await ctx.reply(`${ctx.emoji.unhappy} Essa página não existe! O ajuda vai de 1 a ${total}...\n-# ╰ Ex: \`${p}ajuda 2\``);
         return;

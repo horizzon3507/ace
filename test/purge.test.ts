@@ -183,3 +183,38 @@ test('fallback por-id do recurso não muda a confirmação', async (t) => {
   assert.equal(await fixture.send('a.clear 2'), 'success');
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /Eu apaguei \*\*2 mensagens\*\* deste canal!/);
 });
+
+
+test('purge aceita mencao com exclamacao e avisa quando busca por nome retorna ambiguo', async (t) => {
+  const { fixture, calls } = bot();
+  t.after(() => fixture.destroy());
+  seed(fixture, '60', '61');
+
+  assert.equal(await fixture.send('a.purge <@!2> 2'), 'success');
+  assert.deepEqual(calls, [{ channelID: '200', limit: 2, authorID: '2', include: ['1'] }]);
+
+  const amb = createTestBot({
+    prefix: 'a.',
+    commands: [purge],
+    emoji,
+    authorization: 'off',
+    resources: {
+      users: {
+        async searchMembers() {
+          return {
+            members: [
+              { userID: '2', username: 'ace1', displayName: 'Ace1', nickname: null },
+              { userID: '3', username: 'ace2', displayName: 'Ace2', nickname: null },
+            ],
+            total: 2,
+            hasMore: false,
+            indexing: false,
+          };
+        },
+      },
+    },
+  });
+  t.after(() => amb.destroy());
+  assert.equal(await amb.send('a.purge ace'), 'success');
+  assert.match(amb.messages.at(-1)?.payload.content ?? '', /encontrei vários membros como ace/);
+});

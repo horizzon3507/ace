@@ -3,6 +3,7 @@ import type { AceContext } from './context.js';
 
 const SNOWFLAKE = /^\d{5,}$/;
 const MENTION = /^<@!?(\d+)>$/;
+const DISCRIM_SUFFIX_RE = /#\d{1,6}$/;
 
 export type TargetResult =
   | { status: 'found'; id: string; /** Apelido já resolvido — sem fetch extra antes da ação. */ label?: string }
@@ -15,7 +16,8 @@ export async function resolveTarget(ctx: AceContext, _guildID: string, tokens: r
   const token = tokens[0];
   if (!token) return { status: 'none' };
   // Tag legada user#0001: o resolver nativo não conhece discrim — busca pelo nome.
-  const resolved = await ctx.members.resolve(token.replace(/#\d{1,6}$/, '') || token);
+  const query = token.includes('#') ? token.replace(DISCRIM_SUFFIX_RE, '') || token : token;
+  const resolved = await ctx.members.resolve(query);
   switch (resolved.status) {
     case 'found': return { status: 'found', id: resolved.id, label: resolved.label };
     case 'ambiguous': return { status: 'ambiguous', query: token };
@@ -70,6 +72,13 @@ export function moderationReason(ctx: AceContext, skip = 1): string {
 }
 
 export function targetUserID(ctx: AceContext): string {
-  const first = ctx.tokens[0] ? MENTION.exec(ctx.tokens[0])?.[1] : undefined;
-  return first ?? ctx.message.mentions[0] ?? ctx.tokens.find((token) => SNOWFLAKE.test(token)) ?? ctx.authorID;
+  const firstToken = ctx.tokens[0];
+  const first = firstToken ? MENTION.exec(firstToken)?.[1] : undefined;
+  if (first) return first;
+  if (ctx.message.mentions[0]) return ctx.message.mentions[0];
+  for (let i = 0; i < ctx.tokens.length; i += 1) {
+    const token = ctx.tokens[i]!;
+    if (SNOWFLAKE.test(token)) return token;
+  }
+  return ctx.authorID;
 }

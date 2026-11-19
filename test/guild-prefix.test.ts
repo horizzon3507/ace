@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MemoryStore } from 'yuzuha';
-import { bindGuildPrefixes, guildPrefix, setGuildPrefixCache } from '../src/guild-prefix.js';
+import { bindGuildPrefixes, clearGuildPrefixCache, guildPrefix, setGuildPrefixCache } from '../src/guild-prefix.js';
 
 const VAR = (guildID: string) => JSON.stringify(['guild', guildID, 'prefix']);
 
@@ -42,4 +42,24 @@ test('valor inválido é ignorado', async () => {
 
   assert.equal(await guildPrefix('g3'), undefined);
   assert.equal(await guildPrefix('g4'), undefined);
+});
+
+
+test('leituras concorrentes coalescem para uma chamada no store e clear limpa cache', async () => {
+  let reads = 0;
+  const base = new MemoryStore();
+  await base.update((state) => { state.variables[VAR('g_conc')] = '!'; });
+  bindGuildPrefixes({
+    read: (fn) => { reads += 1; return base.read(fn); },
+    update: (fn) => base.update(fn),
+    readVariable: (key, now) => { reads += 1; return base.readVariable(key, now); },
+  });
+  const [a, b, c] = await Promise.all([guildPrefix('g_conc'), guildPrefix('g_conc'), guildPrefix('g_conc')]);
+  assert.equal(a, '!');
+  assert.equal(b, '!');
+  assert.equal(c, '!');
+  assert.equal(reads, 1);
+  clearGuildPrefixCache();
+  assert.equal(await guildPrefix('g_conc'), '!');
+  assert.equal(reads, 2);
 });

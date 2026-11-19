@@ -1,4 +1,5 @@
-const two = (n: number) => String(n).padStart(2, '0');
+const DAY_MS = 86_400_000;
+const two = (n: number): string => (n < 10 && n >= 0 ? `0${n}` : String(n).padStart(2, '0'));
 
 /** Carimbo curto pt-BR compartilhado: **DD/MM **às **HH:mm**. */
 export function formatStamp(date: Date): string {
@@ -12,7 +13,7 @@ export function formatDayStamp(date: Date): string {
 
 /** Idade aproximada pt-BR: "há **8 meses**". */
 export function formatAge(date: Date, now = Date.now()): string {
-  const days = Math.floor((now - date.getTime()) / 86_400_000);
+  const days = Math.max(0, Math.floor((now - date.getTime()) / DAY_MS));
   if (days >= 365) {
     const years = Math.floor(days / 365);
     return `há **${years} ${years === 1 ? 'ano' : 'anos'}**`;

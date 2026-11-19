@@ -6,7 +6,11 @@ import type { AceContext } from './context.js';
 const LEFT = 'arrowleftfill';
 const RIGHT = 'arrowrightfill';
 const HOME = 'home4fill';
+const DEFAULT_LEFT_TAG = '<:arrowleftfill:1566639260100997120>';
+const DEFAULT_RIGHT_TAG = '<:arrowrightfill:1566639126151700482>';
+const DEFAULT_HOME_TAG = '<:home4fill:1570905409848344576>';
 const NAMES = [LEFT, RIGHT, HOME];
+const WANTED_NAMES = new Set(NAMES);
 const DEFAULT_TIMEOUT_MS = 60_000;
 
 export type PaginatorOptions = { timeoutMs?: number; startPage?: number };
@@ -15,21 +19,33 @@ const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().t
 
 type Button = { name: string; tag: string };
 
+const DEFAULT_BUTTONS: Record<string, Button> = Object.freeze({
+  [LEFT]: Object.freeze({ name: LEFT, tag: DEFAULT_LEFT_TAG }),
+  [RIGHT]: Object.freeze({ name: RIGHT, tag: DEFAULT_RIGHT_TAG }),
+  [HOME]: Object.freeze({ name: HOME, tag: DEFAULT_HOME_TAG }),
+});
+
 function buttons(ctx: AceContext): Record<string, Button> {
+  const leftTag = ctx.emoji.arrowLeft ?? DEFAULT_LEFT_TAG;
+  const rightTag = ctx.emoji.arrowRight ?? DEFAULT_RIGHT_TAG;
+  const homeTag = ctx.emoji.home ?? DEFAULT_HOME_TAG;
+  if (leftTag === DEFAULT_LEFT_TAG && rightTag === DEFAULT_RIGHT_TAG && homeTag === DEFAULT_HOME_TAG) {
+    return DEFAULT_BUTTONS;
+  }
   return {
-    [LEFT]: { name: LEFT, tag: ctx.emoji.arrowLeft ?? '<:arrowleftfill:1566639260100997120>' },
-    [RIGHT]: { name: RIGHT, tag: ctx.emoji.arrowRight ?? '<:arrowrightfill:1566639126151700482>' },
-    [HOME]: { name: HOME, tag: ctx.emoji.home ?? '<:home4fill:1570905409848344576>' },
+    [LEFT]: { name: LEFT, tag: leftTag },
+    [RIGHT]: { name: RIGHT, tag: rightTag },
+    [HOME]: { name: HOME, tag: homeTag },
   };
 }
 
 // Barra por página: ◀ volta, ▶ avança, home volta à primeira — sempre por último.
 function barFor(page: number, total: number, all: Record<string, Button>): Button[] {
-  return [
-    ...(page > 0 ? [all[LEFT]] : []),
-    ...(page < total - 1 ? [all[RIGHT]] : []),
-    all[HOME],
-  ];
+  const bar: Button[] = [];
+  if (page > 0) bar.push(all[LEFT]!);
+  if (page < total - 1) bar.push(all[RIGHT]!);
+  bar.push(all[HOME]!);
+  return bar;
 }
 
 const sameBar = (a: readonly Button[], b: readonly Button[]) =>
@@ -113,13 +129,12 @@ type VoteSource = { next(): Promise<Vote | null>; close(): void };
  * de novo. Sem collector novo nem listeners rearmados a cada voto.
  */
 function nativeVotes(msg: Message, authorID: string, timeoutMs: number): VoteSource {
-  const wanted = new Set(NAMES);
   const queue: (Vote | null)[] = [];
   let wake: (() => void) | undefined;
   const collector = new ReactionCollector(msg.client, msg.id, msg.channelId, {
     time: timeoutMs,
     filter: (reaction, user) =>
-      user.id === authorID && wanted.has(reaction.emoji.name.toLowerCase()),
+      user.id === authorID && WANTED_NAMES.has(reaction.emoji.name.toLowerCase()),
   });
   const push = (vote: Vote | null) => {
     queue.push(vote);

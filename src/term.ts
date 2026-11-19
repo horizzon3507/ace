@@ -24,6 +24,9 @@ function channel(hex: number): string {
   return `${r};${g};${b}`;
 }
 
+const CHIP_OPEN = `\x1b[48;2;${channel(brand.primary)}m\x1b[38;2;${channel(brand.background)}m\x1b[1m `;
+const CHIP_CLOSE = ' \x1b[0m';
+
 function paint(enabled: boolean, open: string, text: string): string {
   if (!enabled) return text;
   return `\x1b[${open}m${text}\x1b[0m`;
@@ -35,7 +38,7 @@ function dim(enabled: boolean, text: string): string {
 
 function chip(enabled: boolean, text: string): string {
   if (!enabled) return `[${text}]`;
-  return `\x1b[48;2;${channel(brand.primary)}m\x1b[38;2;${channel(brand.background)}m\x1b[1m ${text} \x1b[0m`;
+  return `${CHIP_OPEN}${text}${CHIP_CLOSE}`;
 }
 
 function bold(enabled: boolean, text: string): string {
@@ -47,18 +50,26 @@ function row(enabled: boolean, label: string, value: string): string {
 }
 
 function commandBlock(panel: Panel, color: boolean): string[] {
-  const commands = panel.commands.filter((command) => command.name).slice().sort((a, b) => a.name.localeCompare(b.name));
+  const commands = panel.commands.filter((command) => command.name).sort((a, b) => a.name.localeCompare(b.name));
   if (commands.length === 0) return [dim(color, '  nenhum')];
-  const width = Math.max(...commands.map((command) => (panel.prefix + command.name).length));
+  let width = 0;
+  for (let i = 0; i < commands.length; i += 1) {
+    const len = panel.prefix.length + commands[i]!.name.length;
+    if (len > width) width = len;
+  }
   const aliasIndent = ' '.repeat(width + 4);
-  return commands.flatMap((command) => {
+  const lines: string[] = [];
+  for (let i = 0; i < commands.length; i += 1) {
+    const command = commands[i]!;
     const label = `${panel.prefix}${command.name}`.padEnd(width);
     const description = command.description ?? '';
-    const head = `  ${label}  ${description}`.trimEnd();
-    const aliases = command.aliases?.filter(Boolean) ?? [];
-    if (aliases.length === 0) return [head];
-    return [head, dim(color, `${aliasIndent}${aliases.join(', ')}`)];
-  });
+    lines.push(`  ${label}  ${description}`.trimEnd());
+    const aliases = command.aliases?.filter(Boolean);
+    if (aliases && aliases.length > 0) {
+      lines.push(dim(color, `${aliasIndent}${aliases.join(', ')}`));
+    }
+  }
+  return lines;
 }
 
 export function formatConnecting(mode: 'dev' | 'start', color: boolean): string {
@@ -97,10 +108,11 @@ export function formatBanner(panel: Panel, color: boolean): string {
 }
 
 const LABEL_WIDTH = 10;
+const DEFAULT_TIME_PAD = ' '.repeat(8 + 2 + LABEL_WIDTH);
 const LABEL_SGR: Record<string, string> = { erro: '31', gateway: '33', saindo: '33' };
 
 export function formatLine(time: string, label: string, detail: string, color: boolean): string {
-  const pad = ' '.repeat(time.length + 2 + LABEL_WIDTH);
+  const pad = time.length === 8 ? DEFAULT_TIME_PAD : ' '.repeat(time.length + 2 + LABEL_WIDTH);
   const body = detail.split('\n').map((line, index) => (index === 0 ? line : `${pad}${line}`)).join('\n');
   const tag = label.slice(0, LABEL_WIDTH).padEnd(LABEL_WIDTH);
   const sgr = LABEL_SGR[label];

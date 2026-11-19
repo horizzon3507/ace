@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestBot, type MockResourceOverrides } from 'yuzuha/testing';
 import autorole from '../commands/autorole.js';
-import { bindGuildAutoroles, guildAutorole, setGuildAutoroleCache } from '../src/guild-autorole.js';
+import { bindGuildAutoroles, clearGuildAutoroleCache, guildAutorole, setGuildAutoroleCache } from '../src/guild-autorole.js';
 import { emoji } from '../src/emoji.js';
 
 const VAR = JSON.stringify(['guild', '100', 'autorole']);
@@ -159,4 +159,25 @@ test('cargo acima do bot ou do autor é recusado', async (t) => {
   await authorLower.tick(3_100);
   assert.equal(await authorLower.send('a.autorole all 42'), 'success');
   assert.match(authorLower.messages.at(-1)?.payload.content ?? '', /acima do seu maior cargo/);
+});
+
+
+test('tokens repetidos deduplicam resolucao e clearGuildAutoroleCache limpa memoria', async (t) => {
+  let resolveCalls = 0;
+  const fixture = bot({
+    users: hierarchy.users,
+    roles: {
+      resolve: async (g: string, q: string) => {
+        resolveCalls += 1;
+        return resolve({ '42': 5 })(g, q);
+      },
+      list: hierarchy.roles!.list,
+    },
+  });
+  t.after(() => { clearGuildAutoroleCache(); return fixture.destroy(); });
+
+  assert.equal(await fixture.send('a.autorole user <@&42> <@&42>'), 'success');
+  assert.equal(resolveCalls, 1);
+  assert.deepEqual(await guildAutorole('100'), { user: ['42'] });
+  clearGuildAutoroleCache();
 });

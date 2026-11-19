@@ -45,3 +45,19 @@ test('grantJoinRole entrega os cargos que faltam uma vez e ignora bot sem app', 
   assert.equal(await grantJoinRole(bot), true);
   assert.deepEqual(appRoles, ['1', '4']);
 });
+
+
+test('grantJoinRole faz fast-path sem chamadas em servidor sem autorole configurado', async (t) => {
+  t.after(() => setGuildAutoroleCache('g_empty', undefined));
+  let addCalled = 0;
+  const res = await grantJoinRole({
+    guild: { id: 'g_empty' },
+    user: { bot: false },
+    roles: {
+      has: () => false,
+      add: async () => { addCalled += 1; },
+    },
+  });
+  assert.equal(res, false);
+  assert.equal(addCalled, 0);
+});

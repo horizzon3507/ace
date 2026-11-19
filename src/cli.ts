@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -10,15 +10,7 @@ import { emoji } from './emoji.js';
 import { fillMissingEnv } from './env-file.js';
 import { prefix } from './live.js';
 import { formatBanner, formatConnecting, type Panel } from './term.js';
-
-function packageVersion(file: string): string {
-  try {
-    const parsed = JSON.parse(readFileSync(join(process.cwd(), file), 'utf8')) as { version?: string };
-    return parsed.version ?? 'unknown';
-  } catch {
-    return 'unknown';
-  }
-}
+import { readPackageVersion } from './version.js';
 
 type Mode = 'dev' | 'start';
 
@@ -66,8 +58,8 @@ function banner(bot: Yuzuha, mode: Mode, cwd: string): string {
       description: command.description,
       aliases: command.aliases,
     })),
-    version: packageVersion('package.json'),
-    yuzuha: packageVersion('node_modules/yuzuha/package.json'),
+    version: readPackageVersion('package.json', 'unknown'),
+    yuzuha: readPackageVersion('node_modules/yuzuha/package.json', 'unknown'),
     node: process.version,
     cwd,
   };
@@ -91,7 +83,7 @@ async function main(): Promise<void> {
     return;
   }
   if (args.length === 1 && (mode === '--version' || mode === '-v')) {
-    console.log(`ace ${packageVersion('package.json')}`);
+    console.log(`ace ${readPackageVersion('package.json', 'unknown')}`);
     return;
   }
   if (args.length !== 1 || (mode !== 'dev' && mode !== 'start')) {
@@ -121,9 +113,14 @@ async function main(): Promise<void> {
     level: 'warn',
     sink(level, message, fields) {
       if (message === 'gateway error') return;
-      const extra = fields
-        ? `  ${Object.entries(fields).map(([key, value]) => `${key}=${typeof value === 'string' ? value : JSON.stringify(value)}`).join(' ')}`
-        : '';
+      let extra = '';
+      if (fields) {
+        for (const key in fields) {
+          if (!Object.hasOwn(fields, key)) continue;
+          const value = fields[key];
+          extra += `${extra ? ' ' : '  '}${key}=${typeof value === 'string' ? value : JSON.stringify(value)}`;
+        }
+      }
       emit(level === 'error' ? 'erro' : 'sdk', `${message}${extra}`);
     },
   });
@@ -133,14 +130,14 @@ async function main(): Promise<void> {
     ...config,
     emoji,
     clientOptions: { ...config.clientOptions, logger },
-    onError(error, ctx) {
-      if (closing) return config.onError?.(error, ctx);
+    onError(error, ctx, info) {
+      if (closing) return config.onError?.(error, ctx, info);
       const gateway = gatewayDetail(error);
       const detail = gateway ?? `${ctx?.command?.name ? `${prefix()}${ctx.command.name}  ` : ''}${explain(error)}`;
       reported = error;
       reportedDetail = detail;
       emit(gateway ? 'gateway' : 'erro', detail);
-      return config.onError?.(error, ctx);
+      return config.onError?.(error, ctx, info);
     },
     onCommand(ctx, outcome) {
       if (outcome === 'success' || outcome === 'guarded') {
@@ -182,10 +179,13 @@ async function main(): Promise<void> {
       closing = true;
       process.off('SIGINT', onSignal);
       process.off('SIGTERM', onSignal);
+      bot.off(SDK.Events.Ready, show);
+      bot.off(SDK.Events.ShardDisconnect, onDisconnect);
+      bot.off(SDK.Events.ShardResumed, onResume);
       emit('saindo', 'encerrando');
       await watcher?.close();
       try {
-        await bot.destroy();
+        await bot.destroy({ timeoutMs: 5_000 });
       } finally {
         await bot.options.store?.close?.();
       }

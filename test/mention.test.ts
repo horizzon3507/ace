@@ -24,3 +24,12 @@ test('só a menção ao Ace dispara', () => {
   assert.equal(isBareMention(`<@${self}> a.ping`, self, true), false);
   assert.equal(isBareMention('oi', self, false), false);
 });
+
+
+test('cacheia regex de mencao por selfId e ignora prefixo seguido apenas de espacos', () => {
+  assert.equal(isBareMention('<@111>   <@!111>', '111', true), true);
+  assert.equal(isBareMention('<@222>', '222', true), true);
+  assert.equal(isBareMention('<@222> texto', '222', true), false);
+  assert.equal(unknownCommandMessage('a.   ', 'a.', ['ping']), undefined);
+  assert.equal(unknownCommandMessage('a.', 'a.', ['ping']), undefined);
+});

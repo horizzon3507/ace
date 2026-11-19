@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { YuzuhaError } from 'yuzuha';
+import { ConfigError, StoreError, TransportError, YuzuhaError } from 'yuzuha';
 import { clock, explain, gatewayDetail, redact, usage } from '../src/cli-util.js';
 import { relativeChange } from '../src/dev-reload.js';
 
@@ -48,4 +48,12 @@ test('relativeChange recusa caminhos fora da raiz', () => {
   assert.equal(relativeChange(root, '/root/ace/src/ping.ts'), 'src/ping.ts');
   assert.equal(relativeChange(root, '../fora.ts'), undefined);
   assert.equal(relativeChange(root, '/outro/lugar.ts'), undefined);
+});
+
+
+test('explain formata ConfigError, StoreError e TransportError da yuzuha 0.7.0 e redact curto-circuita vazio', () => {
+  assert.equal(explain(new ConfigError('PREFIX', 'prefixo invalido')), 'PREFIX  prefixo invalido');
+  assert.equal(explain(new StoreError('STORE_CLOSED', 'store fechado')), 'STORE_CLOSED  store fechado');
+  assert.equal(explain(new TransportError('DISCONNECTED', 'sem gateway')), 'DISCONNECTED  sem gateway');
+  assert.equal(redact(''), '');
 });

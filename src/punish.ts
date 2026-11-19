@@ -12,13 +12,15 @@ export type ModerationDeps = {
   moderationReason: typeof bundledReason;
 };
 
-const copy = {
-  kick: { past: 'expulso', fail: 'expulsar', mark: 'kick', perm: 'Expulsar membros' },
-  ban: { past: 'banido', fail: 'banir', mark: 'ban', perm: 'Banir membros' },
-  softban: { past: 'expulso', fail: 'expulsar', mark: 'ban', perm: 'Banir membros' },
-  timeout: { past: 'silenciado', fail: 'silenciar', mark: 'time', perm: 'Moderar membros' },
-  unban: { past: 'desbanido', fail: 'desbanir', mark: 'unban', perm: 'Banir membros' },
-} as const;
+const USER_REF_RE = /^<@!?\d+>$|^\d+$/;
+
+const copy = Object.freeze({
+  kick: Object.freeze({ past: 'expulso', fail: 'expulsar', mark: 'kick', perm: 'Expulsar membros' }),
+  ban: Object.freeze({ past: 'banido', fail: 'banir', mark: 'ban', perm: 'Banir membros' }),
+  softban: Object.freeze({ past: 'expulso', fail: 'expulsar', mark: 'ban', perm: 'Banir membros' }),
+  timeout: Object.freeze({ past: 'silenciado', fail: 'silenciar', mark: 'time', perm: 'Moderar membros' }),
+  unban: Object.freeze({ past: 'desbanido', fail: 'desbanir', mark: 'unban', perm: 'Banir membros' }),
+} as const);
 
 /** Reescreve os GuardErrors por reason tipado (0.3.1) — nada de sniffing na mensagem. */
 function guardReply(error: GuardError, spec: (typeof copy)[Punishment], emoji: Record<string, string>): string | null {
@@ -69,7 +71,7 @@ export function bindModeration(deps: ModerationDeps) {
     if (target.status === 'missing') {
       // Unban por menção/ID: o alvo existe — missing significa "sem ban ativo".
       // Por nome, é o "não encontrei" de sempre.
-      const ref = /^<@!?\d+>$|^\d+$/.test(ctx.tokens[0] ?? '');
+      const ref = USER_REF_RE.test(ctx.tokens[0] ?? '');
       await ctx.reply(action === 'unban' && ref
         ? `${emoji.unhappy} Este usuário não está banido neste servidor...`
         : `${emoji.unhappy} Eu não encontrei ninguém como ${target.query}! Use menção ou ID de usuário...`);

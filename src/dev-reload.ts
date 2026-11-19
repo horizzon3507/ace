@@ -9,8 +9,15 @@ import { applyEnvPlan, planEnv } from './env-file.js';
 import { installRuntime } from './live.js';
 import { classifyChange, RUNTIME_FILES, type ReloadKind } from './watch-plan.js';
 
+let reloadSeq = 0;
+
+function missingExport(file: string, name: string): Error {
+  return new Error(`${file} não exportou '${name}'.`);
+}
+
 export async function refreshRuntime(root: string): Promise<void> {
-  const stamp = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+  reloadSeq += 1;
+  const stamp = `${Date.now().toString(36)}${reloadSeq.toString(36)}`;
   const load = (file: string) => import(`${pathToFileURL(resolve(root, file)).href}?ace=${stamp}`);
   const [mention, prefixMod, brandMod, joinMod, punishMod, resolveMod, emojiMod, lockMod, formatMod, embedMod, purgeMod, infoMod, dumpMod, paginatorMod] = await Promise.all(RUNTIME_FILES.map(load)) as [
     typeof import('./mention.js'),
@@ -28,20 +35,19 @@ export async function refreshRuntime(root: string): Promise<void> {
     typeof import('./emoji-dump.js'),
     typeof import('./paginator.js'),
   ];
-  const missing = (file: string, name: string) => new Error(`${file} não exportou '${name}'.`);
-  if (typeof mention.mentionMessage !== 'function') throw missing('src/mention.ts', 'mentionMessage');
-  if (typeof mention.isBareMention !== 'function') throw missing('src/mention.ts', 'isBareMention');
-  if (typeof mention.unknownCommandMessage !== 'function') throw missing('src/mention.ts', 'unknownCommandMessage');
-  if (typeof prefixMod.prefix !== 'function') throw missing('src/prefix.ts', 'prefix');
-  if (!brandMod.brand) throw missing('src/brand.ts', 'brand');
-  if (typeof joinMod.grantJoinRole !== 'function') throw missing('src/join-role.ts', 'grantJoinRole');
-  if (typeof resolveMod.resolveTarget !== 'function') throw missing('src/resolve.ts', 'resolveTarget');
-  if (typeof resolveMod.moderationReason !== 'function') throw missing('src/resolve.ts', 'moderationReason');
-  if (typeof resolveMod.targetUserID !== 'function') throw missing('src/resolve.ts', 'targetUserID');
-  if (typeof resolveMod.resolveBanTarget !== 'function') throw missing('src/resolve.ts', 'resolveBanTarget');
-  if (typeof resolveMod.resolveAssetTarget !== 'function') throw missing('src/resolve.ts', 'resolveAssetTarget');
-  if (typeof punishMod.bindModeration !== 'function') throw missing('src/punish.ts', 'bindModeration');
-  if (!emojiMod.emoji || typeof emojiMod.emoji !== 'object') throw missing('src/emoji.ts', 'emoji');
+  if (typeof mention.mentionMessage !== 'function') throw missingExport('src/mention.ts', 'mentionMessage');
+  if (typeof mention.isBareMention !== 'function') throw missingExport('src/mention.ts', 'isBareMention');
+  if (typeof mention.unknownCommandMessage !== 'function') throw missingExport('src/mention.ts', 'unknownCommandMessage');
+  if (typeof prefixMod.prefix !== 'function') throw missingExport('src/prefix.ts', 'prefix');
+  if (!brandMod.brand) throw missingExport('src/brand.ts', 'brand');
+  if (typeof joinMod.grantJoinRole !== 'function') throw missingExport('src/join-role.ts', 'grantJoinRole');
+  if (typeof resolveMod.resolveTarget !== 'function') throw missingExport('src/resolve.ts', 'resolveTarget');
+  if (typeof resolveMod.moderationReason !== 'function') throw missingExport('src/resolve.ts', 'moderationReason');
+  if (typeof resolveMod.targetUserID !== 'function') throw missingExport('src/resolve.ts', 'targetUserID');
+  if (typeof resolveMod.resolveBanTarget !== 'function') throw missingExport('src/resolve.ts', 'resolveBanTarget');
+  if (typeof resolveMod.resolveAssetTarget !== 'function') throw missingExport('src/resolve.ts', 'resolveAssetTarget');
+  if (typeof punishMod.bindModeration !== 'function') throw missingExport('src/punish.ts', 'bindModeration');
+  if (!emojiMod.emoji || typeof emojiMod.emoji !== 'object') throw missingExport('src/emoji.ts', 'emoji');
   for (const [key, value] of Object.entries(emojiMod.emoji)) {
     if (typeof value !== 'string' || value.length === 0) {
       throw new Error(`src/emoji.ts: 'emoji.${key}' não é texto.`);
@@ -51,19 +57,19 @@ export async function refreshRuntime(root: string): Promise<void> {
   if (typeof runModeration !== 'function') {
     throw new Error('src/punish.ts: bindModeration() não devolveu função.');
   }
-  if (typeof lockMod.runChannelLock !== 'function') throw missing('src/channel-lock.ts', 'runChannelLock');
-  if (typeof formatMod.formatStamp !== 'function') throw missing('src/format.ts', 'formatStamp');
-  if (typeof formatMod.formatDayStamp !== 'function') throw missing('src/format.ts', 'formatDayStamp');
-  if (typeof formatMod.formatAge !== 'function') throw missing('src/format.ts', 'formatAge');
-  if (typeof embedMod.replyUserAsset !== 'function') throw missing('src/embed.ts', 'replyUserAsset');
-  if (typeof embedMod.replyGuildAsset !== 'function') throw missing('src/embed.ts', 'replyGuildAsset');
-  if (typeof purgeMod.runPurge !== 'function') throw missing('src/purge.ts', 'runPurge');
-  if (typeof infoMod.replyUserInfo !== 'function') throw missing('src/info.ts', 'replyUserInfo');
-  if (typeof infoMod.replyGuildInfo !== 'function') throw missing('src/info.ts', 'replyGuildInfo');
-  if (typeof dumpMod.replyEmojiDump !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiDump');
-  if (typeof dumpMod.replyEmojiList !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiList');
-  if (typeof dumpMod.replyEmojiIdDrop !== 'function') throw missing('src/emoji-dump.ts', 'replyEmojiIdDrop');
-  if (typeof paginatorMod.startPaginator !== 'function') throw missing('src/paginator.ts', 'startPaginator');
+  if (typeof lockMod.runChannelLock !== 'function') throw missingExport('src/channel-lock.ts', 'runChannelLock');
+  if (typeof formatMod.formatStamp !== 'function') throw missingExport('src/format.ts', 'formatStamp');
+  if (typeof formatMod.formatDayStamp !== 'function') throw missingExport('src/format.ts', 'formatDayStamp');
+  if (typeof formatMod.formatAge !== 'function') throw missingExport('src/format.ts', 'formatAge');
+  if (typeof embedMod.replyUserAsset !== 'function') throw missingExport('src/embed.ts', 'replyUserAsset');
+  if (typeof embedMod.replyGuildAsset !== 'function') throw missingExport('src/embed.ts', 'replyGuildAsset');
+  if (typeof purgeMod.runPurge !== 'function') throw missingExport('src/purge.ts', 'runPurge');
+  if (typeof infoMod.replyUserInfo !== 'function') throw missingExport('src/info.ts', 'replyUserInfo');
+  if (typeof infoMod.replyGuildInfo !== 'function') throw missingExport('src/info.ts', 'replyGuildInfo');
+  if (typeof dumpMod.replyEmojiDump !== 'function') throw missingExport('src/emoji-dump.ts', 'replyEmojiDump');
+  if (typeof dumpMod.replyEmojiList !== 'function') throw missingExport('src/emoji-dump.ts', 'replyEmojiList');
+  if (typeof dumpMod.replyEmojiIdDrop !== 'function') throw missingExport('src/emoji-dump.ts', 'replyEmojiIdDrop');
+  if (typeof paginatorMod.startPaginator !== 'function') throw missingExport('src/paginator.ts', 'startPaginator');
   installRuntime({
     prefix: prefixMod.prefix,
     mentionMessage: mention.mentionMessage,
@@ -145,14 +151,21 @@ export function watchProject(root: string, commandsPath: string, onFiles: (files
 }
 
 export async function applyChanges(root: string, bot: Yuzuha, commandsPath: string, shellEnv: ReadonlySet<string>, filenames: string[]): Promise<void> {
-  const files = [...new Set(filenames.map((name) => relativeChange(root, name)).filter((name): name is string => Boolean(name)))];
+  const files = new Set<string>();
+  for (let i = 0; i < filenames.length; i += 1) {
+    const rel = relativeChange(root, filenames[i]!);
+    if (rel) files.add(rel);
+  }
   const commandsDir = relative(root, commandsPath);
   const kinds = new Map<ReloadKind, string[]>();
   for (const file of files) {
     const kind = classifyChange(file, commandsDir);
-    const list = kinds.get(kind) ?? [];
+    let list = kinds.get(kind);
+    if (!list) {
+      list = [];
+      kinds.set(kind, list);
+    }
     list.push(file);
-    kinds.set(kind, list);
   }
   const envFiles = kinds.get('env') ?? [];
   if (envFiles.length) {

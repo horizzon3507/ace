@@ -11,3 +11,11 @@ test('tsx trata a query como outro módulo', async () => {
   assert.notEqual(first, second);
   assert.notEqual(first.prefix, second.prefix);
 });
+
+test('tsx isola query strings tambem para src/brand.ts', async () => {
+  const href = pathToFileURL(resolve('src/brand.ts')).href;
+  const first = await import(`${href}?ace=10`) as { brand: { primary: number } };
+  const second = await import(`${href}?ace=11`) as { brand: { primary: number } };
+  assert.notEqual(first, second);
+  assert.equal(first.brand.primary, second.brand.primary);
+});

@@ -27,6 +27,7 @@ npm start          # mesma CLI, sem recarga
 npm test           # suíte de testes
 npm run typecheck  # tsc --noEmit
 npm run check      # config, sem ler o .env
+npm run doctor     # diagnostico offline de ambiente e caches
 ```
 
 Com `npm run dev`, salvar recarrega `commands/` e, dentro de `src/`, a menção, o prefixo, a marca, os emojis, o cargo de entrada e o kick/ban, além do `PREFIX` do `.env`. `yuzuha.config.ts`, a própria CLI, os demais arquivos de `src/` e o token pedem reinício. Um listener novo no `setup` também.
@@ -78,6 +79,6 @@ O token fica só no `.env`; `data/` e `.env` nunca entram no Git. Variáveis (co
 ## Mais
 
 - [BRAND.md](BRAND.md): manual de marca — símbolo, cores, tipografia e voz do Ace.
-- [CHANGELOG.md](CHANGELOG.md): versões no estilo Hory, `v0.1.1-alpha` em desenvolvimento.
+- [CHANGELOG.md](CHANGELOG.md): versões no estilo Hory, `v0.1.3-alpha` em desenvolvimento.
 - [CONTRIBUTING.md](CONTRIBUTING.md): convenções de commit, testes e novos comandos.
 - [LICENSE](LICENSE): AGPL-3.0.

@@ -14,10 +14,10 @@ export async function replyAsset(ctx: AceContext, name: string, url: string, aut
 
 export type GuildAsset = 'icon' | 'banner';
 
-const guildCopy = {
-  icon: { label: 'Ícone', asset: 'um ícone', authorIcon: true },
-  banner: { label: 'Banner', asset: 'um banner', authorIcon: false },
-} as const;
+const guildCopy = Object.freeze({
+  icon: Object.freeze({ label: 'Ícone', asset: 'um ícone', authorIcon: true }),
+  banner: Object.freeze({ label: 'Banner', asset: 'um banner', authorIcon: false }),
+} as const);
 
 /** Busca a guild uma vez e responde o asset em embed; sem asset, avisa. */
 export async function replyGuildAsset(ctx: AceContext, kind: GuildAsset): Promise<void> {
@@ -41,10 +41,12 @@ export async function replyGuildAsset(ctx: AceContext, kind: GuildAsset): Promis
 
 export type UserAsset = 'avatar' | 'banner';
 
-const userCopy = {
-  avatar: { label: 'Avatar', command: 'avatar', fail: 'o avatar', asset: 'um avatar' },
-  banner: { label: 'Banner', command: 'userbanner', fail: 'o banner', asset: 'um banner' },
-} as const;
+const userCopy = Object.freeze({
+  avatar: Object.freeze({ label: 'Avatar', command: 'avatar', fail: 'o avatar', asset: 'um avatar' }),
+  banner: Object.freeze({ label: 'Banner', command: 'userbanner', fail: 'o banner', asset: 'um banner' }),
+} as const);
+
+const MARKDOWN_STRIP_RE = /[*_~`]/g;
 
 /** Resolve o alvo, busca membro→usuário e responde o asset em embed. */
 export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<void> {
@@ -86,7 +88,7 @@ export async function replyUserAsset(ctx: AceContext, kind: UserAsset): Promise<
     await ctx.reply(`${emoji.unhappy} Eu não consegui carregar ${spec.fail} deste usuário...`);
     return;
   }
-  const label = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
+  const label = (user.displayName || user.username).replace(MARKDOWN_STRIP_RE, '') || 'usuário';
   if (!url) {
     await ctx.reply(`${emoji.unhappy} ${label} não possui ${spec.asset} configurado...`);
     return;

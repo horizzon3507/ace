@@ -40,3 +40,11 @@ test('diretório de comandos é configurável', () => {
   assert.equal(classifyChange('other/x.ts', 'src/cmds'), 'ignore');
   assert.equal(classifyChange('src/cmds/readme.md', 'src/cmds'), 'ignore');
 });
+
+
+test('classifyChange normaliza barras invertidas, ponto-barra e segmentos ..', () => {
+  assert.equal(classifyChange('src\\mention.ts'), 'runtime');
+  assert.equal(classifyChange('./commands/ping.ts'), 'commands');
+  assert.equal(classifyChange('commands/sub/../ping.ts'), 'commands');
+  assert.equal(classifyChange('dist/src/cli.js'), 'ignore');
+});

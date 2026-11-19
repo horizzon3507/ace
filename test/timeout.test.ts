@@ -113,3 +113,14 @@ test('autor sem permissão é barrado antes de agir', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /ModerateMembers/);
   assert.equal(fixture.transport.actions.length, 0);
 });
+
+
+test('timeout remove mencoes soltas do motivo antes de enviar ao transporte', async (t) => {
+  const fixture = bot();
+  t.after(() => fixture.destroy());
+
+  assert.equal(await fixture.send('a.timeout <@2> 5m ping de <@1>'), 'success');
+  const action = fixture.transport.actions.at(-1);
+  assert.equal(action?.duration, 300_000);
+  assert.equal(action?.reason, 'ping de');
+});

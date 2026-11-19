@@ -2,6 +2,7 @@ import { embed, SDK, type GuildInfo, type MemberInfo, type UserInfo, type UserPr
 import type { AceContext } from './context.js';
 import { brand, formatAge, formatDayStamp, resolveAssetTarget } from './live.js';
 
+const MARKDOWN_CHARS_RE = /[*_~`]/g;
 const safe = <T>(fn: () => Promise<T>): Promise<T | null> => Promise.resolve().then(fn).catch(() => null);
 const noun = (n: number, singular: string, plural = `${singular}s`) => n === 1 ? singular : plural;
 
@@ -16,7 +17,7 @@ const nativeUser = async (ctx: AceContext, id: string) => {
   return client ? safe(() => client.users.resolve(id)) : null;
 };
 
-const PRIVILEGE_LADDER: { flag: keyof typeof SDK.PermissionFlags; label: string }[] = [
+const PRIVILEGE_LADDER: readonly { flag: keyof typeof SDK.PermissionFlags; label: string }[] = Object.freeze([
   { flag: 'Administrator', label: 'Administrador' },
   { flag: 'ManageGuild', label: 'Gerenciar servidor' },
   { flag: 'ManageRoles', label: 'Gerenciar cargos' },
@@ -25,7 +26,7 @@ const PRIVILEGE_LADDER: { flag: keyof typeof SDK.PermissionFlags; label: string 
   { flag: 'KickMembers', label: 'Expulsar membros' },
   { flag: 'ModerateMembers', label: 'Moderar membros' },
   { flag: 'ManageMessages', label: 'Gerenciar mensagens' },
-];
+]);
 
 const topPrivilege = (permissions: string): string | null => {
   const bits = BigInt(permissions || '0');
@@ -72,7 +73,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
 
   const roleList = member && guildID ? await safe(() => ctx.resources.roles.list(guildID)) : null;
 
-  const name = (user.displayName || user.username).replace(/[*_~`]/g, '') || 'usuário';
+  const name = (user.displayName || user.username).replace(MARKDOWN_CHARS_RE, '') || 'usuário';
   const avatar = user.avatarURL;
   const banner = (guildID ? profile?.serverProfile?.bannerURL : null)
     ?? profile?.globalProfile?.bannerURL
@@ -95,7 +96,7 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   const ficha = [
     `Este ${user.bot ? 'aplicativo' : 'usuário'} é <@${user.id}>, de nome de usuário \`${tag}\` e ID \`${user.id}\`!`,
   ];
-  const nickname = member?.nickname?.replace(/[*_~`]/g, '');
+  const nickname = member?.nickname?.replace(MARKDOWN_CHARS_RE, '');
   if (nickname) {
     ficha.push(`Seu apelido neste servidor é **${nickname}**!`);
   }
@@ -117,10 +118,14 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
       inline: true,
     });
 
+    const roleSet = new Set(member.roles);
     const mine = (roleList ?? [])
-      .filter((role) => role.id !== guildID && member.roles.includes(role.id))
+      .filter((role) => role.id !== guildID && roleSet.has(role.id))
       .sort((a, b) => b.position - a.position);
-    const total = member.roles.filter((roleID) => roleID !== guildID).length;
+    let total = 0;
+    for (let i = 0; i < member.roles.length; i += 1) {
+      if (member.roles[i] !== guildID) total += 1;
+    }
     const hierarquia = [
       total === 0
         ? 'Este membro não possui cargos!'
@@ -160,7 +165,12 @@ export async function replyUserInfo(ctx: AceContext): Promise<void> {
   }
 
   if (accounts.length > 0) {
-    const list = accounts.map((account) => `\`${account.name ?? account.type ?? '?'}\``).join(', ');
+    let list = '';
+    for (let i = 0; i < accounts.length; i += 1) {
+      const account = accounts[i]!;
+      const label = `\`${account.name ?? account.type ?? '?'}\``;
+      list = i === 0 ? label : `${list}, ${label}`;
+    }
     fields.push({ name: `${emoji.links} Conexões`, value: `Este usuário conectou ${list}!`, inline: true });
   }
   if (bio) {
@@ -188,15 +198,15 @@ const NEEDED_PERMISSIONS: { flag: keyof typeof SDK.PermissionFlags; label: strin
   { flag: 'ModerateMembers', label: 'Moderar membros' },
 ];
 
-const VERIFICATION_LABELS: Record<number, string> = {
+const VERIFICATION_LABELS: Readonly<Record<number, string>> = Object.freeze({
   0: 'nenhum', 1: 'baixo', 2: 'médio', 3: 'alto', 4: 'máximo',
-};
+});
 
-const CONTENT_FILTER_LABELS: Record<number, string> = {
+const CONTENT_FILTER_LABELS: Readonly<Record<number, string>> = Object.freeze({
   0: 'desativado', 1: 'membros sem cargo', 2: 'todos os membros',
-};
+});
 
-const FEATURE_LABELS: Record<string, string> = {
+const FEATURE_LABELS: Readonly<Record<string, string>> = Object.freeze({
   ANIMATED_BANNER: 'banner animado',
   ANIMATED_ICON: 'ícone animado',
   BANNER: 'banner',
@@ -211,7 +221,7 @@ const FEATURE_LABELS: Record<string, string> = {
   MEMBER_VERIFICATION_GATE_ENABLED: 'verificação de entrada',
   NEWS: 'anúncios',
   THREADS_ENABLED: 'tópicos',
-};
+});
 
 /** Ficha do servidor em campos inline: guild obrigatória, contadores degradáveis. */
 export async function replyGuildInfo(ctx: AceContext): Promise<void> {
@@ -237,7 +247,12 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
     client ? safe(() => client.guilds.resolve(guildID)) : null,
   ]);
 
-  const joinAnd = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}`;
+  const joinAnd = (parts: readonly string[]): string => {
+    if (parts.length === 0) return '';
+    if (parts.length === 1) return parts[0]!;
+    if (parts.length === 2) return `${parts[0]} e ${parts[1]}`;
+    return `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
+  };
 
   const ownerTag = ownerNative
     ? ownerNative.discriminator && ownerNative.discriminator !== '0'
@@ -257,7 +272,13 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   const total = counts?.memberCount ?? guild.memberCount ?? members?.length ?? null;
   const full = members?.length && total !== null && members.length >= total;
   if (total !== null) {
-    const bots = full ? members!.filter((member) => member.bot).length : null;
+    let bots: number | null = null;
+    if (full) {
+      bots = 0;
+      for (let i = 0; i < members!.length; i += 1) {
+        if (members![i]!.bot) bots += 1;
+      }
+    }
     const humans = bots !== null ? members!.length - bots : 0;
     const split = bots !== null ? `, sendo **${humans}** ${noun(humans, 'humano')} e **${bots}** ${noun(bots, 'aplicativo')}` : '';
     const online = counts?.onlineCount !== undefined ? `Temos **${counts.onlineCount}** usuários online!` : '';
@@ -269,9 +290,14 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   if (roles?.length) {
-    const real = roles.filter((role) => role.id !== guildID);
-    const top = real.length ? real.reduce((a, b) => (b.position > a.position ? b : a)) : null;
-    const base = real.length ? real.reduce((a, b) => (b.position < a.position ? b : a)) : null;
+    let top: (typeof roles)[number] | null = null;
+    let base: (typeof roles)[number] | null = null;
+    for (let i = 0; i < roles.length; i += 1) {
+      const role = roles[i]!;
+      if (role.id === guildID) continue;
+      if (!top || role.position > top.position) top = role;
+      if (!base || role.position < base.position) base = role;
+    }
     const tail = top && base && top.id !== base.id
       ? `, sendo o que está no topo **<@&${top.id}>** e o que está na base **<@&${base.id}>**`
       : top ? `, sendo o que está no topo **<@&${top.id}>**` : '';
@@ -279,15 +305,22 @@ export async function replyGuildInfo(ctx: AceContext): Promise<void> {
   }
 
   if (channels?.length) {
+    let textCount = 0;
+    let voiceCount = 0;
+    let forumCount = 0;
+    let categoryCount = 0;
+    for (let i = 0; i < channels.length; i += 1) {
+      const type = channels[i]!.type;
+      if (type === 0 || type === 5) textCount += 1;
+      else if (type === 2 || type === 13) voiceCount += 1;
+      else if (type === 15) forumCount += 1;
+      else if (type === 4) categoryCount += 1;
+    }
     const items: string[] = [];
-    const push = (type: number | number[], singular: string, plural: string) => {
-      const count = channels.filter((channel) => (Array.isArray(type) ? type : [type]).includes(channel.type)).length;
-      if (count) items.push(`**${count}** ${noun(count, singular, plural)}`);
-    };
-    push([0, 5], 'canal de texto', 'canais de texto');
-    push([2, 13], 'canal de voz', 'canais de voz');
-    push(15, 'fórum', 'fóruns');
-    push(4, 'categoria', 'categorias');
+    if (textCount) items.push(`**${textCount}** ${noun(textCount, 'canal de texto', 'canais de texto')}`);
+    if (voiceCount) items.push(`**${voiceCount}** ${noun(voiceCount, 'canal de voz', 'canais de voz')}`);
+    if (forumCount) items.push(`**${forumCount}** ${noun(forumCount, 'fórum', 'fóruns')}`);
+    if (categoryCount) items.push(`**${categoryCount}** ${noun(categoryCount, 'categoria', 'categorias')}`);
     fields.push({
       name: `${emoji.chatThread} Canais`,
       value: `Há **${channels.length}** ${noun(channels.length, 'canal', 'canais')}${items.length ? `, sendo deles ${joinAnd(items)}` : ''}!`,

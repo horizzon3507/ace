@@ -9,20 +9,28 @@ const copy = {
 
 /** GuildText (0), GuildVoice (2) e GuildAnnouncement (5) — o nativo escolhe o bit certo por tipo. */
 const LOCKABLE_TYPES = new Set([0, 2, 5]);
+const CHANNEL_MENTION_RE = /^<#(\d+)>$/;
+const CHANNEL_ID_RE = /^\d{15,}$/;
+
+export function parseChannelRef(token?: string): string | undefined {
+  if (token === undefined) return undefined;
+  return CHANNEL_MENTION_RE.exec(token)?.[1] ?? (CHANNEL_ID_RE.test(token) ? token : undefined);
+}
 
 export async function runChannelLock(ctx: AceContext, action: LockAction): Promise<void> {
   const { emoji } = ctx;
   const spec = copy[action];
   ctx.requireGuild();
   const first = ctx.tokens[0];
-  const ref = first === undefined
-    ? undefined
-    : (first.match(/^<#(\d+)>$/)?.[1] ?? (/^\d{15,}$/.test(first) ? first : undefined));
+  const ref = parseChannelRef(first);
   const channelID = ref ?? ctx.channelID;
-  const reason = (ref ? ctx.tokens.slice(1) : ctx.tokens)
-    .filter((token) => !token.startsWith('<@'))
-    .join(' ')
-    .trim() || 'Sem motivo informado.';
+  let reason = '';
+  for (let i = ref ? 1 : 0; i < ctx.tokens.length; i += 1) {
+    const token = ctx.tokens[i]!;
+    if (token.startsWith('<@')) continue;
+    reason = reason ? `${reason} ${token}` : token;
+  }
+  reason = reason.trim() || 'Sem motivo informado.';
 
   const channel = await ctx.resources.channels.get(channelID).catch(() => null);
   if (!channel) {

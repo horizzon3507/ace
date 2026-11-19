@@ -53,3 +53,18 @@ test('prefixo longo demais é recusado sem gravar', async (t) => {
   assert.match(fixture.messages.at(-1)?.payload.content ?? '', /muito longo/);
   assert.equal(await fixture.store.read((state) => state.variables[VAR('100')]), undefined);
 });
+
+
+test('padrao e default tambem resetam o prefixo do servidor', async (t) => {
+  const fixture = bot();
+  t.after(() => { setGuildPrefixCache('100', undefined); return fixture.destroy(); });
+
+  for (const word of ['padrao', 'padrão', 'default']) {
+    assert.equal(await fixture.send('a.setprefix z.'), 'success');
+    await fixture.tick(3_100);
+    assert.equal(await fixture.send(`a.setprefix ${word}`), 'success');
+    assert.equal(await guildPrefix('100'), undefined);
+    assert.match(fixture.messages.at(-1)?.payload.content ?? '', /voltou para \*\*`a\.`\*\*!/);
+    await fixture.tick(3_100);
+  }
+});

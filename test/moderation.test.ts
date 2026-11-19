@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { GuardError, YuzuhaError } from 'yuzuha';
 import { createTestBot } from 'yuzuha/testing';
 import kick from '../commands/kick.js';
 import ban from '../commands/ban.js';
@@ -159,4 +160,38 @@ test('kick sem motivo usa o default e registra caso', async (t) => {
   assert.equal(fixture.transport.actions.at(-1)?.reason, 'Sem motivo informado.');
   assert.doesNotMatch(fixture.messages.at(-1)?.payload.content ?? '', /Caso/);
   assert.deepEqual(fixture.errors, []);
+});
+
+
+test('responde erro amigavel quando moderacao falha com ADMIN_IMMUNE ou MEMBER_NOT_FOUND', async (t) => {
+  const adminFixture = createTestBot({
+    prefix: 'a.',
+    commands: [kick],
+    emoji,
+    resources: {
+      users: {
+        async member(_g: string, id: string) {
+          return memberish(id);
+        },
+      },
+    },
+    transport: undefined,
+  });
+  t.after(() => adminFixture.destroy());
+
+  // Forca erro tipado pelo transport de moderacao via throw direto no action
+  const prevKick = adminFixture.transport.moderate.bind(adminFixture.transport);
+  adminFixture.transport.moderate = async () => {
+    throw new GuardError('immune', 'ADMIN_IMMUNE');
+  };
+  assert.equal(await adminFixture.send('a.kick <@2>'), 'success');
+  assert.match(adminFixture.messages.at(-1)?.payload.content ?? '', /não posso silenciar um administrador/);
+
+  adminFixture.clock.advance(4_000);
+  adminFixture.transport.moderate = async () => {
+    throw new YuzuhaError('MEMBER_NOT_FOUND', 'gone');
+  };
+  assert.equal(await adminFixture.send('a.kick <@2>'), 'success');
+  assert.match(adminFixture.messages.at(-1)?.payload.content ?? '', /não está mais neste servidor/);
+  void prevKick;
 });
