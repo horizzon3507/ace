@@ -78,6 +78,7 @@ O token fica só no `.env`; `data/` e `.env` nunca entram no Git. Variáveis (co
 
 ## Mais
 
+- [BRAND.md](BRAND.md): manual de marca — símbolo, cores, tipografia e voz do Ace.
 - [CHANGELOG.md](CHANGELOG.md): versões no estilo Hory, `v0.1.3-alpha` em desenvolvimento.
 - [CONTRIBUTING.md](CONTRIBUTING.md): convenções de commit, testes e novos comandos.
 - [LICENSE](LICENSE): AGPL-3.0.

@@ -1,0 +1,171 @@
+{
+  "cores": [
+    {
+      "nome": "Canary Orange",
+      "hex": "#F5841F",
+      "rgb": [
+        245,
+        132,
+        31
+      ],
+      "uso": "Cor principal do Ace Canary"
+    },
+    {
+      "nome": "Canary Deep",
+      "hex": "#A94A0C",
+      "rgb": [
+        169,
+        74,
+        12
+      ],
+      "uso": "Laranja profundo, para detalhes e contraste"
+    },
+    {
+      "nome": "Canary Light",
+      "hex": "#F9C697",
+      "rgb": [
+        249,
+        198,
+        151
+      ],
+      "uso": "Laranja claro, para apoio e detalhes"
+    },
+    {
+      "nome": "Ink",
+      "hex": "#171717",
+      "rgb": [
+        23,
+        23,
+        23
+      ],
+      "uso": "Fundo escuro e texto"
+    },
+    {
+      "nome": "Eye White",
+      "hex": "#F1F1F1",
+      "rgb": [
+        241,
+        241,
+        241
+      ],
+      "uso": "Olhos e traços sobre o Ace"
+    },
+    {
+      "nome": "White",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "uso": "Fundo claro"
+    },
+    {
+      "nome": "Online",
+      "hex": "#34B878",
+      "rgb": [
+        52,
+        184,
+        120
+      ],
+      "uso": "Estado online (Ace verde)"
+    },
+    {
+      "nome": "Online Text",
+      "hex": "#1F9E60",
+      "rgb": [
+        31,
+        158,
+        96
+      ],
+      "uso": "Texto \"online\" sobre fundo claro"
+    },
+    {
+      "nome": "Error",
+      "hex": "#E53E3E",
+      "rgb": [
+        229,
+        62,
+        62
+      ],
+      "uso": "Estado de erro ou offline (Ace vermelho, olhos em x)"
+    },
+    {
+      "nome": "Unstable",
+      "hex": "#8C919A",
+      "rgb": [
+        140,
+        145,
+        154
+      ],
+      "uso": "Estado instável (Ace cinza, olhos em traço)"
+    }
+  ],
+  "extras": [
+    {
+      "nome": "Purple",
+      "hex": "#8B66E0",
+      "rgb": [
+        139,
+        102,
+        224
+      ]
+    },
+    {
+      "nome": "Pink",
+      "hex": "#F06FA8",
+      "rgb": [
+        240,
+        111,
+        168
+      ]
+    },
+    {
+      "nome": "Deep Orange",
+      "hex": "#D95F0A",
+      "rgb": [
+        217,
+        95,
+        10
+      ]
+    },
+    {
+      "nome": "Teal",
+      "hex": "#25AEB0",
+      "rgb": [
+        37,
+        174,
+        176
+      ]
+    },
+    {
+      "nome": "Amber",
+      "hex": "#EE9B1B",
+      "rgb": [
+        238,
+        155,
+        27
+      ]
+    }
+  ],
+  "gradientes": [
+    {
+      "nome": "Gradiente claro",
+      "de": "#FFFFFF",
+      "para": "#FFE3CC",
+      "direcao": "diagonal: canto superior direito -> inferior esquerdo"
+    },
+    {
+      "nome": "Gradiente laranja",
+      "de": "#FFF3E9",
+      "para": "#F5841F",
+      "direcao": "diagonal: canto superior direito -> inferior esquerdo"
+    },
+    {
+      "nome": "Quase branco",
+      "de": "#FFFFFF",
+      "para": "#FFF6EE",
+      "direcao": "diagonal, bem sutil (usado em avatares e status)"
+    }
+  ]
+}

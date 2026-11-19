@@ -1,0 +1,30 @@
+ACE — BRAND KIT
+===============
+Ace é um mascote em forma de esfera azul (#648DE5), com dois olhos e sem boca. Toda a expressividade vem dos olhos.
+Função principal: identidade visual do bot Ace no Fluxer. O uso como mascote é secundário e segue as mesmas regras.
+
+ESTRUTURA
+01-guia          ace-manual-de-marca.pdf (identidade, logo, cores, expressões, estados, movimento, aplicações, tipografia e especificações)
+02-logo          Logo em PNG (transparente, fundo escuro e fundo branco) e SVG
+03-cores         Paleta em PNG, CSS, JSON e TXT
+04-expressoes    15 expressões em PNG transparente e folha com todas (5 × 3)
+05-avatar        Avatar animado (olhar quase 360°, respiração sutil) e variações do avatar do bot:
+                 ace-avatar-animado, ace-avatar-circular, ace-avatar-ampliado, ace-avatar-ampliado-transparente, ace-avatar-fundo-branco
+06-banners       Banners 1000 × 500 (Aces e formas/cores) e gradientes
+07-status        Estados online (verde), erro (vermelho, olhos em x) e instável (cinza, olhos em traço), status com texto e Ace solo
+08-emojis        Emojis 512 × 512 sem fundo: padrão, online, instável e erro (PNG, GIF, SVG e APNG)
+09-animacoes     Divisão celular (GIF), vídeo de motion sem áudio e protótipo 3D interativo (HTML)
+
+CORES
+Ace Blue #648DE5 | Ink #171717
+Olhos (todas as expressões): Eye White #F1F1F1, cor única e padronizada
+Estados: Online #34B878 | Erro #E53E3E | Instável #8C919A
+
+TIPOGRAFIA
+Principal: Geist (400, 500, 600, 700). Serifada de apoio: Geist Serif, quando disponível (alternativa: Lora). Monoespaçada: Geist Mono.
+A Geist não está inclusa neste kit. As peças de status usam Liberation Sans Bold e Lora SemiBold.
+
+OBSERVAÇÕES
+- O vídeo de motion não possui áudio. Foi sincronizado com o drop em 4,52 s (cerca de 167,6 BPM); basta inserir a música no editor.
+- Limite de emojis no Fluxer: 256 KB por emoji em comunidades gratuitas, segundo a documentação consultada. Confirme na documentação oficial; se um GIF for recusado, use o PNG ou reduza para 128 × 128 px.
+- Os GIFs usam transparência de 1 bit: no emoji animado a borda pode ficar levemente serrilhada. Os PNGs possuem borda suave.
