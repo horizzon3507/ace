@@ -11,8 +11,8 @@ O símbolo do Ace é um círculo azul com dois olhos brancos inclinados a 22°, 
 | `assets/ace.svg` | Versão principal, fundo transparente |
 | `assets/ace-black.svg` / `assets/ace-black.png` | Símbolo colorido sobre fundo Ink |
 | `assets/ace-white.svg` / `assets/ace-white.png` / `assets/ace-white-small.*` | Símbolo colorido sobre fundo branco |
-| `assets/ace-mono-dark.svg` | Monocromática em Ink, para fundos claros |
-| `assets/ace-mono-light.svg` | Monocromática em Eye White, para fundos escuros |
+| `assets/ace-mono-dark.svg` | Um só ink em Ink, olhos vazados — para fundos claros |
+| `assets/ace-mono-light.svg` | Um só ink em Eye White, olhos vazados — para fundos escuros |
 | `assets/ace.png` | Versão raster 1024×1024 |
 | `assets/ace-face.jpg` | Ilustração do mascote para avatar e divulgação |
 
