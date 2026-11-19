@@ -94,7 +94,7 @@ requestAnimationFrame(frame);
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const rnd=(a,b)=>a+Math.random()*(b-a);
-function look(x,y,eyeBoost=1){if(performance.now()<manual)return;set('yaw',x);set('pitch',y);set('ex',x*eyeBoost);set('ey',y*eyeBoost);set('roll',x*.4)}
+function look(x,y,eyeBoost=1,pointer){if(!pointer&&performance.now()<manual)return;set('yaw',x);set('pitch',y);set('ex',x*eyeBoost);set('ey',y*eyeBoost);set('roll',x*.4)}
 async function blink(){set('blink',1);await sleep(90);set('blink',0);await sleep(120)}
 async function happy(ms=1300,which='both'){
   if(which!=='R')set('hL',1);if(which!=='L')set('hR',1);set('squash',1);
@@ -131,8 +131,8 @@ if(!reduce)loop();
 function follow(e){
   const r=stage.getBoundingClientRect();
   const x=((e.clientX-(r.left+r.width/2))/(innerWidth/2)),y=((e.clientY-(r.top+r.height/2))/(innerHeight/2));
-  look(Math.max(-1,Math.min(1,x*1.4)),Math.max(-1,Math.min(1,y*1.4)));
   manual=performance.now()+2500;
+  look(Math.max(-1,Math.min(1,x*1.4)),Math.max(-1,Math.min(1,y*1.4)),1,true);
 }
 addEventListener('pointermove',follow);
 addEventListener('pointerdown',e=>{follow(e);manual=performance.now()+3500;happy(1000)});
