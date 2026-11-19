@@ -29,14 +29,23 @@ Só chamamos algo de **stable** quando é pra valer.
 
 </details>
 
+## v0.1.3-alpha · 19/11/2026
+
+Migração da yuzuha para 0.7.0, enxurrada de otimizações e cobertura de testes — ainda em construção, ainda não é release. Esta versão foi feita para CLI com canal de release alpha em 19/11/2026 (v0.1.3-alpha).
+
+- Atualização da biblioteca `yuzuha` de `^0.3.2` para `^0.7.0`, ativando `memberCache`, `cacheSweepers`, `concurrency`, `owners`, drenagem limitada (`destroy({ timeoutMs })`), suporte a `ErrorReportInfo` no `onError` e script `doctor` (`npm run doctor`).
+- `ctx.isOwner()` passa a usar o `owners` da yuzuha no `a.iddrop`, com fallback pro `BOT_OWNER_ID` do env.
+- Otimizações de performance em runtime e comandos: caches LRU com coalescência concorrente para prefixos e autoroles, ordenação de snowflakes sem `BigInt`, `buildZip` com alocação única de buffer, regexes pré-compiladas, metadados congelados nos 23 comandos e short-circuit de mensagens sem prefixo no `MessageCreate`.
+- Polling de deploy protegido contra sobreposição e timeout pendurado; classificação de watch-plan indexada em `Set` (O(1)).
+- Cobertura de testes ampliada: suítes dedicadas para `ban`, `kick`, `softban`, `avatar`, `userbanner`, `guildicon`, `guildbanner`, `iddrop`, paginador, embed, resolvedores, formatadores, config da yuzuha 0.7.0 e benchmark/regressão de performance.
+- `tsconfig` com verificações de compilação mais estritas e `.env.example` documentando variáveis opcionais.
+
 ## v0.1.2-alpha · 18/11/2026
 
 Autorole por tipo de conta e ajuda mais direta — ainda em construção, ainda não é release. Esta versão foi feita para CLI com canal de release alpha em 18/11/2026 (v0.1.2-alpha).
 
 - `a.ajuda` aceita o número da página (`a.ajuda 3`) e já abre nela com a barra de reações certa; página fora do intervalo avisa quantas existem.
 - Autorole por servidor em três categorias — `a.autorole all|user|app <cargos>` define até 15 cargos (menção, ID ou nome) pra quem entra (`all` cobre usuários e apps, `user` só usuários, `app` só bots); `a.autorole` mostra as três listas, `a.autorole reset <categoria>` desliga uma e `a.autorole off` desliga as três. Recusa cargo gerenciado, `@everyone` ou acima da hierarquia do bot ou do autor.
-- Atualização da biblioteca `yuzuha` de `^0.3.2` para `^0.7.0`, ativando `memberCache`, `cacheSweepers`, `concurrency`, `owners`, drenagem limitada (`destroy({ timeoutMs })`) e suporte a `ErrorReportInfo` e `ctx.isOwner()`.
-- Otimizações de performance em runtime e comandos: caches LRU com coalescência concorrente para prefixos e autoroles, ordenação de snowflakes sem `BigInt`, `buildZip` com alocação única de buffer, regexes pré-compiladas, metadados congelados nos 23 comandos e short-circuit de mensagens no `MessageCreate`.
 - Correção: os exemplos nas mensagens de erro respeitam o prefixo do servidor em vez de assumir `a.`.
 
 ## v0.1.1-stable · 13/11/2026
