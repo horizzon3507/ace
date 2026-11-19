@@ -9,8 +9,10 @@ O símbolo do Ace é um círculo azul com dois olhos brancos inclinados a 22°, 
 | Arquivo | Uso |
 |---|---|
 | `assets/ace.svg` | Versão principal, fundo transparente |
-| `assets/ace-black.svg` / `assets/ace-black.png` | Monocromática escura (fundo claro) |
-| `assets/ace-white.svg` / `assets/ace-white.png` / `assets/ace-white-small.*` | Monocromática clara (fundo escuro) |
+| `assets/ace-black.svg` / `assets/ace-black.png` | Símbolo colorido sobre fundo Ink |
+| `assets/ace-white.svg` / `assets/ace-white.png` / `assets/ace-white-small.*` | Símbolo colorido sobre fundo branco |
+| `assets/ace-mono-dark.svg` | Monocromática em Ink, para fundos claros |
+| `assets/ace-mono-light.svg` | Monocromática em Eye White, para fundos escuros |
 | `assets/ace.png` | Versão raster 1024×1024 |
 | `assets/ace-face.jpg` | Ilustração do mascote para avatar e divulgação |
 
@@ -32,7 +34,7 @@ Símbolo + wordmark `ace` em minúsculas, Geist/Inter, peso 600, tracking −1:
 - Não mudar a cor do círculo ou dos olhos.
 - Não girar, achatar ou deformar o símbolo.
 - Não adicionar boca, contorno ou sombra.
-- Não usar o símbolo colorido sobre fundo azul — use a versão branca.
+- Não usar o símbolo colorido sobre fundo azul — use a versão monocromática.
 - Não escrever o nome em maiúsculas ("ACE"); é sempre `ace` ou `Ace` no início de frase.
 
 ## Cores
@@ -42,10 +44,10 @@ Símbolo + wordmark `ace` em minúsculas, Geist/Inter, peso 600, tracking −1:
 | Nome | Hex | Papel |
 |---|---|---|
 | Ace Blue | `#648DE5` | Primária: embeds, links, destaques, o círculo do símbolo |
-| Ink | `#171717` | Fundo escuro, cor de embeds de sistema (`userbanner`, `emojidump`) |
+| Ink | `#171717` | Fundo escuro, cor dos embeds de informação (`guildinfo`, lista de emojis) |
 | Eye White | `#F1F1F1` | Texto sobre Ink, os olhos do símbolo |
 
-No código, nunca escreva o hex à mão: importe `brand` de `src/brand.ts` (`primary`, `eyes`, `background`). A CLI pinta o selo do dev com Ace Blue sobre Ink (`src/term.ts`).
+No código, nunca escreva o hex à mão: importe `brand` de `src/brand.ts` (`primary`, `eyes`, `background`). A CLI pinta o selo do dev com texto Ink sobre fundo Ace Blue (`src/term.ts`).
 
 ## Tipografia
 
